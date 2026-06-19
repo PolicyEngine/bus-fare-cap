@@ -39,7 +39,7 @@ def _load_dataset() -> tuple[pd.DataFrame, pd.DataFrame]:
     """Load the calibrated Enhanced FRS household + person tables from Hugging Face."""
     from huggingface_hub import hf_hub_download
 
-    path = hf_hub_download(DATASET, repo_id=PRIVATE_REPO, repo_type="model")
+    path = hf_hub_download(repo_id=PRIVATE_REPO, filename=DATASET, repo_type="model")
     with pd.HDFStore(path, "r") as store:
         return store["/household"], store["/person"]
 

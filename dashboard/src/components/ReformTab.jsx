@@ -32,8 +32,16 @@ export default function ReformTab({ data }) {
               Removes bus &amp; coach fares entirely for everyone under 25, to cut the cost of
               reaching college, apprenticeships and work — extending the idea of{" "}
               {A(src.scotland_under_22, "Scotland's under-22 free bus scheme")}. Fiscal cost = the
-              fares government would now meet. For comparison, the{" "}
+              fares government would now meet; this is <strong>static</strong> (lower fares would
+              induce extra trips and cost, so it is a lower bound). For comparison, the{" "}
               {A(src.cpt_under22_estimate, "Confederation of Passenger Transport estimates a £1 under-22 fare at £100–150m/yr")}.
+              {" "}Bus fares are not in the FRS — they are imputed from the{" "}
+              <a href="https://www.gov.uk/government/collections/living-costs-and-food-survey" target="_blank" rel="noreferrer" className="underline">Living Costs and Food Survey</a>{" "}
+              onto PolicyEngine&apos;s Enhanced FRS and calibrated to DfT totals; each household&apos;s
+              fare is then split across its members by a{" "}
+              {A(src.nts_age_profile, "National Travel Survey bus-trips-by-age profile")}{" "}
+              (adjusted so concessionary, free-travelling pensioners carry ~zero fare weight), so the
+              under-25 attribution is modelled, not observed.
             </>
           }
         />
@@ -42,10 +50,6 @@ export default function ReformTab({ data }) {
           <Stat label="People affected" value={`${u25.people_affected_m.toFixed(1)}m`} sub={`under-25 bus users · ${formatPct(data.baseline.under_25_share * 100, 0)} of fares`} />
         </div>
         <div className="mt-6"><BreakdownChart breakdowns={u25.breakdowns} metric="Cost" color={colors.primary[500]} /></div>
-        <p className="mt-3 text-xs leading-5 text-slate-500">
-          Static (no induced demand — lower fares would add trips and cost, so this is a lower bound).
-          The per-person split uses an NTS age profile, so under-25 attribution is modelled, not observed.
-        </p>
       </section>
 
       {/* Reform 2 */}
@@ -54,9 +58,13 @@ export default function ReformTab({ data }) {
           title="Reform 2 — £1 bus fare cap"
           description={
             <>
-              A universal £1 cap on single bus &amp; coach fares. England already runs a{" "}
-              {A(src.fare_cap_policy, "national fare cap (£2 from 2023, £3 for 2025–27)")}; a £1 cap
-              would cut fares further for every fare-paying passenger.
+              A universal £1 cap on single bus &amp; coach fares, <strong>modelled UK-wide</strong>{" "}
+              here. England already runs a{" "}
+              {A(src.fare_cap_policy, "national fare cap (£2 from 2023, £3 for 2025–27)")}; Scotland
+              and Wales set their own — a £1 cap would cut fares further for every fare-paying
+              passenger. <strong>Approximate</strong>: the data records annual fare spend, not
+              per-trip fares, so the cap is modelled as a 20–40% fare reduction (central 30%);
+              firming it up needs NTS trips-per-person. Static.
             </>
           }
         />
@@ -66,10 +74,6 @@ export default function ReformTab({ data }) {
           <Stat label="People affected" value={`${cap.people_affected_m.toFixed(1)}m`} sub="bus fare-payers" />
         </div>
         <div className="mt-6"><BreakdownChart breakdowns={cap.breakdowns} metric="Cost" color={colors.primary[400]} /></div>
-        <p className="mt-3 text-xs leading-5 text-slate-500">
-          Approximate: the data records annual fare spend, not per-trip fares, so the cap is modelled
-          as a 20–40% fare reduction (central 30%); firming it up needs NTS trips-per-person. Static.
-        </p>
       </section>
     </div>
   );

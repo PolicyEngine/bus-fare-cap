@@ -94,6 +94,14 @@ def run(args: argparse.Namespace) -> None:
     quartile[order] = np.clip((cw * 4).astype(int) + 1, 1, 4)
     quintile = np.where(decile >= 1, np.clip(((decile - 1) // 2 + 1).astype(int), 1, 5), 0)
 
+    # Uniform 5-year age bands (so the chart has no width jump above 24).
+    _bstart = (np.minimum(age, 80) // 5 * 5).astype(int)
+    age_band_labels = np.where(
+        _bstart >= 80,
+        "80+",
+        np.char.add(np.char.add(_bstart.astype(str), "-"), (_bstart + 4).astype(str)),
+    )
+
     def breakdown(value_p, eligible):
         v = np.asarray(value_p) * eligible * pw
         df = pd.DataFrame(
@@ -101,11 +109,7 @@ def run(args: argparse.Namespace) -> None:
                 "v": v,
                 "region": [_label(r) for r in region],
                 "household_type": [_label(f) for f in famtype],
-                "age_band": np.select(
-                    [age < 5, age < 9, age < 13, age < 17, age < 21, age < 25, age < 45, age < 65],
-                    ["0-4", "5-8", "9-12", "13-16", "17-20", "21-24", "25-44", "45-64"],
-                    default="65+",
-                ),
+                "age_band": age_band_labels,
                 "income_quintile": [f"Q{n}" if n else "Unknown" for n in quintile],
                 "income_quartile": [f"Q{n}" for n in quartile],
             }

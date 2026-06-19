@@ -1,0 +1,230 @@
+{
+  "year": 2025,
+  "fiscal_year_label": "2025-26",
+  "currency": "GBP",
+  "dataset": "PolicyEngine UK Enhanced FRS (enhanced_frs_2024_25)",
+  "methods": {
+    "baseline": "Household bus & coach fare spending is imputed from the LCFS in the PolicyEngine UK Enhanced FRS and calibrated to the DfT Annual Bus Statistics passenger-fare total (England, uplifted to the UK by population). Bus subsidy is the ETB-imputed government benefit-in-kind, calibrated to DfT net government support.",
+    "allocation": "Household fare is allocated to individuals by an age profile derived from the National Travel Survey (bus trips by age) adjusted for concessionary (free-pass) travel, so it tracks fares paid not trips. LCFS records fares at household level, so the per-person split is modelled, not observed.",
+    "free_under_25": "Fiscal cost = the bus fares allocated to people aged under 25, which the government would now meet. Equivalently a full subsidy for that group. Static (pre-behavioural).",
+    "fare_cap_1pound": "A \u00a31 per-trip cap. The dataset records annual \u00a3 spend, not per-trip fares, so the cap is approximated as a fare reduction fraction applied to fares; a sensitivity grid spans 20-40%. Firming it up requires NTS trips-per-person (fares = trips x min(\u00a31, avg_fare)).",
+    "behaviour": "All figures are static. Lower or zero fares induce extra trips (Scotland's under-22 free scheme saw large uptake); a behavioural trip elasticity would raise both ridership and cost.",
+    "scope": "Great Britain / UK (dataset is UK; fare data anchored to DfT England figures uplifted by population)."
+  },
+  "sources": {
+    "dft_fare": {
+      "value": "\u00a33.4bn (England)",
+      "description": "DfT Annual Bus Statistics, year ending March 2025, table BUS05aii: passenger fare receipts on local bus services (England), ~52% of \u00a36.6bn operating revenue. Calibration target for bus_fare_spending, uplifted England->UK by population.",
+      "url": "https://www.gov.uk/government/statistics/annual-bus-statistics-year-ending-march-2025/annual-bus-statistics-year-ending-march-2025"
+    },
+    "dft_subsidy": {
+      "value": "\u00a33.0bn (England)",
+      "description": "DfT Annual Bus Statistics, year ending March 2025, table BUS05bii: total net government support for local bus services (England), of which \u00a30.8bn concessionary. Calibration target for bus_subsidy_spending, uplifted England->UK by population.",
+      "url": "https://www.gov.uk/government/statistics/annual-bus-statistics-year-ending-march-2025/annual-bus-statistics-year-ending-march-2025"
+    },
+    "ons_population": {
+      "value": "UK 68.3M / England 57.7M ~ 1.18",
+      "description": "ONS mid-2023 population estimates, used to uplift England-only DfT bus finance to a UK total. Indicative: bus use per head varies by nation.",
+      "url": "https://www.ons.gov.uk/peoplepopulationandcommunity/populationandmigration/populationestimates"
+    },
+    "nts_age_profile": {
+      "value": "Bus trips by age; 17-20 peak",
+      "description": "National Travel Survey 2023 bus trips by age, concessionary-adjusted, used to allocate household fares to individuals.",
+      "url": "https://www.gov.uk/government/statistics/national-travel-survey-2023/nts-2023-trips-by-purpose-age-mode-and-sex"
+    },
+    "scotland_u22": {
+      "value": "Free bus travel for under-22s",
+      "description": "Transport Scotland's under-22 free bus scheme, a real-world comparator for a youth free-travel policy (and evidence of large induced demand).",
+      "url": "https://www.transport.gov.scot/concessionary-travel/young-persons-free-bus-travel-scheme/"
+    }
+  },
+  "assumptions": {
+    "age_allocation_weights": {
+      "0-16": 0.5,
+      "17-20": 3.9,
+      "21-29": 1.8,
+      "30-39": 1.0,
+      "40-49": 0.8,
+      "50-59": 0.7,
+      "60-69": 0.3,
+      "70+": 0.07
+    },
+    "fare_cap_reduction_sensitivity": [
+      0.2,
+      0.3,
+      0.4
+    ],
+    "behavioural": "static (no induced demand)"
+  },
+  "baseline": {
+    "total_bus_fare_bn": 3.864,
+    "total_bus_subsidy_bn": 3.526,
+    "under_25_fare_bn": 0.597,
+    "under_25_share": 0.155,
+    "by_age_band": [
+      {
+        "band": "0-15",
+        "fare_bn": 0.266,
+        "share": 0.069
+      },
+      {
+        "band": "16-24",
+        "fare_bn": 0.331,
+        "share": 0.086
+      },
+      {
+        "band": "25-44",
+        "fare_bn": 1.433,
+        "share": 0.371
+      },
+      {
+        "band": "45-64",
+        "fare_bn": 1.13,
+        "share": 0.292
+      },
+      {
+        "band": "65+",
+        "fare_bn": 0.705,
+        "share": 0.182
+      }
+    ],
+    "by_region": [
+      {
+        "region": "North West",
+        "fare_bn": 0.558,
+        "under25_fare_bn": 0.067
+      },
+      {
+        "region": "South East",
+        "fare_bn": 0.476,
+        "under25_fare_bn": 0.059
+      },
+      {
+        "region": "London",
+        "fare_bn": 0.399,
+        "under25_fare_bn": 0.061
+      },
+      {
+        "region": "East Midlands",
+        "fare_bn": 0.39,
+        "under25_fare_bn": 0.046
+      },
+      {
+        "region": "Scotland",
+        "fare_bn": 0.378,
+        "under25_fare_bn": 0.045
+      },
+      {
+        "region": "Yorkshire",
+        "fare_bn": 0.34,
+        "under25_fare_bn": 0.075
+      },
+      {
+        "region": "East Of England",
+        "fare_bn": 0.326,
+        "under25_fare_bn": 0.118
+      },
+      {
+        "region": "South West",
+        "fare_bn": 0.276,
+        "under25_fare_bn": 0.037
+      },
+      {
+        "region": "West Midlands",
+        "fare_bn": 0.262,
+        "under25_fare_bn": 0.031
+      },
+      {
+        "region": "Wales",
+        "fare_bn": 0.177,
+        "under25_fare_bn": 0.022
+      },
+      {
+        "region": "North East",
+        "fare_bn": 0.145,
+        "under25_fare_bn": 0.017
+      },
+      {
+        "region": "Northern Ireland",
+        "fare_bn": 0.137,
+        "under25_fare_bn": 0.02
+      }
+    ]
+  },
+  "reforms": {
+    "free_under_25": {
+      "label": "Free buses for under-25s",
+      "age_limit": 25,
+      "cost_bn": 0.597,
+      "by_region": [
+        {
+          "region": "North West",
+          "cost_bn": 0.067
+        },
+        {
+          "region": "South East",
+          "cost_bn": 0.059
+        },
+        {
+          "region": "London",
+          "cost_bn": 0.061
+        },
+        {
+          "region": "East Midlands",
+          "cost_bn": 0.046
+        },
+        {
+          "region": "Scotland",
+          "cost_bn": 0.045
+        },
+        {
+          "region": "Yorkshire",
+          "cost_bn": 0.075
+        },
+        {
+          "region": "East Of England",
+          "cost_bn": 0.118
+        },
+        {
+          "region": "South West",
+          "cost_bn": 0.037
+        },
+        {
+          "region": "West Midlands",
+          "cost_bn": 0.031
+        },
+        {
+          "region": "Wales",
+          "cost_bn": 0.022
+        },
+        {
+          "region": "North East",
+          "cost_bn": 0.017
+        },
+        {
+          "region": "Northern Ireland",
+          "cost_bn": 0.02
+        }
+      ]
+    },
+    "fare_cap_1pound": {
+      "label": "\u00a31 bus fare cap",
+      "cap_gbp": 1,
+      "central_cost_bn": 1.159,
+      "sensitivity": [
+        {
+          "fare_reduction": 0.2,
+          "cost_bn": 0.773
+        },
+        {
+          "fare_reduction": 0.3,
+          "cost_bn": 1.159
+        },
+        {
+          "fare_reduction": 0.4,
+          "cost_bn": 1.546
+        }
+      ]
+    }
+  }
+}

@@ -78,6 +78,22 @@ SCOTLAND_U22 = Source(
     "https://www.transport.gov.scot/concessionary-travel/young-persons-free-bus-travel-scheme/",
 )
 
+FARE_CAP_POLICY = Source(
+    "£2 (2023) -> £3 (Jan 2025 - Mar 2027)",
+    "England's national bus fare cap: single fares capped at £2 from 2023, raised "
+    "to £3 from January 2025 and funded to March 2027. The real-world comparator "
+    "for a £1 cap.",
+    "https://www.gov.uk/guidance/get-around-for-2-pounds-bus-fares",
+)
+
+CPT_UNDER22_ESTIMATE = Source(
+    "£100-150m/yr (under-22, £1 fare)",
+    "Confederation of Passenger Transport estimate that a £1 fare for under-22s in "
+    "England would cost £100-150m/yr — an external comparator (this analysis costs "
+    "free travel for the wider under-25 group).",
+    "https://www.route-one.net/news/what-should-come-next-after-the-bus-fare-cap-scheme-in-england/",
+)
+
 
 def as_json() -> dict:
     return {
@@ -98,5 +114,7 @@ def as_json() -> dict:
             "ons_population": asdict(ONS_POPULATION),
             "nts_age_profile": asdict(NTS_AGE_PROFILE),
             "scotland_under_22": asdict(SCOTLAND_U22),
+            "fare_cap_policy": asdict(FARE_CAP_POLICY),
+            "cpt_under22_estimate": asdict(CPT_UNDER22_ESTIMATE),
         },
     }

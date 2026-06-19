@@ -64,7 +64,7 @@ function Dashboard() {
     <div className="app-shell min-h-screen">
       <header className="title-row">
         <div className="mx-auto flex max-w-[1400px] items-center justify-between px-6 py-4 md:px-8">
-          <h1>Bus fares for young people</h1>
+          <h1>Bus fares policies analysis</h1>
         </div>
       </header>
 
@@ -73,9 +73,13 @@ function Dashboard() {
           This dashboard uses{" "}
           <a href="https://policyengine.org" target="_blank" rel="noreferrer" className="underline">PolicyEngine</a>{" "}
           UK&apos;s microsimulation (the Enhanced FRS, with household bus fares imputed from the LCFS
-          and calibrated to DfT Annual Bus Statistics) to cost two policies to help young people
-          access training and employment{data ? `, for fiscal year ${data.fiscal_year_label}` : ""}: a{" "}
-          <strong>£1 bus fare cap</strong> and <strong>free buses for under-25s</strong>. The{" "}
+          and calibrated to DfT Annual Bus Statistics) to cost two bus policies
+          {data ? ` for fiscal year ${data.fiscal_year_label}` : ""}: a{" "}
+          <strong>£1 bus fare cap</strong> (England already runs a{" "}
+          <a href="https://www.gov.uk/guidance/get-around-for-2-pounds-bus-fares" target="_blank" rel="noreferrer" className="underline">national fare cap</a>
+          ) and <strong>free buses for under-25s</strong> (cf.{" "}
+          <a href="https://www.transport.gov.scot/concessionary-travel/young-persons-free-bus-travel-scheme/" target="_blank" rel="noreferrer" className="underline">Scotland&apos;s under-22 scheme</a>
+          ), to help young people access training and employment. The{" "}
           <TabLink onSelect={() => handleTabChange("reform")}>Reforms</TabLink> tab shows each
           policy&apos;s fiscal cost and breakdowns. The{" "}
           <TabLink onSelect={() => handleTabChange("baseline")}>Baseline</TabLink> tab shows current

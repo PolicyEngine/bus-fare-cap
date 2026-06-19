@@ -1,10 +1,8 @@
 "use client";
 
-import {
-  Bar, BarChart, CartesianGrid, Cell, ResponsiveContainer, Tooltip, XAxis, YAxis,
-} from "recharts";
 import { colors } from "../lib/colors";
 import { formatBn, formatPct } from "../lib/formatters";
+import BreakdownChart from "./BreakdownChart";
 import SectionHeading from "./SectionHeading";
 
 function Stat({ label, value, sub }) {
@@ -26,6 +24,7 @@ const COMPARE_LABELS = {
 export default function BaselineTab({ data }) {
   const b = data.baseline;
   const cmp = b.official_comparison || {};
+
   return (
     <div className="space-y-10">
       <SectionHeading
@@ -42,14 +41,20 @@ export default function BaselineTab({ data }) {
         <Stat label="Bus fare-payers" value={`${b.fare_paying_people_m.toFixed(1)}m`} sub="people in fare-paying households" />
       </div>
 
-      {/* Comparison with official statistics */}
+      {/* Comparison with official statistics — honest about what's a target vs a check */}
       <div className="rounded-2xl border border-slate-200 bg-white p-6">
         <h3 className="mb-1 text-base font-semibold text-slate-900">Comparison with official statistics</h3>
-        <p className="mb-4 text-sm text-slate-500">Calibrated figures should match the official anchors closely.</p>
+        <p className="mb-4 text-sm leading-6 text-slate-500">
+          Fares and subsidy are <strong>calibration targets</strong> — the dataset is forced to hit
+          them, so they match by construction (not an independent test). Population is an{" "}
+          <strong>independent check</strong>: it is not calibrated here, and comes out slightly above
+          the ONS figure.
+        </p>
         <table className="w-full text-sm">
           <thead>
             <tr className="border-b border-slate-200 text-left text-slate-500">
               <th className="py-2">Measure</th>
+              <th className="py-2">Type</th>
               <th className="py-2 text-right">This model</th>
               <th className="py-2 text-right">Official</th>
               <th className="py-2">Source</th>
@@ -62,6 +67,11 @@ export default function BaselineTab({ data }) {
               return (
                 <tr key={key} className="border-b border-slate-100">
                   <td className="py-2 text-slate-700">{label}</td>
+                  <td className="py-2">
+                    <span className={`rounded-md px-2 py-0.5 text-xs ${c.kind === "Independent check" ? "bg-primary-100 text-[color:var(--pe-color-primary-700)]" : "bg-slate-100 text-slate-500"}`}>
+                      {c.kind}
+                    </span>
+                  </td>
                   <td className="py-2 text-right tabular-nums">{fmt(c.ours)}</td>
                   <td className="py-2 text-right tabular-nums text-slate-500">{fmt(c.official)}</td>
                   <td className="py-2 text-xs text-slate-500">
@@ -75,51 +85,12 @@ export default function BaselineTab({ data }) {
         </table>
       </div>
 
-      <div className="rounded-2xl border border-slate-200 bg-white p-6">
-        <h3 className="mb-4 text-sm font-semibold text-slate-700">Bus fares and people by age band</h3>
-        <ResponsiveContainer width="100%" height={300}>
-          <BarChart data={b.by_age_band} margin={{ left: 8, right: 16, top: 8, bottom: 8 }}>
-            <CartesianGrid strokeDasharray="3 3" stroke={colors.border.light} />
-            <XAxis dataKey="band" tick={{ fontSize: 12 }} />
-            <YAxis tick={{ fontSize: 12 }} />
-            <Tooltip formatter={(v, n) => (n === "fare_bn" ? formatBn(v) : `${v}m people`)} />
-            <Bar dataKey="fare_bn" name="fare_bn" radius={[4, 4, 0, 0]}>
-              {b.by_age_band.map((row, i) => (
-                <Cell key={i} fill={row.band === "16-24" || row.band === "0-15" ? colors.primary[600] : colors.primary[300]} />
-              ))}
-            </Bar>
-          </BarChart>
-        </ResponsiveContainer>
-        <table className="mt-4 w-full text-sm">
-          <thead><tr className="border-b border-slate-200 text-left text-slate-500"><th className="py-1">Age band</th><th className="py-1 text-right">Fares</th><th className="py-1 text-right">People</th></tr></thead>
-          <tbody>
-            {b.by_age_band.map((r) => (
-              <tr key={r.band} className="border-b border-slate-100">
-                <td className="py-1 text-slate-700">{r.band}</td>
-                <td className="py-1 text-right tabular-nums">{formatBn(r.fare_bn)}</td>
-                <td className="py-1 text-right tabular-nums text-slate-500">{r.people_m.toFixed(1)}m</td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-        <p className="mt-3 text-xs text-slate-500">Fares allocated by an NTS age profile (concessionary-adjusted); under-25 bands highlighted.</p>
-      </div>
-
-      <div className="rounded-2xl border border-slate-200 bg-white p-6">
-        <h3 className="mb-4 text-sm font-semibold text-slate-700">Bus fares by region (£bn/yr)</h3>
-        <table className="w-full text-sm">
-          <thead><tr className="border-b border-slate-200 text-left text-slate-500"><th className="py-2">Region</th><th className="py-2 text-right">Total fares</th><th className="py-2 text-right">Under-25 fares</th></tr></thead>
-          <tbody>
-            {b.by_region.map((r) => (
-              <tr key={r.region} className="border-b border-slate-100">
-                <td className="py-2 text-slate-700">{r.region}</td>
-                <td className="py-2 text-right tabular-nums">{formatBn(r.fare_bn)}</td>
-                <td className="py-2 text-right tabular-nums text-slate-500">{formatBn(r.under25_fare_bn)}</td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-      </div>
+      {/* Merged: fares by dimension with a toggle */}
+      <BreakdownChart breakdowns={b.breakdowns} metric="Fares" color={colors.primary[500]} />
+      <p className="-mt-6 text-xs text-slate-500">
+        Bus fares allocated to people by an NTS age profile (concessionary-adjusted), then summed by
+        the selected dimension.
+      </p>
     </div>
   );
 }

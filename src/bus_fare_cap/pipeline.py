@@ -102,8 +102,8 @@ def run(args: argparse.Namespace) -> None:
                 "region": [_label(r) for r in region],
                 "household_type": [_label(f) for f in famtype],
                 "age_band": np.select(
-                    [age < 16, age < 25, age < 45, age < 65],
-                    ["0-15", "16-24", "25-44", "45-64"],
+                    [age < 5, age < 9, age < 13, age < 17, age < 21, age < 25, age < 45, age < 65],
+                    ["0-4", "5-8", "9-12", "13-16", "17-20", "21-24", "25-44", "45-64"],
                     default="65+",
                 ),
                 "income_quintile": [f"Q{n}" if n else "Unknown" for n in quintile],
@@ -115,8 +115,11 @@ def run(args: argparse.Namespace) -> None:
             rows = [
                 {"group": g, "cost_bn": round(float(c) / 1e9, 3)}
                 for g, c in df.groupby(dim)["v"].sum().items()
+                if g != "Unknown"
             ]
-            if dim in ("income_quintile", "income_quartile", "age_band"):
+            if dim == "age_band":
+                rows.sort(key=lambda r: int(r["group"].split("-")[0].replace("+", "")))
+            elif dim in ("income_quintile", "income_quartile"):
                 rows.sort(key=lambda r: r["group"])
             else:
                 rows.sort(key=lambda r: r["cost_bn"], reverse=True)
@@ -177,18 +180,21 @@ def run(args: argparse.Namespace) -> None:
         "total_bus_fare_bn": {
             "ours": round(total_fare / 1e9, 2),
             "official": round(uk_fare, 2),
+            "kind": "Calibration target",
             "official_label": "DfT England £3.4bn (BUS05aii) × 1.18 UK uplift",
             "url": sources.DFT_FARE.url,
         },
         "total_bus_subsidy_bn": {
             "ours": round(total_subsidy / 1e9, 2),
             "official": round(uk_sub, 2),
+            "kind": "Calibration target",
             "official_label": "DfT England £3.0bn (BUS05bii) × 1.18 UK uplift",
             "url": sources.DFT_SUBSIDY.url,
         },
         "population_m": {
             "ours": round(total_people / 1e6, 1),
             "official": 68.3,
+            "kind": "Independent check",
             "official_label": "ONS UK mid-2023 population 68.3m",
             "url": sources.ONS_POPULATION.url,
         },
@@ -210,6 +216,7 @@ def run(args: argparse.Namespace) -> None:
             "under_25_share": round(wsum(alloc * under25) / total_fare, 3),
             "by_age_band": by_age,
             "by_region": by_region,
+            "breakdowns": breakdown(alloc, np.ones_like(age, bool)),
             "official_comparison": official,
         },
         "reforms": {"free_under_25": free_under_25, "fare_cap_1pound": fare_cap},

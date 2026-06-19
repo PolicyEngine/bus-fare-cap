@@ -166,22 +166,173 @@
         "under25_fare_bn": 0.021
       }
     ],
+    "breakdowns": {
+      "region": [
+        {
+          "group": "North West",
+          "cost_bn": 0.581
+        },
+        {
+          "group": "South East",
+          "cost_bn": 0.496
+        },
+        {
+          "group": "London",
+          "cost_bn": 0.415
+        },
+        {
+          "group": "East Midlands",
+          "cost_bn": 0.406
+        },
+        {
+          "group": "Scotland",
+          "cost_bn": 0.393
+        },
+        {
+          "group": "Yorkshire",
+          "cost_bn": 0.354
+        },
+        {
+          "group": "East of England",
+          "cost_bn": 0.34
+        },
+        {
+          "group": "South West",
+          "cost_bn": 0.288
+        },
+        {
+          "group": "West Midlands",
+          "cost_bn": 0.273
+        },
+        {
+          "group": "Wales",
+          "cost_bn": 0.184
+        },
+        {
+          "group": "North East",
+          "cost_bn": 0.151
+        },
+        {
+          "group": "Northern Ireland",
+          "cost_bn": 0.143
+        }
+      ],
+      "household_type": [
+        {
+          "group": "Couple No Children",
+          "cost_bn": 2.129
+        },
+        {
+          "group": "Couple With Children",
+          "cost_bn": 0.987
+        },
+        {
+          "group": "Single",
+          "cost_bn": 0.849
+        },
+        {
+          "group": "Lone Parent",
+          "cost_bn": 0.059
+        }
+      ],
+      "age_band": [
+        {
+          "group": "0-4",
+          "cost_bn": 0.072
+        },
+        {
+          "group": "5-8",
+          "cost_bn": 0.055
+        },
+        {
+          "group": "9-12",
+          "cost_bn": 0.068
+        },
+        {
+          "group": "13-16",
+          "cost_bn": 0.121
+        },
+        {
+          "group": "17-20",
+          "cost_bn": 0.137
+        },
+        {
+          "group": "21-24",
+          "cost_bn": 0.168
+        },
+        {
+          "group": "25-44",
+          "cost_bn": 1.492
+        },
+        {
+          "group": "45-64",
+          "cost_bn": 1.176
+        },
+        {
+          "group": "65+",
+          "cost_bn": 0.734
+        }
+      ],
+      "income_quintile": [
+        {
+          "group": "Q1",
+          "cost_bn": 0.605
+        },
+        {
+          "group": "Q2",
+          "cost_bn": 0.751
+        },
+        {
+          "group": "Q3",
+          "cost_bn": 0.715
+        },
+        {
+          "group": "Q4",
+          "cost_bn": 0.753
+        },
+        {
+          "group": "Q5",
+          "cost_bn": 1.178
+        }
+      ],
+      "income_quartile": [
+        {
+          "group": "Q1",
+          "cost_bn": 0.753
+        },
+        {
+          "group": "Q2",
+          "cost_bn": 0.96
+        },
+        {
+          "group": "Q3",
+          "cost_bn": 0.888
+        },
+        {
+          "group": "Q4",
+          "cost_bn": 1.423
+        }
+      ]
+    },
     "official_comparison": {
       "total_bus_fare_bn": {
         "ours": 4.02,
         "official": 4.02,
+        "kind": "Calibration target",
         "official_label": "DfT England \u00a33.4bn (BUS05aii) \u00d7 1.18 UK uplift",
         "url": "https://www.gov.uk/government/statistics/annual-bus-statistics-year-ending-march-2025/annual-bus-statistics-year-ending-march-2025"
       },
       "total_bus_subsidy_bn": {
         "ours": 3.55,
         "official": 3.55,
+        "kind": "Calibration target",
         "official_label": "DfT England \u00a33.0bn (BUS05bii) \u00d7 1.18 UK uplift",
         "url": "https://www.gov.uk/government/statistics/annual-bus-statistics-year-ending-march-2025/annual-bus-statistics-year-ending-march-2025"
       },
       "population_m": {
         "ours": 69.3,
         "official": 68.3,
+        "kind": "Independent check",
         "official_label": "ONS UK mid-2023 population 68.3m",
         "url": "https://www.ons.gov.uk/peoplepopulationandcommunity/populationandmigration/populationestimates"
       }
@@ -264,12 +415,28 @@
         ],
         "age_band": [
           {
-            "group": "0-15",
-            "cost_bn": 0.277
+            "group": "0-4",
+            "cost_bn": 0.072
           },
           {
-            "group": "16-24",
-            "cost_bn": 0.345
+            "group": "5-8",
+            "cost_bn": 0.055
+          },
+          {
+            "group": "9-12",
+            "cost_bn": 0.068
+          },
+          {
+            "group": "13-16",
+            "cost_bn": 0.121
+          },
+          {
+            "group": "17-20",
+            "cost_bn": 0.137
+          },
+          {
+            "group": "21-24",
+            "cost_bn": 0.168
           },
           {
             "group": "25-44",
@@ -304,10 +471,6 @@
           {
             "group": "Q5",
             "cost_bn": 0.185
-          },
-          {
-            "group": "Unknown",
-            "cost_bn": 0.002
           }
         ],
         "income_quartile": [
@@ -420,12 +583,28 @@
         ],
         "age_band": [
           {
-            "group": "0-15",
-            "cost_bn": 0.083
+            "group": "0-4",
+            "cost_bn": 0.022
           },
           {
-            "group": "16-24",
-            "cost_bn": 0.103
+            "group": "5-8",
+            "cost_bn": 0.016
+          },
+          {
+            "group": "9-12",
+            "cost_bn": 0.02
+          },
+          {
+            "group": "13-16",
+            "cost_bn": 0.036
+          },
+          {
+            "group": "17-20",
+            "cost_bn": 0.041
+          },
+          {
+            "group": "21-24",
+            "cost_bn": 0.05
           },
           {
             "group": "25-44",
@@ -460,10 +639,6 @@
           {
             "group": "Q5",
             "cost_bn": 0.353
-          },
-          {
-            "group": "Unknown",
-            "cost_bn": 0.007
           }
         ],
         "income_quartile": [

@@ -22,6 +22,10 @@ dependencies = [
   "pandas>=2.0",
   "tables>=3.9",
   "huggingface_hub>=0.20",
+  # The policyengine.py wrapper; the [uk] extra exact-pins policyengine-uk, so
+  # the bundle version alone identifies the whole simulation stack. The Populace
+  # UK dataset is loaded via policyengine.tax_benefit_models.uk.
+  "policyengine[uk]>=4.17.10",
 ]
 
 [project.optional-dependencies]

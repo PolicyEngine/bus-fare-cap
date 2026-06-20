@@ -24,35 +24,56 @@ export default function MethodologyTab({ data }) {
             to the DfT Annual Bus Statistics passenger-fare total — £3.4bn for England (table
             BUS05aii), uplifted England→UK by population (×{uplift ? uplift.toFixed(2) : "1.18"}).
             Bus subsidy is the ETB-imputed government benefit-in-kind, calibrated the same way to
-            DfT net government support (£3.0bn England, BUS05bii).
+            DfT net government support (£3.0bn England, BUS05bii). The DfT data is for the year
+            ending March 2025 (largely under the older £2 cap) and covers England local buses
+            (excluding coaches and Northern Ireland), uplifted to the UK — so the baseline is
+            indicative, not an explicit model of the £3 cap or 2027-28 policy.
           </p>
         </div>
         <div>
           <h3 className="font-semibold text-slate-900">2 · Allocating fares to people by age</h3>
           <p>
             The LCFS records fares at <em>household</em> level, so each household&apos;s fare is split
-            across its members by a relative weight that reflects who actually pays. The weights are
-            built from National Travel Survey bus-trips-by-age (bus use peaks sharply at 17–20), then
-            adjusted for concessionary travel: pension-age riders travel free, so they carry a
-            near-zero <em>fare</em> weight even though they make many trips. This tracks fares paid,
-            not trips. The per-person split is therefore modelled, not observed.
+            across its members by a relative weight that proxies who pays. The weights are
+            built from{" "}
+            {src.nts_age_profile ? (
+              <a href={src.nts_age_profile.url} target="_blank" rel="noreferrer" className="text-[color:var(--pe-color-primary-600)] underline">National Travel Survey bus-trips-by-age</a>
+            ) : "National Travel Survey bus-trips-by-age"}{" "}
+            (bus use peaks sharply at 17–20), then lowered for concessionary ages. The weights only
+            redistribute fares <em>within mixed-age households</em> — a single-age household (e.g. a
+            lone pensioner, or an all-adult one) keeps its full imputed fare regardless of weight, so
+            65+ still carries ~18% of fares. The split is a rough heuristic, not observed, and the
+            exact weight values are an illustrative calibration of the NTS profile, not a
+            reproducible derivation.
           </p>
+          <div className="mt-3 flex flex-wrap gap-2 text-sm">
+            {Object.entries(weights).map(([band, w]) => (
+              <span key={band} className="rounded-lg bg-slate-100 px-3 py-1 text-slate-700">{band}: <strong>{w}</strong></span>
+            ))}
+          </div>
         </div>
         <div>
           <h3 className="font-semibold text-slate-900">3 · Reform 1 — free buses for under-25s</h3>
           <p>
             Fiscal cost = the bus fares allocated to people under 25, which the government would now
-            meet (a full subsidy for that group). People affected = under-25s in fare-paying
-            households.
+            meet (a full subsidy for that group). This is a <strong>gross, illustrative</strong>
+            figure: it does not net out existing youth/child concessions (notably Scotland&apos;s
+            under-22 scheme), and the under-25 split comes from age weights, not observed individual
+            fares, so small-child bands are over-stated. &ldquo;People affected&rdquo; counts
+            under-25s in households with imputed bus-fare spending, not observed bus users.
           </p>
         </div>
         <div>
           <h3 className="font-semibold text-slate-900">4 · Reform 2 — £1 fare cap</h3>
           <p>
-            A universal £1 per-trip cap. The dataset records annual £ spend, not per-trip fares, so
-            the cap is approximated as a fare-reduction fraction with a 20–40% sensitivity band
-            (central 30%). Firming it up requires NTS trips-per-person (cost = fares −
-            trips × £1).
+            A universal £1 per-trip cap, approximated. With only annual fare spend (no per-trip
+            fares), fares are cut by a flat fraction set by the DfT average fare = receipts ÷
+            fare-paying journeys. We report the all-concessionary figure: treating <em>all</em>
+            concessionary journeys (incl. fare-paying youth, whose fares are in the receipts) as
+            non-paying gives ≈£1.28 → ≈22% (≈£0.92bn). A stricter denominator that excludes only the
+            genuinely-free older/disabled (ENCTS) journeys gives a lower ≈£1.11 → 9.5% (≈£0.40bn).
+            A flat fraction over a blended average is not the exact Σ max(fare − £1, 0) over single
+            tickets, so this is an indicative figure.
           </p>
         </div>
         <div>
@@ -61,29 +82,15 @@ export default function MethodologyTab({ data }) {
             All figures are <strong>static</strong> — lower or zero fares induce extra trips (cf.
             Scotland&apos;s under-22 scheme), which a behavioural elasticity would add, raising both
             ridership and cost. Figures are UK-wide (England-anchored, population-uplifted).
-            Breakdowns by region, household type, age, and income quintile/quartile allocate the same
-            per-person fares using PolicyEngine&apos;s region, family type and household income
-            decile / equivalised net income.
+            Breakdowns allocate the same per-person fares by PolicyEngine&apos;s region, age, income
+            quintile and family type — &ldquo;Family type&rdquo; is the <em>benefit unit</em> (not the
+            whole household), and income quintiles fold the published household income deciles,
+            excluding a small &ldquo;unknown decile&rdquo; group (~£23m of baseline fares).{" "}
+            <strong>Projection:</strong> {data.fiscal_year_label} figures uprate the 2024-25 dataset —
+            fares by PolicyEngine&apos;s price/earnings uprating <em>and</em> population, but the bus
+            subsidy only by population (no price uprating), so the two are not on a fully consistent
+            price basis.
           </p>
-        </div>
-      </div>
-
-      {/* Age allocation weights — how + source */}
-      <div className="rounded-2xl border border-slate-200 bg-white p-6">
-        <h3 className="mb-2 text-base font-semibold text-slate-900">Age allocation weights</h3>
-        <p className="mb-4 text-sm leading-6 text-slate-600">
-          Relative bus-<em>fare</em> weight by age. Derived from{" "}
-          {src.nts_age_profile ? (
-            <a href={src.nts_age_profile.url} target="_blank" rel="noreferrer" className="text-[color:var(--pe-color-primary-600)] underline">National Travel Survey bus trips by age</a>
-          ) : "National Travel Survey bus trips by age"}{" "}
-          (17–20 is the clear peak), then scaled down for concessionary ages so the weight reflects
-          fares <em>paid</em> rather than trips made (pensioners travel free → ≈0). Only the ratios
-          matter; they are normalised to the 30–39 band = 1.0.
-        </p>
-        <div className="flex flex-wrap gap-2 text-sm">
-          {Object.entries(weights).map(([band, w]) => (
-            <span key={band} className="rounded-lg bg-slate-100 px-3 py-1 text-slate-700">{band}: <strong>{w}</strong></span>
-          ))}
         </div>
       </div>
 

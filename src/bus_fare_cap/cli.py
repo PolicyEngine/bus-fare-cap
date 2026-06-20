@@ -12,7 +12,7 @@ def build_parser() -> argparse.ArgumentParser:
         prog="bus-fare-cap-build",
         description="Generate dashboard-ready bus fare reform results (£1 cap, free under-25s).",
     )
-    parser.add_argument("--year", type=int, default=2025, help="Tax year to cost in.")
+    parser.add_argument("--year", type=int, default=2027, help="Tax year to cost in.")
     return parser
 
 

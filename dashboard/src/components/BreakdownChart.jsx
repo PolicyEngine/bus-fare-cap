@@ -9,13 +9,12 @@ import { formatBn } from "../lib/formatters";
 
 const DIMENSIONS = [
   { id: "region", label: "Region" },
-  { id: "household_type", label: "Household type" },
+  { id: "household_type", label: "Family type" },
   { id: "age_band", label: "Age" },
   { id: "income_quintile", label: "Income quintile" },
-  { id: "income_quartile", label: "Income quartile" },
 ];
 
-export default function BreakdownChart({ breakdowns, metric = "Cost", color = colors.primary[500] }) {
+export default function BreakdownChart({ breakdowns, metric = "Cost", color = colors.primary[500], period }) {
   const [dim, setDim] = useState("region");
   // Drop empty categories (e.g. the 25+ age bands under the under-25 reform,
   // which carry £0) so the chart only shows bands with cost.
@@ -24,7 +23,7 @@ export default function BreakdownChart({ breakdowns, metric = "Cost", color = co
   return (
     <div className="rounded-2xl border border-slate-200 bg-white p-6">
       <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
-        <h3 className="text-sm font-semibold text-slate-700">{metric} by {dimLabel} (£bn/yr)</h3>
+        <h3 className="text-sm font-semibold text-slate-700">{metric} by {dimLabel} (£bn{period ? `, ${period}` : ""})</h3>
         <div className="flex flex-wrap gap-1">
           {DIMENSIONS.map((d) => (
             <button

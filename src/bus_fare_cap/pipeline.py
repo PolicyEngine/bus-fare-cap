@@ -15,7 +15,9 @@ Behaviour is static.
 from __future__ import annotations
 
 import argparse
+import importlib.metadata
 import json
+import os
 from pathlib import Path
 
 import numpy as np
@@ -25,14 +27,32 @@ from . import sources
 from .formulas import bus_fare_age_weight
 from .sources import (
     ENGLAND_TO_UK_POPULATION_UPLIFT,
-    FARE_CAP_REDUCTION_CENTRAL,
-    FARE_CAP_REDUCTION_SENSITIVITY,
     UNDER_25_AGE_LIMIT,
+    dft_average_fare,
+    fare_cap_reduction_high,
+    fare_cap_reduction_low,
 )
 
 REPO_ROOT = Path(__file__).resolve().parents[2]
+# Default simulation source: the PolicyEngine UK Enhanced FRS, downloaded from
+# the private release at a pinned revision for reproducibility
+# (policyengine-uk-data 1.56.5, built with policyengine-uk 2.89.2).
 DATASET = "enhanced_frs_2024_25.h5"
 PRIVATE_REPO = "policyengine/policyengine-uk-data-private"
+DATASET_REVISION = "8a43d256f0f59c8be26f1416343d0798098cc6b6"
+# Opt-in alternative: the Populace UK dataset, simulated through the
+# policyengine.py wrapper (managed_microsimulation). Kept available but NOT
+# triggered by default — set BUS_FARE_CAP_POPULACE=1 to use it.
+POPULACE_DATASET = "populace_uk_2023"
+
+
+def _use_populace() -> bool:
+    return os.environ.get("BUS_FARE_CAP_POPULACE", "").strip().lower() not in (
+        "",
+        "0",
+        "false",
+        "no",
+    )
 
 
 def _label(level: str) -> str:
@@ -40,11 +60,20 @@ def _label(level: str) -> str:
 
 
 def _load_sim():
+    if _use_populace():
+        # Populace UK via policyengine.py. managed_microsimulation returns a
+        # real policyengine_uk.Microsimulation, so .calculate(...) is unchanged.
+        from policyengine.tax_benefit_models.uk import managed_microsimulation
+
+        return managed_microsimulation(dataset=POPULACE_DATASET)
+
     from huggingface_hub import hf_hub_download
     from policyengine_uk import Microsimulation
     from policyengine_uk.data import UKSingleYearDataset
 
-    path = hf_hub_download(repo_id=PRIVATE_REPO, filename=DATASET, repo_type="model")
+    path = hf_hub_download(
+        repo_id=PRIVATE_REPO, filename=DATASET, repo_type="model", revision=DATASET_REVISION
+    )
     return Microsimulation(dataset=UKSingleYearDataset(path))
 
 
@@ -66,9 +95,6 @@ def run(args: argparse.Namespace) -> None:
     decile = np.asarray(
         sim.calculate("household_income_decile", period=year, map_to="person").values, float
     )
-    equiv = np.asarray(
-        sim.calculate("equiv_hbai_household_net_income", period=year, map_to="person").values, float
-    )
     pw = np.asarray(sim.calculate("bus_fare_spending", period=year, map_to="person").weights, float)
 
     aw = bus_fare_age_weight(age)
@@ -86,12 +112,9 @@ def run(args: argparse.Namespace) -> None:
     def wsum(values):
         return float((np.asarray(values) * pw).sum())
 
-    # income quartile (person-weighted equivalised income) + quintile (from decile)
-    order = np.argsort(equiv)
-    cw = np.cumsum(pw[order])
-    cw = cw / cw[-1]
-    quartile = np.empty(len(equiv), int)
-    quartile[order] = np.clip((cw * 4).astype(int) + 1, 1, 4)
+    # Income quintile folds PolicyEngine's published household income deciles (a
+    # household-level ranking). Quartiles are dropped: a person-level quantile can
+    # split members of one household, which is not meaningful here.
     quintile = np.where(decile >= 1, np.clip(((decile - 1) // 2 + 1).astype(int), 1, 5), 0)
 
     # Uniform 5-year age bands (so the chart has no width jump above 24).
@@ -111,11 +134,10 @@ def run(args: argparse.Namespace) -> None:
                 "household_type": [_label(f) for f in famtype],
                 "age_band": age_band_labels,
                 "income_quintile": [f"Q{n}" if n else "Unknown" for n in quintile],
-                "income_quartile": [f"Q{n}" for n in quartile],
             }
         )
         out = {}
-        for dim in ["region", "household_type", "age_band", "income_quintile", "income_quartile"]:
+        for dim in ["region", "household_type", "age_band", "income_quintile"]:
             rows = [
                 {"group": g, "cost_bn": round(float(c) / 1e9, 3)}
                 for g, c in df.groupby(dim)["v"].sum().items()
@@ -123,7 +145,7 @@ def run(args: argparse.Namespace) -> None:
             ]
             if dim == "age_band":
                 rows.sort(key=lambda r: int(r["group"].split("-")[0].replace("+", "")))
-            elif dim in ("income_quintile", "income_quartile"):
+            elif dim == "income_quintile":
                 rows.sort(key=lambda r: r["group"])
             else:
                 rows.sort(key=lambda r: r["cost_bn"], reverse=True)
@@ -139,17 +161,26 @@ def run(args: argparse.Namespace) -> None:
         "breakdowns": breakdown(alloc, under25),
     }
 
-    print("Step 4: Reform — £1 fare cap ...")
+    print("Step 4: Reform — £1 fare cap (DfT-anchored range) ...")
+    # Approximate: with only annual fare spend, cut each fare by a flat fraction set
+    # by the DfT average fare (receipts / fare-paying journeys). The fare-paying
+    # denominator is uncertain: excluding only genuinely-free older/disabled journeys
+    # gives the lower bound (~£1.11 avg, ~9.5%); excluding all concessionary gives the
+    # upper bound (~£1.28 avg, ~21.6%). A flat fraction blends ticket types, so this is
+    # indicative, not the exact sum of max(fare - £1, 0) over single tickets.
+    red_low = fare_cap_reduction_low()
+    red_high = fare_cap_reduction_high()
     fare_cap = {
         "label": "£1 bus fare cap",
         "cap_gbp": sources.FARE_CAP_GBP,
-        "central_cost_bn": round(total_fare * FARE_CAP_REDUCTION_CENTRAL / 1e9, 3),
-        "sensitivity": [
-            {"fare_reduction": fr, "cost_bn": round(total_fare * fr / 1e9, 3)}
-            for fr in FARE_CAP_REDUCTION_SENSITIVITY
-        ],
+        "average_fare_low_gbp": round(dft_average_fare(free_only=True), 3),
+        "average_fare_high_gbp": round(dft_average_fare(free_only=False), 3),
+        "reduction_low": round(red_low, 3),
+        "reduction_high": round(red_high, 3),
+        "cost_low_bn": round(wsum(alloc * red_low) / 1e9, 3),
+        "cost_high_bn": round(wsum(alloc * red_high) / 1e9, 3),
         "people_affected_m": round(wsum(alloc > 0) / 1e6, 2),
-        "breakdowns": breakdown(alloc * FARE_CAP_REDUCTION_CENTRAL, np.ones_like(age, bool)),
+        "breakdowns": breakdown(alloc * red_low, np.ones_like(age, bool)),
     }
 
     print("Step 5: Baseline and official-statistic comparisons ...")
@@ -208,7 +239,18 @@ def run(args: argparse.Namespace) -> None:
         "year": year,
         "fiscal_year_label": f"{year}-{(year + 1) % 100:02d}",
         "currency": "GBP",
-        "dataset": "PolicyEngine UK Enhanced FRS (enhanced_frs_2024_25)",
+        "dataset": (
+            "populace_uk_2023"
+            if _use_populace()
+            else "PolicyEngine UK Enhanced FRS (enhanced_frs_2024_25)"
+        ),
+        "dataset_source": "populace-uk" if _use_populace() else "enhanced-frs",
+        "simulation_stack": (
+            "policyengine.py (managed_microsimulation)"
+            if _use_populace()
+            else "policyengine-uk (direct)"
+        ),
+        "policyengine_uk_version": importlib.metadata.version("policyengine-uk"),
         **sources.as_json(),
         "baseline": {
             "total_bus_fare_bn": round(total_fare / 1e9, 3),
@@ -237,5 +279,6 @@ def run(args: argparse.Namespace) -> None:
     print(
         f"Done. Free under-25s £{free_under_25['cost_bn']:.2f}bn "
         f"({free_under_25['people_affected_m']:.1f}m people); "
-        f"£1 cap £{fare_cap['central_cost_bn']:.2f}bn ({fare_cap['people_affected_m']:.1f}m people)."
+        f"£1 cap £{fare_cap['cost_low_bn']:.2f}–{fare_cap['cost_high_bn']:.2f}bn "
+        f"({fare_cap['people_affected_m']:.1f}m people)."
     )

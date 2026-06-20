@@ -1,42 +1,56 @@
-# Bus fares for young people
+# Bus fare policies analysis
 
-Microsimulation of two policies to help young people access training and employment, built on the **PolicyEngine UK Enhanced FRS** (in which household bus & coach fares are imputed from the LCFS and calibrated to DfT Annual Bus Statistics totals):
+Costs two bus fare reforms on the PolicyEngine UK Enhanced FRS (household bus and coach fares imputed from the LCFS and calibrated to DfT Annual Bus Statistics totals).
 
-1. **£1 bus fare cap** — a universal per-trip cap.
-2. **Free buses for under-25s** — full fare subsidy for that group.
+**Live dashboard:** https://bus-fare-cap.vercel.app
 
-Each is costed as a fiscal cost (the fares government would now meet), with breakdowns by age and region. Static (pre-behavioural).
+## Headline results
 
-## Headline results (`enhanced_frs_2024_25`, 2025-26, static)
+Default dataset `enhanced_frs_2024_25`, fiscal year 2027-28, static (no behavioural response).
 
-| | Fiscal cost / yr |
+| Reform | Fiscal cost / yr |
 |---|---|
-| Free buses for under-25s | **~£0.6bn** |
-| £1 bus fare cap | **~£0.8–1.5bn** (20–40% fare-reduction assumption) |
+| Free buses for under-25s | ~£0.65bn |
+| £1 bus fare cap | ~£0.92bn (≈22% average-fare reduction) |
 
-Baseline: UK household bus/coach fares ≈ £3.9bn; under-25s ≈ 15% of fares.
+Baseline: UK household bus and coach fares ≈ £4.2bn; under-25s ≈ 15.5% of fares.
+
+The £1 cap figure uses an all-concessionary denominator for the average fare. A stricter free-only denominator (excluding only genuinely-free older/disabled journeys) gives a sensitivity of ~£0.40bn (≈9.5% reduction).
 
 ## Method
 
-Household bus fares are allocated to individuals by an NTS bus-trips-by-age profile (concessionary-adjusted, so it tracks fares paid not trips — pensioners travel free). **Free under-25s** is the fares allocated to under-25s. The **£1 cap** is approximated as a fare-reduction fraction because the dataset has annual £ spend, not per-trip fares; firming it up needs NTS trips-per-person. See the dashboard Methodology tab for a source on every number.
+Household bus fares are allocated to individuals using a National Travel Survey bus-trips-by-age profile (concessionary-adjusted, so it tracks fares paid rather than trips). **Free buses for under-25s** is the fares allocated to that group. The **£1 cap** is approximated by a flat fare-reduction fraction set by the DfT average fare (receipts ÷ fare-paying journeys), since the dataset holds annual fare spend rather than per-trip fares. The dashboard Methodology tab gives a source for every number.
 
 ## Layout
 
 - `src/bus_fare_cap/` — the Python package (`formulas`, `sources`, `pipeline`, `cli`).
-- `dashboard/` — Next.js dashboard with **Reforms**, **Baseline** and **Methodology** tabs.
-- `data/` + `dashboard/public/data/` — generated results JSON.
+- `dashboard/` — Next.js dashboard with Reforms, Baseline and Methodology tabs.
+- `data/` and `dashboard/public/data/` — generated results JSON.
 
 ## Run
 
 ```bash
 pip install -e ".[dev]"
-export HUGGING_FACE_TOKEN=hf_xxx   # access to policyengine/policyengine-uk-data-private
-python -m bus_fare_cap --year 2025   # regenerates the results JSON
-cd dashboard && bun install && bun run dev
+export HF_TOKEN=hf_xxx   # access to policyengine/policyengine-uk-data-private
+python -m bus_fare_cap --year 2027   # default: Enhanced FRS; regenerates the results JSON
+```
+
+To cost the reforms on the Populace UK dataset instead (via policyengine.py `managed_microsimulation`), opt in with an environment variable. This path is kept available but off by default:
+
+```bash
+BUS_FARE_CAP_POPULACE=1 python -m bus_fare_cap --year 2027
 ```
 
 ## Caveats
 
-- **Static** — lower/zero fares induce more trips (cf. Scotland's under-22 scheme); a behavioural elasticity raises both ridership and cost.
-- **£1 cap** is a fare-reduction approximation (no per-trip data).
-- Bus fares are calibrated to **DfT England** figures uplifted to the UK by population (~1.18); the per-person age split is **modelled** (LCFS fares are household-level).
+- **Young-adult undercount.** The Enhanced FRS undercounts 18-24s (~3.3m vs ONS ~5.9m) because the FRS misses young adults who have left home. The under-25 fare share and the free-under-25s cost are therefore a lower bound.
+- **Modelled age split.** The split across ages uses NTS age weights, not observed individual fares.
+- **Flat-fraction cap.** The £1 cap is a flat fare-reduction approximation, not a ticket-level calculation.
+- **Static.** No behavioural response — lower or zero fares would induce more trips (cf. Scotland's under-22 scheme) and raise both ridership and cost.
+- **Gross of concessions.** Costs are gross of existing youth and child concessions (e.g. Scotland's under-22 free travel).
+
+## Dashboard
+
+```bash
+cd dashboard && bun install && bun run dev
+```

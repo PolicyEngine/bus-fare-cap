@@ -1,7 +1,6 @@
 "use client";
 
 import { colors } from "../lib/colors";
-import { formatPct } from "../lib/formatters";
 import BreakdownChart from "./BreakdownChart";
 import SectionHeading from "./SectionHeading";
 
@@ -17,7 +16,7 @@ function Stat({ label, value, sub }) {
 
 export default function ReformTab({ data }) {
   const cap = data.reforms.announced_2pound_cap;
-  const findings = cap.distribution_findings;
+  const householdEffect = cap.household_effect;
   const src = data.sources || {};
   const A = (s, text) => (s ? <a href={s.url} target="_blank" rel="noreferrer" className="underline">{text}</a> : text);
 
@@ -38,26 +37,16 @@ export default function ReformTab({ data }) {
             </>
           }
         />
-        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+        <div className="grid gap-4 sm:grid-cols-2">
           <Stat
-            label="Highest-income quintile exposure"
-            value={formatPct(findings.q5_exposure_share * 100, 0)}
-            sub="Our spending-based result. DfT trips point the other way: Q1 66 vs Q5 29 trips/person."
+            label="Government scheme cost"
+            value=">£500m"
+            sub="Official calendar-2027 cost floor; £454m is newly announced funding."
           />
           <Stat
-            label="Lowest-income quintile exposure"
-            value={formatPct(findings.q1_exposure_share * 100, 0)}
-            sub="Our spending exposure is not bus usage or savings; see the DfT trip benchmark below."
-          />
-          <Stat
-            label="Largest regional exposure"
-            value={findings.top_region}
-            sub={`${formatPct(findings.top_region_exposure_share * 100, 0)} of modelled exposure; DfT records 1.85bn journeys across the wider policy geography.`}
-          />
-          <Stat
-            label="Regions represented"
-            value={String(findings.regions_in_scope)}
-            sub="Matches the government scope: England outside London."
+            label="Average middle-income household effect"
+            value={`£${householdEffect.annual_effect_average_gbp}/year`}
+            sub="Our illustrative Q3 estimate across England outside London, allocating the official cost floor by baseline fare exposure."
           />
         </div>
 
@@ -90,13 +79,24 @@ export default function ReformTab({ data }) {
               estimated savings: neither the Enhanced FRS nor the LCFS extract identifies individual
               tickets above £2, participating routes, or places already charging £2 or less. It
               therefore cannot reproduce the official cost or identify the number of beneficiaries.
-              For context, DfT records 1.85bn passenger journeys in England outside London, and its
-              NTS benchmark shows 66 trips per person in Q1 versus 29 in Q5. Those are usage measures,
-              not like-for-like validations of household spending.
+              For context, DfT records 1.85bn passenger journeys in England outside London. This is a
+              usage benchmark, not a like-for-like validation of household spending or savings.
             </>
           }
         />
-        <BreakdownChart breakdowns={cap.breakdowns} metric="Baseline fare exposure" color={colors.primary[400]} period={data.projection_year_label} defaultDimension="income_quintile" />
+        <BreakdownChart
+          breakdowns={cap.breakdowns}
+          metric="Baseline fare exposure"
+          color={colors.primary[400]}
+          period={data.projection_year_label}
+          defaultDimension="income_quintile"
+          alternateMetric={{
+            label: "Middle-income household effect",
+            unit: "£/year",
+            rows: householdEffect.by_region.map((row) => ({ group: row.region, value: row.annual_effect_gbp })),
+            formatter: (value) => `£${Number(value).toFixed(0)}`,
+          }}
+        />
       </section>
     </div>
   );

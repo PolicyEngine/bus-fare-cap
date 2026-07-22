@@ -153,9 +153,51 @@ def run(args: argparse.Namespace) -> None:
 
     print("Step 3: Announced reform — £3 to £2 fare cap ...")
     policy_breakdowns = breakdown(alloc, in_policy_geography)
-    exposure_total = sum(row["cost_bn"] for row in policy_breakdowns["region"])
-    top_region = policy_breakdowns["region"][0]
-    income_exposure = {row["group"]: row["cost_bn"] for row in policy_breakdowns["income_quintile"]}
+    exposure_total_gbp = wsum(alloc * in_policy_geography)
+    allocated_relief = (
+        alloc
+        * in_policy_geography
+        * (sources.OFFICIAL_SCHEME_COST_LOWER_BOUND_BN * 1e9 / exposure_total_gbp)
+    )
+    household_frame = pd.DataFrame(
+        {
+            "household_id": hid,
+            "region": region_label,
+            "income_quintile": quintile,
+            "weight": pw,
+        }
+    ).drop_duplicates("household_id")
+    middle_income_households = (
+        household_frame[
+            household_frame["region"].isin(english_regions_outside_london)
+            & (household_frame["income_quintile"] == 3)
+        ]
+        .groupby("region")["weight"]
+        .sum()
+    )
+    relief_frame = pd.DataFrame(
+        {
+            "region": region_label,
+            "income_quintile": quintile,
+            "relief": allocated_relief * pw,
+        }
+    )
+    middle_income_relief = (
+        relief_frame[relief_frame["income_quintile"] == 3].groupby("region")["relief"].sum()
+    )
+    middle_income_effect_by_region = [
+        {
+            "region": region_name,
+            "annual_effect_gbp": round(
+                float(middle_income_relief.get(region_name, 0)) / household_count
+            ),
+        }
+        for region_name, household_count in middle_income_households.items()
+    ]
+    middle_income_effect_by_region.sort(key=lambda row: row["annual_effect_gbp"], reverse=True)
+    middle_income_effect_average = round(
+        float(middle_income_relief.sum()) / float(middle_income_households.sum())
+    )
     fare_cap = {
         "label": "Announced £2 bus fare cap",
         "baseline_cap_gbp": sources.BASELINE_FARE_CAP_GBP,
@@ -169,12 +211,12 @@ def run(args: argparse.Namespace) -> None:
         "breakdowns": policy_breakdowns,
         "breakdown_metric": "baseline_fare_exposure",
         "ticket_level_savings_estimated": False,
-        "distribution_findings": {
-            "q5_exposure_share": round(income_exposure["Q5"] / exposure_total, 3),
-            "q1_exposure_share": round(income_exposure["Q1"] / exposure_total, 3),
-            "top_region": top_region["group"],
-            "top_region_exposure_share": round(top_region["cost_bn"] / exposure_total, 3),
-            "regions_in_scope": len(policy_breakdowns["region"]),
+        "household_effect": {
+            "income_group": "Middle income (Q3)",
+            "annual_effect_average_gbp": middle_income_effect_average,
+            "by_region": middle_income_effect_by_region,
+            "allocation_base_bn": sources.OFFICIAL_SCHEME_COST_LOWER_BOUND_BN,
+            "method": "Official cost floor allocated by baseline fare exposure",
         },
     }
 

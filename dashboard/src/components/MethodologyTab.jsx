@@ -51,8 +51,11 @@ export default function MethodologyTab({ data }) {
             Savings require ticket-level data: Σ journeys × max(current single fare − £2, 0). The
             Enhanced FRS contains annual household spending, not individual ticket prices or journeys.
             Its historic blended average fare is below £2, so applying a flat percentage would be
-            misleading and could produce negative savings. The charts therefore show existing fare
-            exposure only—not benefits, beneficiaries or fiscal cost.
+            misleading and could produce negative savings. Fare-exposure charts therefore do not
+            claim ticket-level benefits or beneficiary counts. The middle-income household view is
+            a separate illustrative allocation: it distributes the official £500m cost floor in
+            proportion to baseline fare exposure, then divides each region&apos;s Q3 allocation across
+            all Q3 households, including non-bus users.
           </p>
         </div>
         <div>

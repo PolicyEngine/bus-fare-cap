@@ -33,10 +33,11 @@ def test_results_keep_official_cost_separate_from_exposure(results):
     assert cap["announced_new_funding_bn"] == 0.454
     assert cap["breakdown_metric"] == "baseline_fare_exposure"
     assert cap["ticket_level_savings_estimated"] is False
-    findings = cap["distribution_findings"]
-    assert findings["regions_in_scope"] == 8
-    assert 0 < findings["q1_exposure_share"] < findings["q5_exposure_share"] < 1
-    assert findings["top_region_exposure_share"] > 0
+    effect = cap["household_effect"]
+    assert effect["income_group"] == "Middle income (Q3)"
+    assert effect["annual_effect_average_gbp"] > 0
+    assert effect["allocation_base_bn"] == 0.5
+    assert len(effect["by_region"]) == 8
 
 
 def test_results_breakdowns_have_no_quartile(results):

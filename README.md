@@ -17,7 +17,7 @@ The official announcement is the source for the fiscal headline. The analysis do
 
 PolicyEngine projects household bus and coach fare spending to 2027 and shows baseline fare exposure by English region outside London, family type, age and income quintile. Household fares are imputed from the LCFS, calibrated to DfT Annual Bus Statistics and allocated to household members with an NTS-derived age profile.
 
-This exposure is not estimated savings. The dataset records annual household spending rather than individual ticket prices, so it cannot calculate `journeys × max(current fare − £2, 0)`, identify participating routes, or remove places already charging £2 or less.
+This exposure is not a ticket-level savings estimate. The dataset records annual household spending rather than individual ticket prices, so it cannot calculate `journeys × max(current fare − £2, 0)`, identify participating routes, or remove places already charging £2 or less. The dashboard also shows an illustrative middle-income household effect by allocating the official £500m cost floor in proportion to baseline fare exposure and averaging each region's allocation across all Q3 households.
 
 ## Layout
 

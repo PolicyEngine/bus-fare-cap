@@ -507,12 +507,45 @@
       },
       "breakdown_metric": "baseline_fare_exposure",
       "ticket_level_savings_estimated": false,
-      "distribution_findings": {
-        "q5_exposure_share": 0.288,
-        "q1_exposure_share": 0.162,
-        "top_region": "North West",
-        "top_region_exposure_share": 0.201,
-        "regions_in_scope": 8
+      "household_effect": {
+        "income_group": "Middle income (Q3)",
+        "annual_effect_average_gbp": 20,
+        "by_region": [
+          {
+            "region": "Yorkshire",
+            "annual_effect_gbp": 32
+          },
+          {
+            "region": "North East",
+            "annual_effect_gbp": 24
+          },
+          {
+            "region": "South West",
+            "annual_effect_gbp": 22
+          },
+          {
+            "region": "East of England",
+            "annual_effect_gbp": 21
+          },
+          {
+            "region": "East Midlands",
+            "annual_effect_gbp": 17
+          },
+          {
+            "region": "South East",
+            "annual_effect_gbp": 16
+          },
+          {
+            "region": "West Midlands",
+            "annual_effect_gbp": 15
+          },
+          {
+            "region": "North West",
+            "annual_effect_gbp": 13
+          }
+        ],
+        "allocation_base_bn": 0.5,
+        "method": "Official cost floor allocated by baseline fare exposure"
       }
     }
   }

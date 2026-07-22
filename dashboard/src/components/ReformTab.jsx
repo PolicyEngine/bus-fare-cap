@@ -81,8 +81,8 @@ export default function ReformTab({ data }) {
           description={
             <>
               PolicyEngine estimates household bus and coach fare spending in English regions outside
-              London. We apply the <strong>6.3% reduction across all ticket types</strong> observed in
-              DfT&apos;s evaluation of the previous £2 cap. Simulated spending determines the cost and
+              London. We apply the <strong>6.3% reduction across all ticket types</strong> observed in{" "}
+              {A(src.dft_two_pound_cap_evaluation, "DfT's evaluation of the previous £2 cap")}. Simulated spending determines the cost and
               distribution; the government&apos;s £400m cap funding is only a benchmark. The estimate is
               static and does not model individual ticket prices, participating routes or induced demand.
             </>

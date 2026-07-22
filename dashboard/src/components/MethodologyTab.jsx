@@ -5,6 +5,12 @@ import SectionHeading from "./SectionHeading";
 export default function MethodologyTab({ data }) {
   const src = data.sources || {};
   const weights = data.assumptions?.age_allocation_weights || {};
+  const L = (s, text) =>
+    s ? (
+      <a href={s.url} target="_blank" rel="noreferrer" className="text-[color:var(--pe-color-primary-600)] underline">{text}</a>
+    ) : (
+      text
+    );
 
   return (
     <div className="space-y-10">
@@ -18,12 +24,14 @@ export default function MethodologyTab({ data }) {
         <div>
           <h3 className="font-semibold text-slate-900">1 · Official policy and fiscal figures</h3>
           <p>
-            The 22 July 2026 government announcement is the source for the £2 cap, calendar-2027
-            dates, England-outside-London geography, participating-bus condition, £400m of extra
-            funding backing the cap and £454m of total extra funding including devolved-government
-            funding. The GOV.UK announcement does not publish a total scheme cost; contemporaneous
-            ITV/PA reporting says the government expects it to exceed £500m, with the balance above
-            the new funding coming from existing DfT bus allocations. These figures are comparison
+            The {L(src.two_pound_announcement, "22 July 2026 government announcement")} is the
+            source for the £2 cap, calendar-2027 dates, England-outside-London geography,
+            participating-bus condition, £400m of extra funding backing the cap and £454m of total
+            extra funding including devolved-government funding. The GOV.UK announcement does not
+            publish a total scheme cost; {L(src.reported_scheme_cost, "contemporaneous ITV/PA reporting")}{" "}
+            says the government expects it to exceed £500m, with the balance above the new funding
+            coming from existing DfT bus allocations. The £3 cap it replaces was{" "}
+            {L(src.current_fare_cap_policy, "funded through 31 March 2027")}. These figures are comparison
             benchmarks, not inputs to our estimate, and none is presented as England-only passenger savings.
           </p>
         </div>
@@ -31,7 +39,8 @@ export default function MethodologyTab({ data }) {
           <h3 className="font-semibold text-slate-900">2 · Household microsimulation</h3>
           <p>
             Household bus &amp; coach spending is imputed from the Living Costs and Food Survey in the
-            PolicyEngine UK Enhanced FRS, calibrated to DfT&apos;s England-wide fare-receipts total and
+            PolicyEngine UK Enhanced FRS, calibrated to{" "}
+            {L(src.dft_fare, "DfT's England-wide fare-receipts total")} and
             uprated by PolicyEngine to {data.projection_year_label}. Each household&apos;s fare is split
             across its members using a{" "}
             {src.nts_age_profile ? (
@@ -50,8 +59,9 @@ export default function MethodologyTab({ data }) {
           <p>
             The estimate is projected fare spending of households resident in the eight English
             regions outside London ({data.reforms?.announced_2pound_cap?.baseline_fare_spending_bn ? `£${data.reforms.announced_2pound_cap.baseline_fare_spending_bn.toFixed(2)}bn` : "the policy-geography base"})
-            multiplied by the 6.3% all-ticket reduction observed in DfT&apos;s evaluation of the
-            previous £2 cap (average yield £1.49 → £1.40). Region, family-type and quintile averages
+            multiplied by the 6.3% all-ticket reduction observed in{" "}
+            {L(src.dft_two_pound_cap_evaluation, "DfT's evaluation of the previous £2 cap")}{" "}
+            (average yield £1.49 → £1.40). Region, family-type and quintile averages
             divide each group&apos;s saving by all its households, including non-bus users; age-band
             averages are per person in the policy geography. The government&apos;s funding figures are
             not inputs. Treating passenger savings as fiscal cost assumes pound-for-pound operator
@@ -61,11 +71,12 @@ export default function MethodologyTab({ data }) {
         <div>
           <h3 className="font-semibold text-slate-900">4 · Limitations</h3>
           <p>
-            This is not a ticket-level model. The 6.3% was measured against 2023 uncapped fares, while
-            the 2027 counterfactual is a £3 cap, so the true marginal reduction is likely smaller.
-            Calibration is to the England total only — the London/outside-London split is not
-            separately calibrated, and the model&apos;s London share is below DfT&apos;s, which can
-            overstate the outside-London base. Spending includes coach fares the cap does not cover;
+            This is not a ticket-level model. The{" "}
+            {L(src.dft_two_pound_cap_evaluation, "6.3% was measured against 2023 uncapped fares")},
+            while the 2027 counterfactual is a £3 cap, so the true marginal reduction is likely
+            smaller. Calibration is to the England total only — the London/outside-London split is
+            not separately calibrated, and the model&apos;s London share is below{" "}
+            {L(src.dft_journeys, "DfT's")}, which can overstate the outside-London base. Spending includes coach fares the cap does not cover;
             geography is where households live, not where journeys happen. Non-participating routes,
             local fares already at £2 or less, and induced demand are not modelled.
           </p>

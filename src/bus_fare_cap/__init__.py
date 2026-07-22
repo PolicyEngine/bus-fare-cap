@@ -1,8 +1,8 @@
 """Analysis of the announced 2027 £2 bus fare cap.
 
-PolicyEngine UK distributes baseline household bus-fare exposure across the
-policy geography. Official scheme cost is reported separately because the
-underlying survey data do not contain ticket-level fares.
+PolicyEngine UK estimates the distribution of household savings using the
+whole-market fare reduction observed in DfT's evaluation of the previous £2 cap.
+The official scheme cost is retained as a separate comparison benchmark.
 """
 
 from .formulas import bus_fare_age_weight, fare_cap_relief, household_fare_share

@@ -40,8 +40,7 @@ def household_fare_share(person_weight, person_household_id, eligible):
 def fare_cap_relief(fare_spending, reduction_fraction):
     """Government cost of a per-trip fare cap, approximated as a fraction of fares.
 
-    The dataset records annual £ spend, not per-trip fares. This generic helper
-    is retained for sensitivity analysis; the announced £2 policy does not use
-    it because a blended fraction cannot identify tickets currently above £2.
+    The dataset records annual £ spend, not per-trip fares, so the reduction
+    fraction must come from external evidence covering the whole ticket market.
     """
     return fare_spending * float(reduction_fraction)

@@ -1,9 +1,10 @@
 """Bus fare reform pipeline.
 
-Describes the £3-to-£2 English bus fare cap announced on 22 July 2026 and uses
-the PolicyEngine UK Enhanced FRS to show the distribution of existing household
-bus-fare exposure. The official fiscal cost is kept separate from this exposure:
-annual household spending cannot identify ticket prices above £2.
+Costs the £3-to-£2 English bus fare cap announced on 22 July 2026 using the
+PolicyEngine UK Enhanced FRS. Household bus-fare spending is allocated to people
+and reduced by the 6.3% whole-market fare reduction observed in DfT's evaluation
+of the previous £2 cap. The result is an independent, static microsimulation
+estimate; the government's >£500m figure is retained only as a benchmark.
 """
 
 from __future__ import annotations
@@ -161,18 +162,16 @@ def run(args: argparse.Namespace) -> None:
         return out
 
     print("Step 3: Announced reform — £3 to £2 fare cap ...")
-    policy_breakdowns = breakdown(alloc, in_policy_geography)
     exposure_total_gbp = wsum(alloc * in_policy_geography)
-    allocated_relief = (
-        alloc
-        * in_policy_geography
-        * (sources.OFFICIAL_SCHEME_COST_LOWER_BOUND_BN * 1e9 / exposure_total_gbp)
-    )
+    reduction = sources.DFT_ALL_TICKET_FARE_REDUCTION
+    allocated_relief = alloc * in_policy_geography * reduction
+    estimated_cost_gbp = wsum(allocated_relief)
+    estimated_cost_bn = estimated_cost_gbp / 1e9
     effect_breakdowns = breakdown(
         allocated_relief,
         np.ones_like(age, bool),
         include_unknown=False,
-        target_total_bn=sources.OFFICIAL_SCHEME_COST_LOWER_BOUND_BN,
+        target_total_bn=round(estimated_cost_bn, 3),
     )
     household_frame = pd.DataFrame(
         {
@@ -277,17 +276,20 @@ def run(args: argparse.Namespace) -> None:
         "people_potentially_affected_m": round(wsum(in_policy_geography & (alloc > 0)) / 1e6, 2),
         "announced_new_funding_bn": sources.ANNOUNCED_NEW_FUNDING_BN,
         "official_scheme_cost_lower_bound_bn": sources.OFFICIAL_SCHEME_COST_LOWER_BOUND_BN,
-        "breakdowns": policy_breakdowns,
+        "estimated_cost_bn": round(estimated_cost_bn, 3),
+        "fare_reduction": reduction,
+        "baseline_fare_spending_bn": round(exposure_total_gbp / 1e9, 3),
+        "breakdowns": effect_breakdowns,
         "effect_breakdowns": effect_breakdowns,
         "average_effect_breakdowns": average_effect_breakdowns,
-        "breakdown_metric": "baseline_fare_exposure",
+        "breakdown_metric": "estimated_household_benefit",
         "ticket_level_savings_estimated": False,
         "household_effect": {
             "income_group": "Middle income (Q3)",
             "annual_effect_average_gbp": middle_income_effect_average,
             "by_region": middle_income_effect_by_region,
-            "allocation_base_bn": sources.OFFICIAL_SCHEME_COST_LOWER_BOUND_BN,
-            "method": "Official cost floor allocated by baseline fare exposure",
+            "allocation_base_bn": round(estimated_cost_bn, 3),
+            "method": "6.3% DfT observed all-ticket reduction applied to simulated fare spending",
         },
     }
 
@@ -380,4 +382,7 @@ def run(args: argparse.Namespace) -> None:
         dest.parent.mkdir(parents=True, exist_ok=True)
         dest.write_text(json.dumps(output, indent=2, default=str))
         print(f"    wrote {dest}")
-    print(f"Done. Official scheme cost >£{fare_cap['official_scheme_cost_lower_bound_bn']:.1f}bn.")
+    print(
+        f"Done. Microsimulation estimate £{fare_cap['estimated_cost_bn']:.3f}bn; "
+        f"government benchmark >£{fare_cap['official_scheme_cost_lower_bound_bn']:.1f}bn."
+    )

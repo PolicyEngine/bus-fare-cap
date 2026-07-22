@@ -40,8 +40,8 @@ export default function ReformTab({ data }) {
         <div className="grid gap-4 sm:grid-cols-3">
           <Stat
             label="Estimated fiscal cost"
-            value=">£500m"
-            sub="Published lower bound, not an exact total; includes £454m of new funding."
+            value={`£${Math.round(cap.estimated_cost_bn * 1000)}m`}
+            sub="Our static microsimulation. Government benchmark: >£500m."
           />
           <Stat
             label="Estimated middle-income household effect"
@@ -79,19 +79,17 @@ export default function ReformTab({ data }) {
           title="Who has bus-fare exposure in the policy geography?"
           description={
             <>
-              PolicyEngine shows the distribution of <strong>existing household bus and coach fare
-              spending</strong> in English regions outside London. This is an exposure measure, not
-              estimated savings: neither the Enhanced FRS nor the LCFS extract identifies individual
-              tickets above £2, participating routes, or places already charging £2 or less. It
-              therefore cannot reproduce the official cost or identify the number of beneficiaries.
-              For context, DfT records 1.85bn passenger journeys in England outside London. This is a
-              usage benchmark, not a like-for-like validation of household spending or savings.
+              PolicyEngine estimates household bus and coach fare spending in English regions outside
+              London. We apply the <strong>6.3% reduction across all ticket types</strong> observed in
+              DfT&apos;s evaluation of the previous £2 cap. Simulated spending determines the cost and
+              distribution; the government&apos;s &gt;£500m figure is only a benchmark. The estimate is
+              static and does not model individual ticket prices, participating routes or induced demand.
             </>
           }
         />
         <BreakdownChart
           breakdowns={cap.effect_breakdowns}
-          metric="Total estimated household benefit"
+          metric="Total estimated benefit"
           color={colors.primary[400]}
           period={data.projection_year_label}
           defaultDimension="income_quintile"

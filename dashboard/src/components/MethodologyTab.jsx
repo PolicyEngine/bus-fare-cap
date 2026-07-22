@@ -10,7 +10,7 @@ export default function MethodologyTab({ data }) {
     <div className="space-y-10">
       <SectionHeading
         title="Methodology"
-        description="What is official, what PolicyEngine models, and why the dashboard does not estimate ticket-level savings."
+        description="How the DfT evidence and PolicyEngine household microsimulation produce the estimate."
       />
 
       {/* One comprehensive method box */}
@@ -20,14 +20,14 @@ export default function MethodologyTab({ data }) {
           <p>
             The 22 July 2026 government announcement is the source for the £2 cap, calendar-2027
             dates, England-outside-London geography, participating-service condition, more-than-£500m
-            total cost and £454m of new funding. Those fiscal figures are reported as official
-            announcement values; they are not outputs of PolicyEngine. The £454m also includes
+            total cost and £454m of new funding. Those fiscal figures are comparison benchmarks,
+            not inputs to our estimate. The £454m also includes
             funding that enables devolved governments to take similar action, so it is not presented
             as England-only passenger savings.
           </p>
         </div>
         <div>
-          <h3 className="font-semibold text-slate-900">2 · Baseline household fare exposure</h3>
+          <h3 className="font-semibold text-slate-900">2 · Household microsimulation</h3>
           <p>
             Household bus &amp; coach spending is imputed from the Living Costs and Food Survey in the
             PolicyEngine UK Enhanced FRS and calibrated to DfT Annual Bus Statistics. The LCFS records
@@ -46,25 +46,23 @@ export default function MethodologyTab({ data }) {
           </div>
         </div>
         <div>
-          <h3 className="font-semibold text-slate-900">3 · Why savings are not microsimulated</h3>
+          <h3 className="font-semibold text-slate-900">3 · Costing the £2 cap</h3>
           <p>
-            Savings require ticket-level data: Σ journeys × max(current single fare − £2, 0). The
-            Enhanced FRS contains annual household spending, not individual ticket prices or journeys.
-            Its historic blended average fare is below £2, so applying a flat percentage would be
-            misleading and could produce negative savings. Fare-exposure charts therefore do not
-            claim ticket-level benefits or beneficiary counts. The middle-income household view is
-            a separate illustrative allocation: it distributes the official £500m cost floor in
-            proportion to baseline fare exposure, then divides each region&apos;s Q3 allocation across
-            all Q3 households, including non-bus users.
+            DfT&apos;s evaluation of the previous £2 cap found that average yield across all ticket
+            types fell from £1.49 to £1.40, a weighted reduction of 6.3%. We apply that independently
+            observed whole-market reduction to each simulated household&apos;s projected fare spending.
+            The resulting household savings sum to our fiscal-cost estimate. Average household effects
+            divide each group&apos;s modelled saving by all households in that group, including non-bus users.
+            The government&apos;s £500m floor is not used anywhere in this calculation.
           </p>
         </div>
         <div>
-          <h3 className="font-semibold text-slate-900">4 · What would enable an independent costing</h3>
+          <h3 className="font-semibold text-slate-900">4 · Limitation</h3>
           <p>
-            A defensible estimate needs the distribution of current single fares and journeys by
-            operator or route, the final 2027 participation list, existing local caps, concessionary
-            travel treatment and reimbursement rules. Behavioural modelling could then add induced
-            journeys as a separate sensitivity rather than mixing them into the static estimate.
+            This restores the original DfT-anchored microsimulation structure, but it is not a
+            ticket-level model. The 6.3% evidence comes from the 2023 £2 cap against the fares then
+            prevailing, while the 2027 counterfactual is a £3 cap. Route-level fares, final operator
+            participation, existing local caps and induced demand are not modelled.
           </p>
         </div>
         <div>

@@ -36,6 +36,15 @@ POLICY_END_DATE = "2027-12-31"
 ANNOUNCED_NEW_FUNDING_BN = 0.454
 OFFICIAL_SCHEME_COST_LOWER_BOUND_BN = 0.5
 
+# Independent empirical costing assumption. DfT's evaluation of the first ten
+# months of the previous £2 cap found that average yield across *all ticket
+# types* fell from £1.49 to £1.40, a weighted reduction of 6.3%. Applying this
+# observed whole-market reduction to simulated fare spending restores the
+# original dashboard's DfT-anchored microsimulation method. Because the 2027
+# counterfactual already has a £3 cap, this is best treated as an indicative
+# static estimate rather than a ticket-level forecast.
+DFT_ALL_TICKET_FARE_REDUCTION = 0.063
+
 # DfT Annual Bus Statistics, year ending March 2025 (England). These remain the
 # calibration anchors for household fare exposure, not a ticket-level estimate
 # of the newly announced £3-to-£2 cap.
@@ -113,6 +122,15 @@ TWO_POUND_ANNOUNCEMENT = Source(
     "https://www.gov.uk/government/news/cheaper-travel-for-millions-with-a-third-off-fares",
 )
 
+DFT_TWO_POUND_CAP_EVALUATION = Source(
+    "6.3% reduction across all ticket types",
+    "DfT's evaluation of the first ten months of the previous £2 cap reports "
+    "average operator yield of £1.49 before and £1.40 after the cap across all "
+    "ticket types, a weighted average saving of 6.3%. Affected singles fell from "
+    "£2.73 to £2.00, but they represented less than half of trips.",
+    "https://www.gov.uk/government/publications/evaluation-of-the-2-bus-fare-cap",
+)
+
 
 def as_json() -> dict:
     return {
@@ -126,7 +144,9 @@ def as_json() -> dict:
         },
         "assumptions": {
             "age_allocation_weights": AGE_ALLOCATION_WEIGHTS,
-            "incidence_method": "baseline household fare exposure; not estimated savings",
+            "fare_cap_reduction": DFT_ALL_TICKET_FARE_REDUCTION,
+            "incidence_method": "DfT observed all-ticket reduction applied to household fare spending",
+            "behavioural": "static (no induced demand)",
         },
         "sources": {
             "dft_fare": asdict(DFT_FARE),
@@ -138,5 +158,6 @@ def as_json() -> dict:
             "nts_age_profile": asdict(NTS_AGE_PROFILE),
             "current_fare_cap_policy": asdict(CURRENT_FARE_CAP_POLICY),
             "two_pound_announcement": asdict(TWO_POUND_ANNOUNCEMENT),
+            "dft_two_pound_cap_evaluation": asdict(DFT_TWO_POUND_CAP_EVALUATION),
         },
     }

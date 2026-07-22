@@ -76,12 +76,12 @@ function Dashboard() {
           2026</strong>. The policy lowers the £3 maximum single fare on participating services in
           England outside London for calendar 2027. The{" "}
           <TabLink onSelect={() => handleTabChange("reform")}>Announcement</TabLink> tab separates
-          official funding figures from PolicyEngine&apos;s distribution of baseline fare exposure. The{" "}
+          our microsimulation estimate from the government&apos;s published funding benchmark. The{" "}
           <TabLink onSelect={() => handleTabChange("baseline")}>Baseline</TabLink> tab shows the
           projected baseline bus fares by age and region. The{" "}
           <TabLink onSelect={() => handleTabChange("methodology")}>Methodology</TabLink> tab explains
-          how every result is computed, with a source for every assumption. The dashboard does not
-          estimate ticket-level savings because the survey data do not identify fares above £2.
+          how every result is computed, with a source for every assumption. The estimate applies
+          DfT&apos;s observed 6.3% all-ticket reduction to simulated household fare spending.
         </p>
 
         <div className="mb-8 mt-8 flex w-fit flex-wrap border-b-2 border-slate-200">

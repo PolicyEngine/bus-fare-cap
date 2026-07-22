@@ -27,17 +27,22 @@ def results():
     return json.loads(RESULTS.read_text())
 
 
-def test_results_keep_official_cost_separate_from_exposure(results):
+def test_results_cost_is_microsimulated_and_official_cost_is_a_benchmark(results):
     cap = results["reforms"]["announced_2pound_cap"]
     assert cap["official_scheme_cost_lower_bound_bn"] == 0.5
     assert cap["announced_new_funding_bn"] == 0.454
     assert cap["people_potentially_affected_m"] > 0
-    assert cap["breakdown_metric"] == "baseline_fare_exposure"
+    assert cap["breakdown_metric"] == "estimated_household_benefit"
     assert cap["ticket_level_savings_estimated"] is False
+    assert cap["fare_reduction"] == sources.DFT_ALL_TICKET_FARE_REDUCTION
+    assert cap["estimated_cost_bn"] == pytest.approx(
+        cap["baseline_fare_spending_bn"] * cap["fare_reduction"], abs=0.002
+    )
+    assert cap["estimated_cost_bn"] != cap["official_scheme_cost_lower_bound_bn"]
     effect = cap["household_effect"]
     assert effect["income_group"] == "Middle income (Q3)"
     assert effect["annual_effect_average_gbp"] > 0
-    assert effect["allocation_base_bn"] == 0.5
+    assert effect["allocation_base_bn"] == cap["estimated_cost_bn"]
     assert len(effect["by_region"]) == 8
 
 
@@ -56,10 +61,12 @@ def test_results_breakdown_totals_reconcile(results):
     assert sum(r["cost_bn"] for r in region_rows) > 0
 
 
-def test_effect_breakdowns_reconcile_to_cost_floor(results):
+def test_effect_breakdowns_reconcile_to_modelled_cost(results):
     cap = results["reforms"]["announced_2pound_cap"]
     for rows in cap["effect_breakdowns"].values():
-        assert sum(row["cost_bn"] for row in rows) == pytest.approx(0.5, abs=0.01)
+        assert sum(row["cost_bn"] for row in rows) == pytest.approx(
+            cap["estimated_cost_bn"], abs=0.01
+        )
     assert {row["group"] for row in cap["effect_breakdowns"]["income_quintile"]} == {
         "Q1",
         "Q2",

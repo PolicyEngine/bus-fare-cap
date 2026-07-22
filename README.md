@@ -9,7 +9,7 @@ Source-backed analysis of the £2 bus fare cap announced by the UK government on
 - Maximum single fare falls from £3 to £2.
 - Applies from 1 January through 31 December 2027.
 - Covers participating bus services in England outside London.
-- Government says total scheme cost will exceed £500m and identifies £454m of new funding, including funding that enables devolved governments to take similar action.
+- Government says £400m of extra funding backs the cap and reports £454m of extra funding in total, including funding for devolved governments through the Barnett formula. It does not publish a total scheme cost.
 
 The dashboard estimates the fiscal cost independently. The government figure is shown only as a benchmark.
 
@@ -17,7 +17,7 @@ The dashboard estimates the fiscal cost independently. The government figure is 
 
 PolicyEngine projects household bus and coach fare spending to 2027 by English region outside London, family type, age and income quintile. Household fares are imputed from the LCFS, calibrated to DfT Annual Bus Statistics and allocated to household members with an NTS-derived age profile.
 
-DfT's evaluation of the previous £2 cap found that average operator yield across all ticket types fell from £1.49 to £1.40, a 6.3% reduction. The pipeline applies that observed reduction to simulated fare spending in the policy geography. Household savings sum to the modelled fiscal cost; average household effects divide each group's savings by all households in that group. The official >£500m cost is not an input.
+DfT's evaluation of the previous £2 cap found that average operator yield across all ticket types fell from £1.49 to £1.40, a 6.3% reduction. The pipeline applies that observed reduction to simulated fare spending in the policy geography. Household savings sum to the modelled fiscal cost; average household effects divide each group's savings by all households in that group. The official funding figures are not inputs.
 
 ## Layout
 

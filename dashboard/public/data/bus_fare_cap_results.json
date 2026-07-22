@@ -67,13 +67,13 @@
       "url": "https://www.gov.uk/government/statistics/national-travel-survey-2023/nts-2023-trips-by-purpose-age-mode-and-sex"
     },
     "current_fare_cap_policy": {
-      "value": "\u00a33 until 31 December 2026",
-      "description": "The current maximum single fare on participating bus services in England outside London, before the announced \u00a32 cap begins.",
+      "value": "\u00a33 funded until 31 March 2027",
+      "description": "The existing national scheme funds a \u00a33 maximum single fare on participating services through March 2027. The new policy supersedes it from 1 January 2027, lowering the cap to \u00a32 and extending it through December.",
       "url": "https://www.gov.uk/guidance/3-national-bus-fare-cap"
     },
     "two_pound_announcement": {
-      "value": "\u00a32 from 1 January 2027; >\u00a3500m scheme cost",
-      "description": "Government announcement of a \u00a32 maximum single fare on participating buses in England outside London throughout 2027. It announces \u00a3454m of new funding, including funding enabling devolved governments to take similar action, and says total scheme cost will exceed \u00a3500m.",
+      "value": "\u00a32 from 1 January 2027; \u00a3400m backs the cap",
+      "description": "Government announcement of a \u00a32 maximum single fare on participating buses in England outside London throughout 2027. It says \u00a3400m of extra funding backs the cap and separately reports \u00a3454m of extra funding including Barnett funding for devolved governments. It does not publish a total scheme cost.",
       "url": "https://www.gov.uk/government/news/cheaper-travel-for-millions-with-a-third-off-fares"
     },
     "dft_two_pound_cap_evaluation": {
@@ -365,8 +365,9 @@
       "geography": "England outside London",
       "participating_services_only": true,
       "people_potentially_affected_m": 14.18,
-      "announced_new_funding_bn": 0.454,
-      "official_scheme_cost_lower_bound_bn": 0.5,
+      "announced_cap_funding_bn": 0.4,
+      "announced_total_extra_funding_bn": 0.454,
+      "official_total_scheme_cost_published": false,
       "estimated_cost_bn": 0.191,
       "fare_reduction": 0.063,
       "baseline_fare_spending_bn": 3.037,

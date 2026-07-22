@@ -33,8 +33,8 @@ BASELINE_FARE_CAP_GBP = 3
 REFORM_FARE_CAP_GBP = 2
 POLICY_START_DATE = "2027-01-01"
 POLICY_END_DATE = "2027-12-31"
-ANNOUNCED_NEW_FUNDING_BN = 0.454
-OFFICIAL_SCHEME_COST_LOWER_BOUND_BN = 0.5
+ANNOUNCED_CAP_FUNDING_BN = 0.4
+ANNOUNCED_TOTAL_EXTRA_FUNDING_BN = 0.454
 
 # Independent empirical costing assumption. DfT's evaluation of the first ten
 # months of the previous £2 cap found that average yield across *all ticket
@@ -107,18 +107,19 @@ NTS_AGE_PROFILE = Source(
     "https://www.gov.uk/government/statistics/national-travel-survey-2023/nts-2023-trips-by-purpose-age-mode-and-sex",
 )
 CURRENT_FARE_CAP_POLICY = Source(
-    "£3 until 31 December 2026",
-    "The current maximum single fare on participating bus services in England "
-    "outside London, before the announced £2 cap begins.",
+    "£3 funded until 31 March 2027",
+    "The existing national scheme funds a £3 maximum single fare on participating "
+    "services through March 2027. The new policy supersedes it from 1 January 2027, "
+    "lowering the cap to £2 and extending it through December.",
     "https://www.gov.uk/guidance/3-national-bus-fare-cap",
 )
 
 TWO_POUND_ANNOUNCEMENT = Source(
-    "£2 from 1 January 2027; >£500m scheme cost",
+    "£2 from 1 January 2027; £400m backs the cap",
     "Government announcement of a £2 maximum single fare on participating buses "
-    "in England outside London throughout 2027. It announces £454m of new funding, "
-    "including funding enabling devolved governments to take similar action, and "
-    "says total scheme cost will exceed £500m.",
+    "in England outside London throughout 2027. It says £400m of extra funding "
+    "backs the cap and separately reports £454m of extra funding including Barnett "
+    "funding for devolved governments. It does not publish a total scheme cost.",
     "https://www.gov.uk/government/news/cheaper-travel-for-millions-with-a-third-off-fares",
 )
 

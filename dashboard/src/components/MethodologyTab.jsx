@@ -19,11 +19,11 @@ export default function MethodologyTab({ data }) {
           <h3 className="font-semibold text-slate-900">1 · Official policy and fiscal figures</h3>
           <p>
             The 22 July 2026 government announcement is the source for the £2 cap, calendar-2027
-            dates, England-outside-London geography, participating-service condition, more-than-£500m
-            total cost and £454m of new funding. Those fiscal figures are comparison benchmarks,
-            not inputs to our estimate. The £454m also includes
-            funding that enables devolved governments to take similar action, so it is not presented
-            as England-only passenger savings.
+            dates, England-outside-London geography, participating-bus condition, £400m of extra
+            funding backing the cap and £454m of total extra funding including devolved-government
+            funding. The announcement does not publish a total scheme cost. These funding figures are
+            comparison benchmarks, not inputs to our estimate, and neither is presented as England-only
+            passenger savings.
           </p>
         </div>
         <div>
@@ -53,7 +53,7 @@ export default function MethodologyTab({ data }) {
             observed whole-market reduction to each simulated household&apos;s projected fare spending.
             The resulting household savings sum to our fiscal-cost estimate. Average household effects
             divide each group&apos;s modelled saving by all households in that group, including non-bus users.
-            The government&apos;s £500m floor is not used anywhere in this calculation.
+            The government&apos;s funding figures are not used anywhere in this calculation.
           </p>
         </div>
         <div>

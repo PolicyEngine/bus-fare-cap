@@ -29,8 +29,9 @@ def results():
 
 def test_results_cost_is_microsimulated_and_official_cost_is_a_benchmark(results):
     cap = results["reforms"]["announced_2pound_cap"]
-    assert cap["official_scheme_cost_lower_bound_bn"] == 0.5
-    assert cap["announced_new_funding_bn"] == 0.454
+    assert cap["announced_cap_funding_bn"] == 0.4
+    assert cap["announced_total_extra_funding_bn"] == 0.454
+    assert cap["official_total_scheme_cost_published"] is False
     assert cap["people_potentially_affected_m"] > 0
     assert cap["breakdown_metric"] == "estimated_household_benefit"
     assert cap["ticket_level_savings_estimated"] is False
@@ -38,7 +39,7 @@ def test_results_cost_is_microsimulated_and_official_cost_is_a_benchmark(results
     assert cap["estimated_cost_bn"] == pytest.approx(
         cap["baseline_fare_spending_bn"] * cap["fare_reduction"], abs=0.002
     )
-    assert cap["estimated_cost_bn"] != cap["official_scheme_cost_lower_bound_bn"]
+    assert cap["estimated_cost_bn"] != cap["announced_cap_funding_bn"]
     effect = cap["household_effect"]
     assert effect["income_group"] == "Middle income (Q3)"
     assert effect["annual_effect_average_gbp"] > 0

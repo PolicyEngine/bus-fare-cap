@@ -4,7 +4,7 @@ Costs the £3-to-£2 English bus fare cap announced on 22 July 2026 using the
 PolicyEngine UK Enhanced FRS. Household bus-fare spending is allocated to people
 and reduced by the 6.3% whole-market fare reduction observed in DfT's evaluation
 of the previous £2 cap. The result is an independent, static microsimulation
-estimate; the government's >£500m figure is retained only as a benchmark.
+estimate; the government's £400m funding figure is retained only as a benchmark.
 """
 
 from __future__ import annotations
@@ -274,8 +274,9 @@ def run(args: argparse.Namespace) -> None:
         "geography": "England outside London",
         "participating_services_only": True,
         "people_potentially_affected_m": round(wsum(in_policy_geography & (alloc > 0)) / 1e6, 2),
-        "announced_new_funding_bn": sources.ANNOUNCED_NEW_FUNDING_BN,
-        "official_scheme_cost_lower_bound_bn": sources.OFFICIAL_SCHEME_COST_LOWER_BOUND_BN,
+        "announced_cap_funding_bn": sources.ANNOUNCED_CAP_FUNDING_BN,
+        "announced_total_extra_funding_bn": sources.ANNOUNCED_TOTAL_EXTRA_FUNDING_BN,
+        "official_total_scheme_cost_published": False,
         "estimated_cost_bn": round(estimated_cost_bn, 3),
         "fare_reduction": reduction,
         "baseline_fare_spending_bn": round(exposure_total_gbp / 1e9, 3),
@@ -384,5 +385,5 @@ def run(args: argparse.Namespace) -> None:
         print(f"    wrote {dest}")
     print(
         f"Done. Microsimulation estimate £{fare_cap['estimated_cost_bn']:.3f}bn; "
-        f"government benchmark >£{fare_cap['official_scheme_cost_lower_bound_bn']:.1f}bn."
+        f"government cap-funding benchmark £{fare_cap['announced_cap_funding_bn']:.1f}bn."
     )

@@ -53,3 +53,9 @@ def test_results_breakdown_totals_reconcile(results):
         {"London", "Scotland", "Wales", "Northern Ireland"}
     )
     assert sum(r["cost_bn"] for r in region_rows) > 0
+
+
+def test_effect_breakdowns_reconcile_to_cost_floor(results):
+    cap = results["reforms"]["announced_2pound_cap"]
+    for rows in cap["effect_breakdowns"].values():
+        assert sum(row["cost_bn"] for row in rows) == pytest.approx(0.5, abs=0.01)

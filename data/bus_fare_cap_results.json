@@ -505,6 +505,156 @@
           }
         ]
       },
+      "effect_breakdowns": {
+        "region": [
+          {
+            "group": "North West",
+            "cost_bn": 0.101
+          },
+          {
+            "group": "South East",
+            "cost_bn": 0.086
+          },
+          {
+            "group": "East Midlands",
+            "cost_bn": 0.07
+          },
+          {
+            "group": "Yorkshire",
+            "cost_bn": 0.061
+          },
+          {
+            "group": "East of England",
+            "cost_bn": 0.059
+          },
+          {
+            "group": "South West",
+            "cost_bn": 0.05
+          },
+          {
+            "group": "West Midlands",
+            "cost_bn": 0.047
+          },
+          {
+            "group": "North East",
+            "cost_bn": 0.026
+          }
+        ],
+        "household_type": [
+          {
+            "group": "Couple No Children",
+            "cost_bn": 0.265
+          },
+          {
+            "group": "Couple With Children",
+            "cost_bn": 0.114
+          },
+          {
+            "group": "Single",
+            "cost_bn": 0.112
+          },
+          {
+            "group": "Lone Parent",
+            "cost_bn": 0.009
+          }
+        ],
+        "age_band": [
+          {
+            "group": "0-4",
+            "cost_bn": 0.01
+          },
+          {
+            "group": "5-9",
+            "cost_bn": 0.009
+          },
+          {
+            "group": "10-14",
+            "cost_bn": 0.009
+          },
+          {
+            "group": "15-19",
+            "cost_bn": 0.026
+          },
+          {
+            "group": "20-24",
+            "cost_bn": 0.027
+          },
+          {
+            "group": "25-29",
+            "cost_bn": 0.064
+          },
+          {
+            "group": "30-34",
+            "cost_bn": 0.037
+          },
+          {
+            "group": "35-39",
+            "cost_bn": 0.034
+          },
+          {
+            "group": "40-44",
+            "cost_bn": 0.034
+          },
+          {
+            "group": "45-49",
+            "cost_bn": 0.021
+          },
+          {
+            "group": "50-54",
+            "cost_bn": 0.055
+          },
+          {
+            "group": "55-59",
+            "cost_bn": 0.053
+          },
+          {
+            "group": "60-64",
+            "cost_bn": 0.023
+          },
+          {
+            "group": "65-69",
+            "cost_bn": 0.026
+          },
+          {
+            "group": "70-74",
+            "cost_bn": 0.023
+          },
+          {
+            "group": "75-79",
+            "cost_bn": 0.014
+          },
+          {
+            "group": "80+",
+            "cost_bn": 0.035
+          }
+        ],
+        "income_quintile": [
+          {
+            "group": "Q1",
+            "cost_bn": 0.081
+          },
+          {
+            "group": "Q2",
+            "cost_bn": 0.096
+          },
+          {
+            "group": "Q3",
+            "cost_bn": 0.082
+          },
+          {
+            "group": "Q4",
+            "cost_bn": 0.093
+          },
+          {
+            "group": "Q5",
+            "cost_bn": 0.145
+          },
+          {
+            "group": "Unknown",
+            "cost_bn": 0.003
+          }
+        ]
+      },
       "breakdown_metric": "baseline_fare_exposure",
       "ticket_level_savings_estimated": false,
       "household_effect": {

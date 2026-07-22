@@ -124,7 +124,7 @@ def run(args: argparse.Namespace) -> None:
         np.char.add(np.char.add(_bstart.astype(str), "-"), (_bstart + 4).astype(str)),
     )
 
-    def breakdown(value_p, eligible):
+    def breakdown(value_p, eligible, include_unknown=False, target_total_bn=None):
         v = np.asarray(value_p) * eligible * pw
         df = pd.DataFrame(
             {
@@ -140,7 +140,7 @@ def run(args: argparse.Namespace) -> None:
             rows = [
                 {"group": g, "cost_bn": round(float(c) / 1e9, 3)}
                 for g, c in df.groupby(dim)["v"].sum().items()
-                if g != "Unknown" and c > 0
+                if (include_unknown or g != "Unknown") and c > 0
             ]
             if dim == "age_band":
                 rows.sort(key=lambda r: int(r["group"].split("-")[0].replace("+", "")))
@@ -148,6 +148,10 @@ def run(args: argparse.Namespace) -> None:
                 rows.sort(key=lambda r: r["group"])
             else:
                 rows.sort(key=lambda r: r["cost_bn"], reverse=True)
+            if target_total_bn is not None and rows:
+                residual = round(target_total_bn - sum(r["cost_bn"] for r in rows), 3)
+                largest = max(rows, key=lambda r: r["cost_bn"])
+                largest["cost_bn"] = round(largest["cost_bn"] + residual, 3)
             out[dim] = rows
         return out
 
@@ -158,6 +162,12 @@ def run(args: argparse.Namespace) -> None:
         alloc
         * in_policy_geography
         * (sources.OFFICIAL_SCHEME_COST_LOWER_BOUND_BN * 1e9 / exposure_total_gbp)
+    )
+    effect_breakdowns = breakdown(
+        allocated_relief,
+        np.ones_like(age, bool),
+        include_unknown=True,
+        target_total_bn=sources.OFFICIAL_SCHEME_COST_LOWER_BOUND_BN,
     )
     household_frame = pd.DataFrame(
         {
@@ -209,6 +219,7 @@ def run(args: argparse.Namespace) -> None:
         "announced_new_funding_bn": sources.ANNOUNCED_NEW_FUNDING_BN,
         "official_scheme_cost_lower_bound_bn": sources.OFFICIAL_SCHEME_COST_LOWER_BOUND_BN,
         "breakdowns": policy_breakdowns,
+        "effect_breakdowns": effect_breakdowns,
         "breakdown_metric": "baseline_fare_exposure",
         "ticket_level_savings_estimated": False,
         "household_effect": {

@@ -98,10 +98,8 @@ export default function ReformTab({ data }) {
           period={data.projection_year_label}
           defaultDimension="income_quintile"
           alternateMetric={{
-            label: "Middle-income household effect",
-            unit: "£/year",
-            rows: householdEffect.by_region.map((row) => ({ group: row.region, value: row.annual_effect_gbp })),
-            formatter: (value) => `£${Number(value).toFixed(0)}`,
+            label: "Estimated household benefit",
+            breakdowns: cap.effect_breakdowns,
           }}
         />
       </section>

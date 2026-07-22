@@ -1,4 +1,4 @@
-# 2027 £2 bus fare cap analysis
+# £2 bus fare cap analysis
 
 Source-backed analysis of the £2 bus fare cap announced by the UK government on 22 July 2026, with PolicyEngine UK distributional context from the Enhanced FRS.
 

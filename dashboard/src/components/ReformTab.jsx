@@ -42,17 +42,17 @@ export default function ReformTab({ data }) {
           <Stat
             label="Estimated fiscal cost"
             value={`£${Math.round(cap.estimated_cost_bn * 1000)}m`}
-            sub="Our static microsimulation. Government funding benchmark: £400m."
+            sub={<>Our static microsimulation. {A(src.two_pound_announcement, "Government funding benchmark: £400m.")}</>}
           />
           <Stat
             label="Estimated middle-income household effect"
             value={`£${householdEffect.annual_effect_average_gbp.toFixed(2)}/year`}
-            sub="Modelled Q3 average across England outside London."
+            sub="Modelled average for Q3: the middle fifth of households by income, across England outside London."
           />
           <Stat
             label="Estimated people potentially affected"
             value={`${cap.people_potentially_affected_m.toFixed(2)}m`}
-            sub="People in modelled fare-spending households; government benchmark: millions benefit."
+            sub="People in modelled fare-spending households."
           />
         </div>
 

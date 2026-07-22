@@ -30,27 +30,32 @@ export default function BreakdownChart({ breakdowns, metric = "Cost", color = co
   const dataKey = showAlternate ? "annual_effect_gbp" : "cost_bn";
   return (
     <div className="rounded-2xl border border-slate-200 bg-white p-6">
-      {alternateMetric ? (
-        <div className="mb-5 grid w-full max-w-xl grid-cols-2 rounded-xl border border-slate-200 bg-slate-50 p-1">
-          <button type="button" aria-pressed={metricView === "primary"} onClick={() => setMetricView("primary")} className={`rounded-lg px-4 py-2 text-sm font-semibold transition-colors ${metricView === "primary" ? "bg-[color:var(--pe-color-primary-600)] text-white shadow-sm" : "text-slate-600 hover:bg-slate-100"}`}>Total estimated benefit</button>
-          <button type="button" aria-pressed={metricView === "alternate"} onClick={() => setMetricView("alternate")} className={`rounded-lg px-4 py-2 text-sm font-semibold transition-colors ${metricView === "alternate" ? "bg-[color:var(--pe-color-primary-600)] text-white shadow-sm" : "text-slate-600 hover:bg-slate-100"}`}>Average household effect</button>
-        </div>
-      ) : null}
-      <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
-        <h3 className="text-sm font-semibold text-slate-700">{chartMetric} by {dimLabel} ({unit}{period ? `, ${period}` : ""})</h3>
-        <div className="flex flex-wrap gap-1">
-          {DIMENSIONS.map((d) => (
-            <button
-              type="button"
-              key={d.id}
-              onClick={() => setDim(d.id)}
-              className={`rounded-lg px-3 py-1 text-xs font-medium transition-colors ${dim === d.id ? "bg-[color:var(--pe-color-primary-600)] text-white" : "bg-slate-100 text-slate-600 hover:bg-slate-200"}`}
+      <div className="mb-5 grid gap-3 sm:grid-cols-2">
+        {alternateMetric ? (
+          <label className="min-w-0">
+            <span className="mb-1 block text-xs font-medium text-slate-500">Measure</span>
+            <select
+              value={metricView}
+              onChange={(event) => setMetricView(event.target.value)}
+              className="h-10 w-full rounded-lg border border-slate-200 bg-white px-3 text-sm font-semibold text-slate-700 outline-none transition-colors focus:border-[color:var(--pe-color-primary-500)] focus:ring-2 focus:ring-[color:var(--pe-color-primary-100)]"
             >
-              {d.label}
-            </button>
-          ))}
-        </div>
+              <option value="primary">Total estimated benefit</option>
+              <option value="alternate">Average household effect</option>
+            </select>
+          </label>
+        ) : null}
+        <label className="min-w-0">
+          <span className="mb-1 block text-xs font-medium text-slate-500">Breakdown</span>
+          <select
+            value={dim}
+            onChange={(event) => setDim(event.target.value)}
+            className="h-10 w-full rounded-lg border border-slate-200 bg-white px-3 text-sm font-semibold text-slate-700 outline-none transition-colors focus:border-[color:var(--pe-color-primary-500)] focus:ring-2 focus:ring-[color:var(--pe-color-primary-100)]"
+          >
+            {DIMENSIONS.map((d) => <option key={d.id} value={d.id}>{d.label}</option>)}
+          </select>
+        </label>
       </div>
+      <h3 className="mb-4 text-sm font-semibold text-slate-700">{chartMetric} by {dimLabel} ({unit}{period ? `, ${period}` : ""})</h3>
       <ResponsiveContainer width="100%" height={320}>
         <BarChart data={rows} margin={{ left: 8, right: 16, top: 8, bottom: 64 }}>
           <CartesianGrid strokeDasharray="3 3" stroke={colors.border.light} />

@@ -90,14 +90,14 @@ export default function ReformTab({ data }) {
           }
         />
         <BreakdownChart
-          breakdowns={cap.breakdowns}
-          metric="Baseline fare exposure"
+          breakdowns={cap.effect_breakdowns}
+          metric="Total estimated household benefit"
           color={colors.primary[400]}
           period={data.projection_year_label}
           defaultDimension="income_quintile"
           alternateMetric={{
-            label: "Estimated household benefit",
-            breakdowns: cap.effect_breakdowns,
+            label: "Average household effect",
+            breakdowns: cap.average_effect_breakdowns,
           }}
         />
       </section>

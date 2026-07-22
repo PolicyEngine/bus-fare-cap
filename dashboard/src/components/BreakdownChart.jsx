@@ -20,17 +20,20 @@ export default function BreakdownChart({ breakdowns, metric = "Cost", color = co
   const showAlternate = metricView === "alternate" && alternateMetric;
   // Drop empty categories so the chart only shows groups with exposure.
   const rows = showAlternate
-    ? (alternateMetric.breakdowns[dim] || []).filter((r) => r.cost_bn > 0)
+    ? (alternateMetric.breakdowns[dim] || []).filter((r) => r.annual_effect_gbp > 0)
     : (breakdowns[dim] || []).filter((r) => r.cost_bn > 0);
   const dimLabel = DIMENSIONS.find((d) => d.id === dim).label.toLowerCase();
-  const chartMetric = showAlternate ? alternateMetric.label : metric;
-  const unit = "£bn";
+  const chartMetric = showAlternate
+    ? dim === "age_band" ? "Average person effect" : alternateMetric.label
+    : metric;
+  const unit = showAlternate ? "£/year" : "£bn";
+  const dataKey = showAlternate ? "annual_effect_gbp" : "cost_bn";
   return (
     <div className="rounded-2xl border border-slate-200 bg-white p-6">
       {alternateMetric ? (
-        <div className="mb-4 flex w-fit rounded-lg bg-slate-100 p-1">
-          <button type="button" onClick={() => setMetricView("primary")} className={`rounded-md px-3 py-1.5 text-xs font-semibold ${metricView === "primary" ? "bg-white text-slate-900 shadow-sm" : "text-slate-600"}`}>Baseline fare spending</button>
-          <button type="button" onClick={() => setMetricView("alternate")} className={`rounded-md px-3 py-1.5 text-xs font-semibold ${metricView === "alternate" ? "bg-white text-slate-900 shadow-sm" : "text-slate-600"}`}>Estimated household benefit</button>
+        <div className="mb-5 grid w-full max-w-xl grid-cols-2 rounded-xl border border-slate-200 bg-slate-50 p-1">
+          <button type="button" aria-pressed={metricView === "primary"} onClick={() => setMetricView("primary")} className={`rounded-lg px-4 py-2 text-sm font-semibold transition-colors ${metricView === "primary" ? "bg-[color:var(--pe-color-primary-600)] text-white shadow-sm" : "text-slate-600 hover:bg-slate-100"}`}>Total estimated benefit</button>
+          <button type="button" aria-pressed={metricView === "alternate"} onClick={() => setMetricView("alternate")} className={`rounded-lg px-4 py-2 text-sm font-semibold transition-colors ${metricView === "alternate" ? "bg-[color:var(--pe-color-primary-600)] text-white shadow-sm" : "text-slate-600 hover:bg-slate-100"}`}>Average household effect</button>
         </div>
       ) : null}
       <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
@@ -53,8 +56,8 @@ export default function BreakdownChart({ breakdowns, metric = "Cost", color = co
           <CartesianGrid strokeDasharray="3 3" stroke={colors.border.light} />
           <XAxis dataKey="group" angle={-30} textAnchor="end" interval={0} height={72} tick={{ fontSize: 11 }} />
           <YAxis tick={{ fontSize: 12 }} />
-          <Tooltip formatter={(v) => formatBn(v)} />
-          <Bar dataKey="cost_bn" radius={[4, 4, 0, 0]}>
+          <Tooltip formatter={(v) => showAlternate ? `£${Number(v).toFixed(2)}` : formatBn(v)} />
+          <Bar dataKey={dataKey} radius={[4, 4, 0, 0]}>
             {rows.map((_, i) => <Cell key={i} fill={color} />)}
           </Bar>
         </BarChart>

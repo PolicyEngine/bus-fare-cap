@@ -632,27 +632,169 @@
         "income_quintile": [
           {
             "group": "Q1",
-            "cost_bn": 0.081
-          },
-          {
-            "group": "Q2",
-            "cost_bn": 0.096
-          },
-          {
-            "group": "Q3",
             "cost_bn": 0.082
           },
           {
+            "group": "Q2",
+            "cost_bn": 0.097
+          },
+          {
+            "group": "Q3",
+            "cost_bn": 0.083
+          },
+          {
             "group": "Q4",
-            "cost_bn": 0.093
+            "cost_bn": 0.094
           },
           {
             "group": "Q5",
-            "cost_bn": 0.145
+            "cost_bn": 0.144
+          }
+        ]
+      },
+      "average_effect_breakdowns": {
+        "region": [
+          {
+            "group": "East Midlands",
+            "annual_effect_gbp": 30.89
           },
           {
-            "group": "Unknown",
-            "cost_bn": 0.003
+            "group": "North West",
+            "annual_effect_gbp": 28.68
+          },
+          {
+            "group": "Yorkshire",
+            "annual_effect_gbp": 23.71
+          },
+          {
+            "group": "East of England",
+            "annual_effect_gbp": 20.13
+          },
+          {
+            "group": "South East",
+            "annual_effect_gbp": 19.95
+          },
+          {
+            "group": "North East",
+            "annual_effect_gbp": 19.77
+          },
+          {
+            "group": "South West",
+            "annual_effect_gbp": 18.19
+          },
+          {
+            "group": "West Midlands",
+            "annual_effect_gbp": 17.46
+          }
+        ],
+        "household_type": [
+          {
+            "group": "Couple No Children",
+            "annual_effect_gbp": 31.1
+          },
+          {
+            "group": "Couple With Children",
+            "annual_effect_gbp": 27.34
+          },
+          {
+            "group": "Single",
+            "annual_effect_gbp": 13.05
+          },
+          {
+            "group": "Lone Parent",
+            "annual_effect_gbp": 4.8
+          }
+        ],
+        "age_band": [
+          {
+            "group": "0-4",
+            "annual_effect_gbp": 2.44
+          },
+          {
+            "group": "5-9",
+            "annual_effect_gbp": 2.38
+          },
+          {
+            "group": "10-14",
+            "annual_effect_gbp": 2.13
+          },
+          {
+            "group": "15-19",
+            "annual_effect_gbp": 6.73
+          },
+          {
+            "group": "20-24",
+            "annual_effect_gbp": 9.59
+          },
+          {
+            "group": "25-29",
+            "annual_effect_gbp": 10.34
+          },
+          {
+            "group": "30-34",
+            "annual_effect_gbp": 6.93
+          },
+          {
+            "group": "35-39",
+            "annual_effect_gbp": 8.4
+          },
+          {
+            "group": "40-44",
+            "annual_effect_gbp": 7.6
+          },
+          {
+            "group": "45-49",
+            "annual_effect_gbp": 4.97
+          },
+          {
+            "group": "50-54",
+            "annual_effect_gbp": 12.05
+          },
+          {
+            "group": "55-59",
+            "annual_effect_gbp": 11.11
+          },
+          {
+            "group": "60-64",
+            "annual_effect_gbp": 5.47
+          },
+          {
+            "group": "65-69",
+            "annual_effect_gbp": 7.85
+          },
+          {
+            "group": "70-74",
+            "annual_effect_gbp": 6.53
+          },
+          {
+            "group": "75-79",
+            "annual_effect_gbp": 5.68
+          },
+          {
+            "group": "80+",
+            "annual_effect_gbp": 9.31
+          }
+        ],
+        "income_quintile": [
+          {
+            "group": "Q1",
+            "annual_effect_gbp": 16.2
+          },
+          {
+            "group": "Q2",
+            "annual_effect_gbp": 17.91
+          },
+          {
+            "group": "Q3",
+            "annual_effect_gbp": 19.83
+          },
+          {
+            "group": "Q4",
+            "annual_effect_gbp": 25.3
+          },
+          {
+            "group": "Q5",
+            "annual_effect_gbp": 36.08
           }
         ]
       },

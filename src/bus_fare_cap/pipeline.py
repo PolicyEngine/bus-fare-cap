@@ -149,6 +149,11 @@ def run(args: argparse.Namespace) -> None:
             else:
                 rows.sort(key=lambda r: r["cost_bn"], reverse=True)
             if target_total_bn is not None and rows:
+                current_total = sum(r["cost_bn"] for r in rows)
+                if current_total > 0:
+                    scale = target_total_bn / current_total
+                    for row in rows:
+                        row["cost_bn"] = round(row["cost_bn"] * scale, 3)
                 residual = round(target_total_bn - sum(r["cost_bn"] for r in rows), 3)
                 largest = max(rows, key=lambda r: r["cost_bn"])
                 largest["cost_bn"] = round(largest["cost_bn"] + residual, 3)
@@ -166,17 +171,70 @@ def run(args: argparse.Namespace) -> None:
     effect_breakdowns = breakdown(
         allocated_relief,
         np.ones_like(age, bool),
-        include_unknown=True,
+        include_unknown=False,
         target_total_bn=sources.OFFICIAL_SCHEME_COST_LOWER_BOUND_BN,
     )
     household_frame = pd.DataFrame(
         {
             "household_id": hid,
             "region": region_label,
+            "household_type": [_label(f) for f in famtype],
             "income_quintile": quintile,
             "weight": pw,
         }
     ).drop_duplicates("household_id")
+    household_relief = (
+        pd.DataFrame({"household_id": hid, "relief": allocated_relief})
+        .groupby("household_id")["relief"]
+        .sum()
+    )
+    household_frame = household_frame.join(household_relief, on="household_id")
+    policy_household_frame = household_frame[
+        household_frame["region"].isin(english_regions_outside_london)
+    ]
+
+    def average_household_effect(dimension):
+        grouped = policy_household_frame.groupby(dimension).apply(
+            lambda group: np.average(group["relief"], weights=group["weight"]),
+            include_groups=False,
+        )
+        return [
+            {
+                "group": f"Q{int(group)}" if dimension == "income_quintile" else _label(group),
+                "annual_effect_gbp": round(float(value), 2),
+            }
+            for group, value in grouped.items()
+            if group not in (0, "Unknown")
+        ]
+
+    age_effect_frame = pd.DataFrame(
+        {
+            "age_band": age_band_labels,
+            "relief": allocated_relief * pw,
+            "weight": pw,
+        }
+    )
+    age_effect = age_effect_frame.groupby("age_band").sum()
+    average_effect_breakdowns = {
+        "region": average_household_effect("region"),
+        "household_type": average_household_effect("household_type"),
+        "age_band": [
+            {
+                "group": group,
+                "annual_effect_gbp": round(float(row.relief / row.weight), 2),
+            }
+            for group, row in age_effect.iterrows()
+        ],
+        "income_quintile": average_household_effect("income_quintile"),
+    }
+    average_effect_breakdowns["region"].sort(key=lambda row: row["annual_effect_gbp"], reverse=True)
+    average_effect_breakdowns["household_type"].sort(
+        key=lambda row: row["annual_effect_gbp"], reverse=True
+    )
+    average_effect_breakdowns["age_band"].sort(
+        key=lambda row: int(row["group"].split("-")[0].replace("+", ""))
+    )
+    average_effect_breakdowns["income_quintile"].sort(key=lambda row: row["group"])
     middle_income_households = (
         household_frame[
             household_frame["region"].isin(english_regions_outside_london)
@@ -216,13 +274,12 @@ def run(args: argparse.Namespace) -> None:
         "end_date": sources.POLICY_END_DATE,
         "geography": "England outside London",
         "participating_services_only": True,
-        "people_potentially_affected_m": round(
-            wsum(in_policy_geography & (alloc > 0)) / 1e6, 2
-        ),
+        "people_potentially_affected_m": round(wsum(in_policy_geography & (alloc > 0)) / 1e6, 2),
         "announced_new_funding_bn": sources.ANNOUNCED_NEW_FUNDING_BN,
         "official_scheme_cost_lower_bound_bn": sources.OFFICIAL_SCHEME_COST_LOWER_BOUND_BN,
         "breakdowns": policy_breakdowns,
         "effect_breakdowns": effect_breakdowns,
+        "average_effect_breakdowns": average_effect_breakdowns,
         "breakdown_metric": "baseline_fare_exposure",
         "ticket_level_savings_estimated": False,
         "household_effect": {

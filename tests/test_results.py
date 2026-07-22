@@ -60,3 +60,19 @@ def test_effect_breakdowns_reconcile_to_cost_floor(results):
     cap = results["reforms"]["announced_2pound_cap"]
     for rows in cap["effect_breakdowns"].values():
         assert sum(row["cost_bn"] for row in rows) == pytest.approx(0.5, abs=0.01)
+    assert {row["group"] for row in cap["effect_breakdowns"]["income_quintile"]} == {
+        "Q1",
+        "Q2",
+        "Q3",
+        "Q4",
+        "Q5",
+    }
+
+
+def test_average_effect_breakdowns_are_positive_and_q3_matches_headline(results):
+    cap = results["reforms"]["announced_2pound_cap"]
+    averages = cap["average_effect_breakdowns"]
+    assert set(averages) == {"region", "household_type", "age_band", "income_quintile"}
+    assert all(row["annual_effect_gbp"] >= 0 for rows in averages.values() for row in rows)
+    q3 = next(row for row in averages["income_quintile"] if row["group"] == "Q3")
+    assert q3["annual_effect_gbp"] == cap["household_effect"]["annual_effect_average_gbp"]

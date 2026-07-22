@@ -17,6 +17,8 @@ function Stat({ label, value, sub }) {
 export default function ReformTab({ data }) {
   const cap = data.reforms.announced_2pound_cap;
   const householdEffect = cap.household_effect;
+  const highestRegionalEffect = householdEffect.by_region[0];
+  const lowestRegionalEffect = householdEffect.by_region[householdEffect.by_region.length - 1];
   const src = data.sources || {};
   const A = (s, text) => (s ? <a href={s.url} target="_blank" rel="noreferrer" className="underline">{text}</a> : text);
 
@@ -37,16 +39,21 @@ export default function ReformTab({ data }) {
             </>
           }
         />
-        <div className="grid gap-4 sm:grid-cols-2">
+        <div className="grid gap-4 sm:grid-cols-3">
           <Stat
-            label="Government scheme cost"
-            value=">£500m"
-            sub="Official calendar-2027 cost floor; £454m is newly announced funding."
+            label="Estimated fiscal cost"
+            value="£500m+"
+            sub="Analysis floor. Government benchmark: >£500m, including £454m of new funding."
           />
           <Stat
-            label="Average middle-income household effect"
+            label="Estimated middle-income household effect"
             value={`£${householdEffect.annual_effect_average_gbp}/year`}
-            sub="Our illustrative Q3 estimate across England outside London, allocating the official cost floor by baseline fare exposure."
+            sub="Our Q3 average. No comparable published household benchmark found."
+          />
+          <Stat
+            label="Estimated regional household range"
+            value={`£${lowestRegionalEffect.annual_effect_gbp}–£${highestRegionalEffect.annual_effect_gbp}/year`}
+            sub={`Our Q3 range, ${lowestRegionalEffect.region} to ${highestRegionalEffect.region}. No like-for-like benchmark found.`}
           />
         </div>
 

@@ -107,11 +107,18 @@ DFT_OUTSIDE_LONDON_JOURNEYS = Source(
     "https://www.gov.uk/government/statistics/annual-bus-statistics-year-ending-march-2025/annual-bus-statistics-year-ending-march-2025",
 )
 DFT_INCOME_QUINTILE_TRIPS = Source(
-    "Q1: 66 trips/person; Q5: 29",
-    "National Travel Survey 2024 benchmark reported by DfT. This measures local "
-    "bus trips, not household fare spending, so it is a directional comparison.",
-    "https://www.gov.uk/government/statistics/annual-bus-statistics-year-ending-march-2025/annual-bus-statistics-year-ending-march-2025",
+    "Local bus trips/person/year, 2024: Q1 47.6 … Q5 13.0",
+    "National Travel Survey table NTS0705a, 2024, 'Other local bus' (outside "
+    "London): average trips per person per year by household income quintile — "
+    "Q1 47.6, Q2 37.5, Q3 24.8, Q4 18.5, Q5 13.0. Anchors the income "
+    "distribution of household fare spending, assuming a common average fare "
+    "per trip across quintiles.",
+    "https://www.gov.uk/government/statistical-data-sets/nts07-car-ownership-and-access",
 )
+
+# NTS0705a 2024 'Other local bus' trips per person per year by household income
+# quintile (England). Anchors the across-household income allocation of fares.
+NTS_BUS_TRIPS_BY_INCOME_QUINTILE = {1: 47.6, 2: 37.5, 3: 24.8, 4: 18.5, 5: 13.0}
 NTS_AGE_PROFILE = Source(
     "Bus trips by age; 17-20 peak",
     "National Travel Survey 2023 bus trips by age (concessionary-adjusted), used "
@@ -209,6 +216,7 @@ def as_json() -> dict:
             "fare_cap_reduction_low": FARE_CAP_REDUCTION_LOW,
             "fare_cap_reduction_high": FARE_CAP_REDUCTION_HIGH,
             "london_fare_share_of_england": round(DFT_LONDON_FARE_SHARE_OF_ENGLAND, 4),
+            "nts_bus_trips_by_income_quintile": NTS_BUS_TRIPS_BY_INCOME_QUINTILE,
             "incidence_method": (
                 "Derived all-ticket reduction applied to household fare spending, "
                 "regionally recalibrated to DfT BUS05ai"

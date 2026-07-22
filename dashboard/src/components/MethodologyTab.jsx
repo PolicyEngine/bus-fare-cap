@@ -46,7 +46,10 @@ export default function MethodologyTab({ data }) {
             {src.nts_age_profile ? (
               <a href={src.nts_age_profile.url} target="_blank" rel="noreferrer" className="text-[color:var(--pe-color-primary-600)] underline">National Travel Survey bus-trips-by-age</a>
             ) : "National Travel Survey bus-trips-by-age"}{" "}
-            profile adjusted for concessionary ages.
+            profile adjusted for concessionary ages. Across households, the income distribution of
+            fares is anchored to{" "}
+            {L(src.dft_income_quintile_trips, "NTS0705a local-bus trip rates by income quintile")}{" "}
+            (Q1 makes ~3.7× the trips of Q5), holding the regional totals fixed.
           </p>
           <div className="mt-3 flex flex-wrap gap-2 text-sm">
             {Object.entries(weights).map(([band, w]) => (

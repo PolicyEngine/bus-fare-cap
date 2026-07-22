@@ -113,29 +113,6 @@ def run(args: argparse.Namespace) -> None:
     in_policy_geography = np.isin(region_label, list(english_regions_outside_london))
     is_london = region_label == "London"
 
-    def wsum_pre(values):
-        return float((np.asarray(values) * pw).sum())
-
-    # Recalibrate the within-England regional split to DfT BUS05ai. The LCFS
-    # imputation under-captures London fares (Oyster/contactless spend is poorly
-    # separated in household diaries), and national-only calibration smears the
-    # shortfall across the other English regions. Rescale London and
-    # outside-London fares to DfT's observed receipts split, preserving the
-    # model's England total; devolved nations are untouched.
-    model_england = wsum_pre(alloc * (in_policy_geography | is_london))
-    model_london = wsum_pre(alloc * is_london)
-    model_outside = model_england - model_london
-    london_share = sources.DFT_LONDON_FARE_SHARE_OF_ENGLAND
-    alloc = np.where(
-        is_london,
-        alloc * london_share * model_england / model_london,
-        np.where(
-            in_policy_geography,
-            alloc * (1 - london_share) * model_england / model_outside,
-            alloc,
-        ),
-    )
-
     def wsum(values):
         return float((np.asarray(values) * pw).sum())
 
@@ -143,6 +120,40 @@ def run(args: argparse.Namespace) -> None:
     # household-level ranking). Quartiles are dropped: a person-level quantile can
     # split members of one household, which is not meaningful here.
     quintile = np.where(decile >= 1, np.clip(((decile - 1) // 2 + 1).astype(int), 1, 5), 0)
+
+    # Recalibrate within-England fares to two observed anchors, alternating in a
+    # small IPF loop (each step preserves the model's England total; devolved
+    # nations are untouched):
+    #   1. Income: quintile fare shares proportional to population x NTS0705a
+    #      local-bus trips per person (the LCFS spend gradient runs the wrong
+    #      way — richer households record more spend, but NTS shows Q1 makes
+    #      ~3.7x the trips of Q5). Assumes a common average fare per trip.
+    #   2. Region: DfT BUS05ai London/outside-London receipts split (the LCFS
+    #      imputation under-captures London contactless/Oyster spend).
+    in_england = in_policy_geography | is_london
+    london_share = sources.DFT_LONDON_FARE_SHARE_OF_ENGLAND
+    nts_rates = sources.NTS_BUS_TRIPS_BY_INCOME_QUINTILE
+    eng_total = wsum(alloc * in_england)
+    quintile_people = {q: wsum(in_england & (quintile == q)) for q in nts_rates}
+    target_norm = sum(quintile_people[q] * r for q, r in nts_rates.items())
+    for _ in range(3):
+        for q, rate in nts_rates.items():
+            m = in_england & (quintile == q)
+            current = wsum(alloc * m)
+            if current > 0:
+                target = quintile_people[q] * rate / target_norm * eng_total
+                alloc = np.where(m, alloc * target / current, alloc)
+        model_london = wsum(alloc * is_london)
+        model_outside = wsum(alloc * in_england) - model_london
+        alloc = np.where(
+            is_london,
+            alloc * london_share * eng_total / model_london,
+            np.where(
+                in_policy_geography,
+                alloc * (1 - london_share) * eng_total / model_outside,
+                alloc,
+            ),
+        )
 
     # Uniform 5-year age bands (so the chart has no width jump above 24).
     _bstart = (np.minimum(age, 80) // 5 * 5).astype(int)

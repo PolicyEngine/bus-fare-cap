@@ -62,7 +62,7 @@ export default function ReformTab({ data }) {
           <Stat label="Baseline fare exposure" value={formatBn(cap.eligible_baseline_fare_exposure_bn)} sub={`${data.projection_year_label} projection · England outside London`} />
           <Stat label="People in fare-spending households" value={`${cap.people_in_fare_spending_households_m.toFixed(2)}m`} sub="exposure proxy, not confirmed beneficiaries" />
         </div>
-        <div className="mt-6"><BreakdownChart breakdowns={cap.breakdowns} metric="Baseline fare exposure" color={colors.primary[400]} period={data.projection_year_label} /></div>
+        <div className="mt-6"><BreakdownChart breakdowns={cap.breakdowns} metric="Baseline fare exposure" color={colors.primary[400]} period={data.projection_year_label} defaultDimension="income_quintile" /></div>
       </section>
     </div>
   );

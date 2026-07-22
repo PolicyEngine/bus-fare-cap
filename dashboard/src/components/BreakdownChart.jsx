@@ -14,8 +14,8 @@ const DIMENSIONS = [
   { id: "income_quintile", label: "Income quintile" },
 ];
 
-export default function BreakdownChart({ breakdowns, metric = "Cost", color = colors.primary[500], period }) {
-  const [dim, setDim] = useState("region");
+export default function BreakdownChart({ breakdowns, metric = "Cost", color = colors.primary[500], period, defaultDimension = "region" }) {
+  const [dim, setDim] = useState(defaultDimension);
   // Drop empty categories so the chart only shows groups with exposure.
   const rows = (breakdowns[dim] || []).filter((r) => r.cost_bn > 0);
   const dimLabel = DIMENSIONS.find((d) => d.id === dim).label.toLowerCase();

@@ -44,6 +44,16 @@
       "description": "DfT Annual Bus Statistics, year ending March 2025, table BUS01: 3.7 billion local bus passenger journeys in England, of which 28% (1.0 billion) were concessionary. This provides context, but cannot identify tickets above \u00a32.",
       "url": "https://www.gov.uk/government/statistics/annual-bus-statistics-year-ending-march-2025/annual-bus-statistics-year-ending-march-2025"
     },
+    "dft_outside_london_journeys": {
+      "value": "1.85bn passenger journeys",
+      "description": "DfT Annual Bus Statistics, year ending March 2025: passenger journeys on local buses in England outside London.",
+      "url": "https://www.gov.uk/government/statistics/annual-bus-statistics-year-ending-march-2025/annual-bus-statistics-year-ending-march-2025"
+    },
+    "dft_income_quintile_trips": {
+      "value": "Q1: 66 trips/person; Q5: 29",
+      "description": "National Travel Survey 2024 benchmark reported by DfT. This measures local bus trips, not household fare spending, so it is a directional comparison.",
+      "url": "https://www.gov.uk/government/statistics/annual-bus-statistics-year-ending-march-2025/annual-bus-statistics-year-ending-march-2025"
+    },
     "ons_population": {
       "value": "UK 68.3M / England 57.7M ~ 1.18",
       "description": "ONS mid-2023 population estimates, used to uplift England-only DfT bus finance to a UK total. Indicative: bus use per head varies by nation.",
@@ -349,8 +359,6 @@
       "participating_services_only": true,
       "announced_new_funding_bn": 0.454,
       "official_scheme_cost_lower_bound_bn": 0.5,
-      "eligible_baseline_fare_exposure_bn": 3.037,
-      "people_in_fare_spending_households_m": 14.18,
       "breakdowns": {
         "region": [
           {
@@ -498,7 +506,14 @@
         ]
       },
       "breakdown_metric": "baseline_fare_exposure",
-      "ticket_level_savings_estimated": false
+      "ticket_level_savings_estimated": false,
+      "distribution_findings": {
+        "q5_exposure_share": 0.288,
+        "q1_exposure_share": 0.162,
+        "top_region": "North West",
+        "top_region_exposure_share": 0.201,
+        "regions_in_scope": 8
+      }
     }
   }
 }

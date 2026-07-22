@@ -152,6 +152,10 @@ def run(args: argparse.Namespace) -> None:
         return out
 
     print("Step 3: Announced reform — £3 to £2 fare cap ...")
+    policy_breakdowns = breakdown(alloc, in_policy_geography)
+    exposure_total = sum(row["cost_bn"] for row in policy_breakdowns["region"])
+    top_region = policy_breakdowns["region"][0]
+    income_exposure = {row["group"]: row["cost_bn"] for row in policy_breakdowns["income_quintile"]}
     fare_cap = {
         "label": "Announced £2 bus fare cap",
         "baseline_cap_gbp": sources.BASELINE_FARE_CAP_GBP,
@@ -162,13 +166,16 @@ def run(args: argparse.Namespace) -> None:
         "participating_services_only": True,
         "announced_new_funding_bn": sources.ANNOUNCED_NEW_FUNDING_BN,
         "official_scheme_cost_lower_bound_bn": sources.OFFICIAL_SCHEME_COST_LOWER_BOUND_BN,
-        "eligible_baseline_fare_exposure_bn": round(wsum(alloc * in_policy_geography) / 1e9, 3),
-        "people_in_fare_spending_households_m": round(
-            wsum(in_policy_geography & (alloc > 0)) / 1e6, 2
-        ),
-        "breakdowns": breakdown(alloc, in_policy_geography),
+        "breakdowns": policy_breakdowns,
         "breakdown_metric": "baseline_fare_exposure",
         "ticket_level_savings_estimated": False,
+        "distribution_findings": {
+            "q5_exposure_share": round(income_exposure["Q5"] / exposure_total, 3),
+            "q1_exposure_share": round(income_exposure["Q1"] / exposure_total, 3),
+            "top_region": top_region["group"],
+            "top_region_exposure_share": round(top_region["cost_bn"] / exposure_total, 3),
+            "regions_in_scope": len(policy_breakdowns["region"]),
+        },
     }
 
     print("Step 4: Baseline and official-statistic comparisons ...")
@@ -260,8 +267,4 @@ def run(args: argparse.Namespace) -> None:
         dest.parent.mkdir(parents=True, exist_ok=True)
         dest.write_text(json.dumps(output, indent=2, default=str))
         print(f"    wrote {dest}")
-    print(
-        f"Done. Official scheme cost >£{fare_cap['official_scheme_cost_lower_bound_bn']:.1f}bn; "
-        f"eligible-geography baseline fare exposure "
-        f"£{fare_cap['eligible_baseline_fare_exposure_bn']:.2f}bn."
-    )
+    print(f"Done. Official scheme cost >£{fare_cap['official_scheme_cost_lower_bound_bn']:.1f}bn.")

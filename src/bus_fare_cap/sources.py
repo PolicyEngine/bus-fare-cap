@@ -79,6 +79,18 @@ DFT_JOURNEYS = Source(
     "concessionary. This provides context, but cannot identify tickets above £2.",
     "https://www.gov.uk/government/statistics/annual-bus-statistics-year-ending-march-2025/annual-bus-statistics-year-ending-march-2025",
 )
+DFT_OUTSIDE_LONDON_JOURNEYS = Source(
+    "1.85bn passenger journeys",
+    "DfT Annual Bus Statistics, year ending March 2025: passenger journeys on "
+    "local buses in England outside London.",
+    "https://www.gov.uk/government/statistics/annual-bus-statistics-year-ending-march-2025/annual-bus-statistics-year-ending-march-2025",
+)
+DFT_INCOME_QUINTILE_TRIPS = Source(
+    "Q1: 66 trips/person; Q5: 29",
+    "National Travel Survey 2024 benchmark reported by DfT. This measures local "
+    "bus trips, not household fare spending, so it is a directional comparison.",
+    "https://www.gov.uk/government/statistics/annual-bus-statistics-year-ending-march-2025/annual-bus-statistics-year-ending-march-2025",
+)
 NTS_AGE_PROFILE = Source(
     "Bus trips by age; 17-20 peak",
     "National Travel Survey 2023 bus trips by age (concessionary-adjusted), used "
@@ -120,6 +132,8 @@ def as_json() -> dict:
             "dft_fare": asdict(DFT_FARE),
             "dft_subsidy": asdict(DFT_SUBSIDY),
             "dft_journeys": asdict(DFT_JOURNEYS),
+            "dft_outside_london_journeys": asdict(DFT_OUTSIDE_LONDON_JOURNEYS),
+            "dft_income_quintile_trips": asdict(DFT_INCOME_QUINTILE_TRIPS),
             "ons_population": asdict(ONS_POPULATION),
             "nts_age_profile": asdict(NTS_AGE_PROFILE),
             "current_fare_cap_policy": asdict(CURRENT_FARE_CAP_POLICY),

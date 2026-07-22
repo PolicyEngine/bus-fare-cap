@@ -1,7 +1,7 @@
 "use client";
 
 import { colors } from "../lib/colors";
-import { formatBn } from "../lib/formatters";
+import { formatPct } from "../lib/formatters";
 import BreakdownChart from "./BreakdownChart";
 import SectionHeading from "./SectionHeading";
 
@@ -17,6 +17,7 @@ function Stat({ label, value, sub }) {
 
 export default function ReformTab({ data }) {
   const cap = data.reforms.announced_2pound_cap;
+  const findings = cap.distribution_findings;
   const src = data.sources || {};
   const A = (s, text) => (s ? <a href={s.url} target="_blank" rel="noreferrer" className="underline">{text}</a> : text);
 
@@ -38,11 +39,45 @@ export default function ReformTab({ data }) {
           }
         />
         <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-          <Stat label="Maximum single fare" value="£2" sub="down from the current £3 cap" />
-          <Stat label="Official scheme cost" value=">£500m" sub="government announcement, calendar 2027" />
-          <Stat label="New funding announced" value="£454m" sub="includes scope for devolved governments" />
-          <Stat label="Policy period" value="12 months" sub={data.policy_period_label} />
+          <Stat
+            label="Highest-income quintile exposure"
+            value={formatPct(findings.q5_exposure_share * 100, 0)}
+            sub="Our spending-based result. DfT trips point the other way: Q1 66 vs Q5 29 trips/person."
+          />
+          <Stat
+            label="Lowest-income quintile exposure"
+            value={formatPct(findings.q1_exposure_share * 100, 0)}
+            sub="Our spending exposure is not bus usage or savings; see the DfT trip benchmark below."
+          />
+          <Stat
+            label="Largest regional exposure"
+            value={findings.top_region}
+            sub={`${formatPct(findings.top_region_exposure_share * 100, 0)} of modelled exposure; DfT records 1.85bn journeys across the wider policy geography.`}
+          />
+          <Stat
+            label="Regions represented"
+            value={String(findings.regions_in_scope)}
+            sub="Matches the government scope: England outside London."
+          />
         </div>
+
+        <details className="mt-6 overflow-hidden rounded-2xl border border-slate-200 bg-white">
+          <summary className="cursor-pointer px-6 py-4 font-semibold text-slate-900">
+            Policy details — what, who, where, when and how
+          </summary>
+          <div className="overflow-x-auto border-t border-slate-200">
+            <table className="w-full text-left text-sm">
+              <tbody className="divide-y divide-slate-100">
+                <tr><th className="w-32 px-6 py-4 text-slate-900">What</th><td className="px-6 py-4 text-slate-600">Maximum participating single fare falls from £3 to £2.</td></tr>
+                <tr><th className="px-6 py-4 text-slate-900">Who</th><td className="px-6 py-4 text-slate-600">Passengers whose eligible single fare would otherwise exceed £2. The number of beneficiaries has not been published.</td></tr>
+                <tr><th className="px-6 py-4 text-slate-900">Where</th><td className="px-6 py-4 text-slate-600">Participating bus services in England outside London. Devolved governments may take similar action.</td></tr>
+                <tr><th className="px-6 py-4 text-slate-900">When</th><td className="px-6 py-4 text-slate-600">1 January–31 December 2027.</td></tr>
+                <tr><th className="px-6 py-4 text-slate-900">How</th><td className="px-6 py-4 text-slate-600">Government reimburses participating operators under rules still to be published.</td></tr>
+                <tr><th className="px-6 py-4 text-slate-900">Funding</th><td className="px-6 py-4 text-slate-600">Official scheme cost is more than £500m, including £454m of newly announced funding.</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </details>
       </section>
 
       <section>
@@ -55,14 +90,13 @@ export default function ReformTab({ data }) {
               estimated savings: neither the Enhanced FRS nor the LCFS extract identifies individual
               tickets above £2, participating routes, or places already charging £2 or less. It
               therefore cannot reproduce the official cost or identify the number of beneficiaries.
+              For context, DfT records 1.85bn passenger journeys in England outside London, and its
+              NTS benchmark shows 66 trips per person in Q1 versus 29 in Q5. Those are usage measures,
+              not like-for-like validations of household spending.
             </>
           }
         />
-        <div className="grid gap-4 sm:grid-cols-2">
-          <Stat label="Baseline fare exposure" value={formatBn(cap.eligible_baseline_fare_exposure_bn)} sub={`${data.projection_year_label} projection · England outside London`} />
-          <Stat label="People in fare-spending households" value={`${cap.people_in_fare_spending_households_m.toFixed(2)}m`} sub="exposure proxy, not confirmed beneficiaries" />
-        </div>
-        <div className="mt-6"><BreakdownChart breakdowns={cap.breakdowns} metric="Baseline fare exposure" color={colors.primary[400]} period={data.projection_year_label} defaultDimension="income_quintile" /></div>
+        <BreakdownChart breakdowns={cap.breakdowns} metric="Baseline fare exposure" color={colors.primary[400]} period={data.projection_year_label} defaultDimension="income_quintile" />
       </section>
     </div>
   );

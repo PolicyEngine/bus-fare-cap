@@ -5,46 +5,39 @@ import SectionHeading from "./SectionHeading";
 export default function MethodologyTab({ data }) {
   const src = data.sources || {};
   const weights = data.assumptions?.age_allocation_weights || {};
-  const uplift = data.reform_definition?.england_to_uk_population_uplift;
 
   return (
     <div className="space-y-10">
       <SectionHeading
         title="Methodology"
-        description="How every result is computed. Modelled quantities are read from the PolicyEngine UK Enhanced FRS microsimulation; every other number has a source in the table below."
+        description="How the DfT evidence and PolicyEngine household microsimulation produce the estimate."
       />
 
       {/* One comprehensive method box */}
       <div className="space-y-4 rounded-2xl border border-slate-200 bg-white p-6 text-sm leading-6 text-slate-600">
         <div>
-          <h3 className="font-semibold text-slate-900">1 · Baseline fares &amp; subsidy</h3>
+          <h3 className="font-semibold text-slate-900">1 · Official policy and fiscal figures</h3>
           <p>
-            Household bus &amp; coach fare spending is imputed from the Living Costs and Food Survey
-            (LCFS) in the PolicyEngine UK Enhanced FRS (COICOP 7.3.2 bus/coach codes) and calibrated
-            to the DfT Annual Bus Statistics passenger-fare total — £3.4bn for England (table
-            BUS05aii), uplifted England→UK by population (×{uplift ? uplift.toFixed(2) : "1.18"}).
-            Bus subsidy is the ETB-imputed government benefit-in-kind, calibrated the same way to
-            DfT net government support (£3.0bn England, BUS05bii). The DfT data is for the year
-            ending March 2025 (largely under the older £2 cap) and covers England local buses
-            (excluding coaches and Northern Ireland), uplifted to the UK — so the baseline is
-            indicative, not an explicit model of the £3 cap or 2027-28 policy.
+            The 22 July 2026 government announcement is the source for the £2 cap, calendar-2027
+            dates, England-outside-London geography, participating-bus condition, £400m of extra
+            funding backing the cap and £454m of total extra funding including devolved-government
+            funding. The GOV.UK announcement does not publish a total scheme cost; contemporaneous
+            ITV/PA reporting says the government expects it to exceed £500m, with the balance above
+            the new funding coming from existing DfT bus allocations. These figures are comparison
+            benchmarks, not inputs to our estimate, and none is presented as England-only passenger savings.
           </p>
         </div>
         <div>
-          <h3 className="font-semibold text-slate-900">2 · Allocating fares to people by age</h3>
+          <h3 className="font-semibold text-slate-900">2 · Household microsimulation</h3>
           <p>
-            The LCFS records fares at <em>household</em> level, so each household&apos;s fare is split
-            across its members by a relative weight that proxies who pays. The weights are
-            built from{" "}
+            Household bus &amp; coach spending is imputed from the Living Costs and Food Survey in the
+            PolicyEngine UK Enhanced FRS, calibrated to DfT&apos;s England-wide fare-receipts total and
+            uprated by PolicyEngine to {data.projection_year_label}. Each household&apos;s fare is split
+            across its members using a{" "}
             {src.nts_age_profile ? (
               <a href={src.nts_age_profile.url} target="_blank" rel="noreferrer" className="text-[color:var(--pe-color-primary-600)] underline">National Travel Survey bus-trips-by-age</a>
             ) : "National Travel Survey bus-trips-by-age"}{" "}
-            (bus use peaks sharply at 17–20), then lowered for concessionary ages. The weights only
-            redistribute fares <em>within mixed-age households</em> — a single-age household (e.g. a
-            lone pensioner, or an all-adult one) keeps its full imputed fare regardless of weight, so
-            65+ still carries ~18% of fares. The split is a rough heuristic, not observed, and the
-            exact weight values are an illustrative calibration of the NTS profile, not a
-            reproducible derivation.
+            profile adjusted for concessionary ages.
           </p>
           <div className="mt-3 flex flex-wrap gap-2 text-sm">
             {Object.entries(weights).map(([band, w]) => (
@@ -53,43 +46,36 @@ export default function MethodologyTab({ data }) {
           </div>
         </div>
         <div>
-          <h3 className="font-semibold text-slate-900">3 · Reform 1 — free buses for under-25s</h3>
+          <h3 className="font-semibold text-slate-900">3 · Costing the £2 cap</h3>
           <p>
-            Fiscal cost = the bus fares allocated to people under 25, which the government would now
-            meet (a full subsidy for that group). This is a <strong>gross, illustrative</strong>
-            figure: it does not net out existing youth/child concessions (notably Scotland&apos;s
-            under-22 scheme), and the under-25 split comes from age weights, not observed individual
-            fares, so small-child bands are over-stated. &ldquo;People affected&rdquo; counts
-            under-25s in households with imputed bus-fare spending, not observed bus users.
+            The estimate is projected fare spending of households resident in the eight English
+            regions outside London ({data.reforms?.announced_2pound_cap?.baseline_fare_spending_bn ? `£${data.reforms.announced_2pound_cap.baseline_fare_spending_bn.toFixed(2)}bn` : "the policy-geography base"})
+            multiplied by the 6.3% all-ticket reduction observed in DfT&apos;s evaluation of the
+            previous £2 cap (average yield £1.49 → £1.40). Region, family-type and quintile averages
+            divide each group&apos;s saving by all its households, including non-bus users; age-band
+            averages are per person in the policy geography. The government&apos;s funding figures are
+            not inputs. Treating passenger savings as fiscal cost assumes pound-for-pound operator
+            reimbursement.
           </p>
         </div>
         <div>
-          <h3 className="font-semibold text-slate-900">4 · Reform 2 — £1 fare cap</h3>
+          <h3 className="font-semibold text-slate-900">4 · Limitations</h3>
           <p>
-            A universal £1 per-trip cap, approximated. With only annual fare spend (no per-trip
-            fares), fares are cut by a flat fraction set by the DfT average fare = receipts ÷
-            fare-paying journeys. We report the all-concessionary figure: treating <em>all</em>
-            concessionary journeys (incl. fare-paying youth, whose fares are in the receipts) as
-            non-paying gives ≈£1.28 → ≈22% (≈£0.92bn). A stricter denominator that excludes only the
-            genuinely-free older/disabled (ENCTS) journeys gives a lower ≈£1.11 → 9.5% (≈£0.40bn).
-            A flat fraction over a blended average is not the exact Σ max(fare − £1, 0) over single
-            tickets, so this is an indicative figure.
+            This is not a ticket-level model. The 6.3% was measured against 2023 uncapped fares, while
+            the 2027 counterfactual is a £3 cap, so the true marginal reduction is likely smaller.
+            Calibration is to the England total only — the London/outside-London split is not
+            separately calibrated, and the model&apos;s London share is below DfT&apos;s, which can
+            overstate the outside-London base. Spending includes coach fares the cap does not cover;
+            geography is where households live, not where journeys happen. Non-participating routes,
+            local fares already at £2 or less, and induced demand are not modelled.
           </p>
         </div>
         <div>
-          <h3 className="font-semibold text-slate-900">5 · Behaviour, scope and breakdowns</h3>
+          <h3 className="font-semibold text-slate-900">5 · Interpretation</h3>
           <p>
-            All figures are <strong>static</strong> — lower or zero fares induce extra trips (cf.
-            Scotland&apos;s under-22 scheme), which a behavioural elasticity would add, raising both
-            ridership and cost. Figures are UK-wide (England-anchored, population-uplifted).
-            Breakdowns allocate the same per-person fares by PolicyEngine&apos;s region, age, income
-            quintile and family type — &ldquo;Family type&rdquo; is the <em>benefit unit</em> (not the
-            whole household), and income quintiles fold the published household income deciles,
-            excluding a small &ldquo;unknown decile&rdquo; group (~£23m of baseline fares).{" "}
-            <strong>Projection:</strong> {data.fiscal_year_label} figures uprate the 2024-25 dataset —
-            fares by PolicyEngine&apos;s price/earnings uprating <em>and</em> population, but the bus
-            subsidy only by population (no price uprating), so the two are not on a fully consistent
-            price basis.
+            The policy runs 1 January–31 December 2027, so results are calendar-2027, not fiscal-year.
+            Family type is the benefit unit. Income quintiles fold household income deciles. People in
+            fare-spending households are an exposure proxy, not confirmed beneficiaries.
           </p>
         </div>
       </div>

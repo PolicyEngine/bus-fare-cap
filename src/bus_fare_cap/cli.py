@@ -10,9 +10,9 @@ from .pipeline import run
 def build_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(
         prog="bus-fare-cap-build",
-        description="Generate dashboard-ready bus fare reform results (£1 cap, free under-25s).",
+        description="Generate dashboard-ready results for the announced 2027 £2 bus fare cap.",
     )
-    parser.add_argument("--year", type=int, default=2027, help="Tax year to cost in.")
+    parser.add_argument("--year", type=int, default=2027, help="Projection year for exposure.")
     return parser
 
 

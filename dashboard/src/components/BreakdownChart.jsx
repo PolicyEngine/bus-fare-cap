@@ -14,39 +14,68 @@ const DIMENSIONS = [
   { id: "income_quintile", label: "Income quintile" },
 ];
 
-export default function BreakdownChart({ breakdowns, metric = "Cost", color = colors.primary[500], period }) {
-  const [dim, setDim] = useState("region");
-  // Drop empty categories (e.g. the 25+ age bands under the under-25 reform,
-  // which carry £0) so the chart only shows bands with cost.
-  const rows = (breakdowns[dim] || []).filter((r) => r.cost_bn > 0);
+export default function BreakdownChart({ breakdowns, metric = "Cost", color = colors.primary[500], period, defaultDimension = "region", alternateMetric = null }) {
+  const [dim, setDim] = useState(defaultDimension);
+  const [metricView, setMetricView] = useState("primary");
+  const showAlternate = metricView === "alternate" && alternateMetric;
+  // Drop empty categories so the chart only shows groups with exposure.
+  const rows = showAlternate
+    ? (alternateMetric.breakdowns[dim] || []).filter((r) => r.annual_effect_gbp > 0)
+    : (breakdowns[dim] || []).filter((r) => r.cost_bn > 0);
   const dimLabel = DIMENSIONS.find((d) => d.id === dim).label.toLowerCase();
+  const chartMetric = showAlternate
+    ? dim === "age_band" ? "Average person effect" : alternateMetric.label
+    : metric;
+  const unit = showAlternate ? "£/year" : "£bn";
+  const dataKey = showAlternate ? "annual_effect_gbp" : "cost_bn";
+  const breakdownTotalBn = showAlternate
+    ? null
+    : rows.reduce((total, row) => total + Number(row.cost_bn), 0);
   return (
     <div className="rounded-2xl border border-slate-200 bg-white p-6">
-      <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
-        <h3 className="text-sm font-semibold text-slate-700">{metric} by {dimLabel} (£bn{period ? `, ${period}` : ""})</h3>
-        <div className="flex flex-wrap gap-1">
-          {DIMENSIONS.map((d) => (
-            <button
-              key={d.id}
-              onClick={() => setDim(d.id)}
-              className={`rounded-lg px-3 py-1 text-xs font-medium transition-colors ${dim === d.id ? "bg-[color:var(--pe-color-primary-600)] text-white" : "bg-slate-100 text-slate-600 hover:bg-slate-200"}`}
+      <div className="mb-5 grid gap-3 sm:grid-cols-2">
+        {alternateMetric ? (
+          <label className="min-w-0">
+            <span className="mb-1 block text-xs font-medium text-slate-500">Measure</span>
+            <select
+              value={metricView}
+              onChange={(event) => setMetricView(event.target.value)}
+              className="h-10 w-full rounded-lg border border-slate-200 bg-white px-3 text-sm font-semibold text-slate-700 outline-none transition-colors focus:border-[color:var(--pe-color-primary-500)] focus:ring-2 focus:ring-[color:var(--pe-color-primary-100)]"
             >
-              {d.label}
-            </button>
-          ))}
-        </div>
+              <option value="primary">Total estimated benefit</option>
+              <option value="alternate">Average household effect</option>
+            </select>
+          </label>
+        ) : null}
+        <label className="min-w-0">
+          <span className="mb-1 block text-xs font-medium text-slate-500">Breakdown</span>
+          <select
+            value={dim}
+            onChange={(event) => setDim(event.target.value)}
+            className="h-10 w-full rounded-lg border border-slate-200 bg-white px-3 text-sm font-semibold text-slate-700 outline-none transition-colors focus:border-[color:var(--pe-color-primary-500)] focus:ring-2 focus:ring-[color:var(--pe-color-primary-100)]"
+          >
+            {DIMENSIONS.map((d) => <option key={d.id} value={d.id}>{d.label}</option>)}
+          </select>
+        </label>
       </div>
+      <h3 className="mb-4 text-sm font-semibold text-slate-700">{chartMetric} by {dimLabel} ({unit}{period ? `, ${period}` : ""})</h3>
       <ResponsiveContainer width="100%" height={320}>
         <BarChart data={rows} margin={{ left: 8, right: 16, top: 8, bottom: 64 }}>
           <CartesianGrid strokeDasharray="3 3" stroke={colors.border.light} />
           <XAxis dataKey="group" angle={-30} textAnchor="end" interval={0} height={72} tick={{ fontSize: 11 }} />
           <YAxis tick={{ fontSize: 12 }} />
-          <Tooltip formatter={(v) => formatBn(v)} />
-          <Bar dataKey="cost_bn" radius={[4, 4, 0, 0]}>
+          <Tooltip formatter={(v) => showAlternate ? `£${Number(v).toFixed(2)}` : formatBn(v)} />
+          <Bar dataKey={dataKey} radius={[4, 4, 0, 0]}>
             {rows.map((_, i) => <Cell key={i} fill={color} />)}
           </Bar>
         </BarChart>
       </ResponsiveContainer>
+      {!showAlternate ? (
+        <div className="mt-2 flex justify-end border-t border-slate-100 pt-3 text-sm text-slate-600">
+          Breakdown total: <strong className="ml-1 text-slate-900">£{Math.round(breakdownTotalBn * 1000)}m</strong>
+          <span className="ml-1 text-slate-500">· matches estimated fiscal cost</span>
+        </div>
+      ) : null}
     </div>
   );
 }

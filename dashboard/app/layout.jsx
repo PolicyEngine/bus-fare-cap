@@ -1,9 +1,9 @@
 import "./globals.css";
 
 export const metadata = {
-  title: "Bus fare policies analysis | PolicyEngine",
+  title: "2027 £2 bus fare cap analysis | PolicyEngine",
   description:
-    "Interactive dashboard costing a £1 bus fare cap and free bus travel for under-25s in the UK, using PolicyEngine UK microsimulation on the Enhanced FRS.",
+    "Source-backed analysis of the announced £2 bus fare cap for participating services in England outside London in 2027.",
 };
 
 export default function RootLayout({ children }) {

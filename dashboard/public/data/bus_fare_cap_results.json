@@ -1,15 +1,19 @@
 {
   "year": 2027,
-  "fiscal_year_label": "2027-28",
+  "projection_year_label": "2027",
+  "policy_period_label": "1 January\u201331 December 2027",
   "currency": "GBP",
   "dataset": "PolicyEngine UK Enhanced FRS (enhanced_frs_2024_25)",
   "dataset_source": "enhanced-frs",
   "simulation_stack": "policyengine-uk (direct)",
   "policyengine_uk_version": "2.89.2",
   "reform_definition": {
-    "under_25_age_limit": 25,
-    "fare_cap_gbp": 1,
-    "england_to_uk_population_uplift": 1.1837088388214903
+    "baseline_fare_cap_gbp": 3,
+    "reform_fare_cap_gbp": 2,
+    "start_date": "2027-01-01",
+    "end_date": "2027-12-31",
+    "geography": "England outside London",
+    "participating_services_only": true
   },
   "assumptions": {
     "age_allocation_weights": {
@@ -22,10 +26,8 @@
       "60-69": 0.3,
       "70+": 0.07
     },
-    "fare_cap_average_fare_low_gbp": 1.105,
-    "fare_cap_average_fare_high_gbp": 1.276,
-    "fare_cap_reduction_low": 0.095,
-    "fare_cap_reduction_high": 0.216,
+    "fare_cap_reduction": 0.063,
+    "incidence_method": "DfT observed all-ticket reduction applied to household fare spending",
     "behavioural": "static (no induced demand)"
   },
   "sources": {
@@ -41,7 +43,17 @@
     },
     "dft_journeys": {
       "value": "3.7bn journeys (England), 28% concessionary",
-      "description": "DfT Annual Bus Statistics, year ending March 2025, table BUS01: 3.7 billion local bus passenger journeys in England, of which 28% (1.0 billion) were free concessionary journeys. With fare receipts this gives the average fare paid (~\u00a31.28), which anchors the \u00a31 cap cost (fares - journeys x \u00a31).",
+      "description": "DfT Annual Bus Statistics, year ending March 2025, table BUS01: 3.7 billion local bus passenger journeys in England, of which 28% (1.0 billion) were concessionary. This provides context, but cannot identify tickets above \u00a32.",
+      "url": "https://www.gov.uk/government/statistics/annual-bus-statistics-year-ending-march-2025/annual-bus-statistics-year-ending-march-2025"
+    },
+    "dft_outside_london_journeys": {
+      "value": "1.85bn passenger journeys",
+      "description": "DfT Annual Bus Statistics, year ending March 2025: passenger journeys on local buses in England outside London.",
+      "url": "https://www.gov.uk/government/statistics/annual-bus-statistics-year-ending-march-2025/annual-bus-statistics-year-ending-march-2025"
+    },
+    "dft_income_quintile_trips": {
+      "value": "Q1: 66 trips/person; Q5: 29",
+      "description": "National Travel Survey 2024 benchmark reported by DfT. This measures local bus trips, not household fare spending, so it is a directional comparison.",
       "url": "https://www.gov.uk/government/statistics/annual-bus-statistics-year-ending-march-2025/annual-bus-statistics-year-ending-march-2025"
     },
     "ons_population": {
@@ -54,30 +66,32 @@
       "description": "National Travel Survey 2023 bus trips by age (concessionary-adjusted), used to allocate household bus fares to individuals.",
       "url": "https://www.gov.uk/government/statistics/national-travel-survey-2023/nts-2023-trips-by-purpose-age-mode-and-sex"
     },
-    "scotland_under_22": {
-      "value": "Free bus travel for under-22s",
-      "description": "Transport Scotland's under-22 free bus scheme \u2014 a real-world comparator for a youth free-travel policy, and evidence of large induced demand.",
-      "url": "https://www.transport.gov.scot/concessionary-travel/young-persons-free-bus-travel-scheme/"
+    "current_fare_cap_policy": {
+      "value": "\u00a33 funded until 31 March 2027",
+      "description": "The existing national scheme funds a \u00a33 maximum single fare on participating services through March 2027. The new policy supersedes it from 1 January 2027, lowering the cap to \u00a32 and extending it through December.",
+      "url": "https://www.gov.uk/guidance/3-national-bus-fare-cap"
     },
-    "fare_cap_policy": {
-      "value": "\u00a32 (2023) -> \u00a33 (Jan 2025 - Mar 2027)",
-      "description": "England's national bus fare cap: single fares capped at \u00a32 from 2023, raised to \u00a33 from January 2025 and funded to March 2027. The real-world comparator for a \u00a31 cap.",
-      "url": "https://www.gov.uk/guidance/get-around-for-2-pounds-bus-fares"
+    "two_pound_announcement": {
+      "value": "\u00a32 from 1 January 2027; \u00a3400m backs the cap",
+      "description": "Government announcement of a \u00a32 maximum single fare on participating buses in England outside London throughout 2027. It says \u00a3400m of extra funding backs the cap and separately reports \u00a3454m of extra funding including Barnett funding for devolved governments. It does not publish a total scheme cost.",
+      "url": "https://www.gov.uk/government/news/cheaper-travel-for-millions-with-a-third-off-fares"
     },
-    "cpt_under22_estimate": {
-      "value": "\u00a3100-150m/yr (under-22, \u00a31 fare)",
-      "description": "Confederation of Passenger Transport estimate that a \u00a31 fare for under-22s in England would cost \u00a3100-150m/yr \u2014 an external comparator (this analysis costs free travel for the wider under-25 group).",
-      "url": "https://www.route-one.net/news/what-should-come-next-after-the-bus-fare-cap-scheme-in-england/"
+    "dft_two_pound_cap_evaluation": {
+      "value": "6.3% reduction across all ticket types",
+      "description": "DfT's evaluation of the first ten months of the previous \u00a32 cap reports average operator yield of \u00a31.49 before and \u00a31.40 after the cap across all ticket types, a weighted average saving of 6.3%. Affected singles fell from \u00a32.73 to \u00a32.00, but they represented less than half of trips.",
+      "url": "https://www.gov.uk/government/publications/evaluation-of-the-2-bus-fare-cap"
+    },
+    "reported_scheme_cost": {
+      "value": ">\u00a3500m expected total scheme cost",
+      "description": "Contemporaneous ITV/PA reporting says the government expects the scheme to cost more than \u00a3500m. It reports \u00a3454m of new funding, with the balance from Department for Transport funding already allocated to buses. The GOV.UK press release itself does not state the total.",
+      "url": "https://www.itv.com/news/2026-07-22/burnham-announces-2-bus-fare-cap-from-january"
     }
   },
   "baseline": {
     "total_bus_fare_bn": 4.231,
     "total_bus_subsidy_bn": 3.578,
     "population_m": 69.78,
-    "under_25_people_m": 18.9,
     "fare_paying_people_m": 19.7,
-    "under_25_fare_bn": 0.654,
-    "under_25_share": 0.155,
     "by_age_band": [
       {
         "band": "0-15",
@@ -113,63 +127,51 @@
     "by_region": [
       {
         "region": "North West",
-        "fare_bn": 0.611,
-        "under25_fare_bn": 0.073
+        "fare_bn": 0.611
       },
       {
         "region": "South East",
-        "fare_bn": 0.521,
-        "under25_fare_bn": 0.065
+        "fare_bn": 0.521
       },
       {
         "region": "London",
-        "fare_bn": 0.437,
-        "under25_fare_bn": 0.067
+        "fare_bn": 0.437
       },
       {
         "region": "East Midlands",
-        "fare_bn": 0.427,
-        "under25_fare_bn": 0.05
+        "fare_bn": 0.427
       },
       {
         "region": "Scotland",
-        "fare_bn": 0.414,
-        "under25_fare_bn": 0.049
+        "fare_bn": 0.414
       },
       {
         "region": "Yorkshire",
-        "fare_bn": 0.372,
-        "under25_fare_bn": 0.083
+        "fare_bn": 0.372
       },
       {
         "region": "East of England",
-        "fare_bn": 0.357,
-        "under25_fare_bn": 0.129
+        "fare_bn": 0.357
       },
       {
         "region": "South West",
-        "fare_bn": 0.302,
-        "under25_fare_bn": 0.04
+        "fare_bn": 0.302
       },
       {
         "region": "West Midlands",
-        "fare_bn": 0.287,
-        "under25_fare_bn": 0.034
+        "fare_bn": 0.287
       },
       {
         "region": "Wales",
-        "fare_bn": 0.194,
-        "under25_fare_bn": 0.024
+        "fare_bn": 0.194
       },
       {
         "region": "North East",
-        "fare_bn": 0.158,
-        "under25_fare_bn": 0.018
+        "fare_bn": 0.158
       },
       {
         "region": "Northern Ireland",
-        "fare_bn": 0.15,
-        "under25_fare_bn": 0.022
+        "fare_bn": 0.15
       }
     ],
     "breakdowns": {
@@ -359,345 +361,501 @@
     }
   },
   "reforms": {
-    "free_under_25": {
-      "label": "Free buses for under-25s",
-      "age_limit": 25,
-      "cost_bn": 0.654,
-      "people_affected_m": 4.6,
-      "breakdowns": {
-        "region": [
-          {
-            "group": "East of England",
-            "cost_bn": 0.129
-          },
-          {
-            "group": "Yorkshire",
-            "cost_bn": 0.083
-          },
-          {
-            "group": "North West",
-            "cost_bn": 0.073
-          },
-          {
-            "group": "London",
-            "cost_bn": 0.067
-          },
-          {
-            "group": "South East",
-            "cost_bn": 0.065
-          },
-          {
-            "group": "East Midlands",
-            "cost_bn": 0.05
-          },
-          {
-            "group": "Scotland",
-            "cost_bn": 0.049
-          },
-          {
-            "group": "South West",
-            "cost_bn": 0.04
-          },
-          {
-            "group": "West Midlands",
-            "cost_bn": 0.034
-          },
-          {
-            "group": "Wales",
-            "cost_bn": 0.024
-          },
-          {
-            "group": "Northern Ireland",
-            "cost_bn": 0.022
-          },
-          {
-            "group": "North East",
-            "cost_bn": 0.018
-          }
-        ],
-        "household_type": [
-          {
-            "group": "Couple With Children",
-            "cost_bn": 0.38
-          },
-          {
-            "group": "Couple No Children",
-            "cost_bn": 0.122
-          },
-          {
-            "group": "Single",
-            "cost_bn": 0.114
-          },
-          {
-            "group": "Lone Parent",
-            "cost_bn": 0.037
-          }
-        ],
-        "age_band": [
-          {
-            "group": "0-4",
-            "cost_bn": 0.076
-          },
-          {
-            "group": "5-9",
-            "cost_bn": 0.082
-          },
-          {
-            "group": "10-14",
-            "cost_bn": 0.09
-          },
-          {
-            "group": "15-19",
-            "cost_bn": 0.206
-          },
-          {
-            "group": "20-24",
-            "cost_bn": 0.2
-          },
-          {
-            "group": "25-29",
-            "cost_bn": 0.0
-          },
-          {
-            "group": "30-34",
-            "cost_bn": 0.0
-          },
-          {
-            "group": "35-39",
-            "cost_bn": 0.0
-          },
-          {
-            "group": "40-44",
-            "cost_bn": 0.0
-          },
-          {
-            "group": "45-49",
-            "cost_bn": 0.0
-          },
-          {
-            "group": "50-54",
-            "cost_bn": 0.0
-          },
-          {
-            "group": "55-59",
-            "cost_bn": 0.0
-          },
-          {
-            "group": "60-64",
-            "cost_bn": 0.0
-          },
-          {
-            "group": "65-69",
-            "cost_bn": 0.0
-          },
-          {
-            "group": "70-74",
-            "cost_bn": 0.0
-          },
-          {
-            "group": "75-79",
-            "cost_bn": 0.0
-          },
-          {
-            "group": "80+",
-            "cost_bn": 0.0
-          }
-        ],
-        "income_quintile": [
-          {
-            "group": "Q1",
-            "cost_bn": 0.131
-          },
-          {
-            "group": "Q2",
-            "cost_bn": 0.08
-          },
-          {
-            "group": "Q3",
-            "cost_bn": 0.136
-          },
-          {
-            "group": "Q4",
-            "cost_bn": 0.112
-          },
-          {
-            "group": "Q5",
-            "cost_bn": 0.194
-          }
-        ]
-      }
-    },
-    "fare_cap_1pound": {
-      "label": "\u00a31 bus fare cap",
-      "cap_gbp": 1,
-      "average_fare_low_gbp": 1.105,
-      "average_fare_high_gbp": 1.276,
-      "reduction_low": 0.095,
-      "reduction_high": 0.216,
-      "cost_low_bn": 0.403,
-      "cost_high_bn": 0.916,
-      "people_affected_m": 19.7,
+    "announced_2pound_cap": {
+      "label": "Announced \u00a32 bus fare cap",
+      "baseline_cap_gbp": 3,
+      "reform_cap_gbp": 2,
+      "start_date": "2027-01-01",
+      "end_date": "2027-12-31",
+      "geography": "England outside London",
+      "participating_services_only": true,
+      "people_potentially_affected_m": 14.18,
+      "announced_cap_funding_bn": 0.4,
+      "announced_total_extra_funding_bn": 0.454,
+      "reported_scheme_cost_lower_bound_bn": 0.5,
+      "official_total_scheme_cost_published": false,
+      "estimated_cost_bn": 0.191,
+      "fare_reduction": 0.063,
+      "baseline_fare_spending_bn": 3.037,
       "breakdowns": {
         "region": [
           {
             "group": "North West",
-            "cost_bn": 0.058
+            "cost_bn": 0.038
           },
           {
             "group": "South East",
-            "cost_bn": 0.05
-          },
-          {
-            "group": "London",
-            "cost_bn": 0.042
-          },
-          {
-            "group": "East Midlands",
-            "cost_bn": 0.041
-          },
-          {
-            "group": "Scotland",
-            "cost_bn": 0.039
-          },
-          {
-            "group": "Yorkshire",
-            "cost_bn": 0.035
-          },
-          {
-            "group": "East of England",
-            "cost_bn": 0.034
-          },
-          {
-            "group": "South West",
-            "cost_bn": 0.029
-          },
-          {
-            "group": "West Midlands",
-            "cost_bn": 0.027
-          },
-          {
-            "group": "Wales",
-            "cost_bn": 0.018
-          },
-          {
-            "group": "North East",
-            "cost_bn": 0.015
-          },
-          {
-            "group": "Northern Ireland",
-            "cost_bn": 0.014
-          }
-        ],
-        "household_type": [
-          {
-            "group": "Couple No Children",
-            "cost_bn": 0.213
-          },
-          {
-            "group": "Couple With Children",
-            "cost_bn": 0.099
-          },
-          {
-            "group": "Single",
-            "cost_bn": 0.085
-          },
-          {
-            "group": "Lone Parent",
-            "cost_bn": 0.006
-          }
-        ],
-        "age_band": [
-          {
-            "group": "0-4",
-            "cost_bn": 0.007
-          },
-          {
-            "group": "5-9",
-            "cost_bn": 0.008
-          },
-          {
-            "group": "10-14",
-            "cost_bn": 0.009
-          },
-          {
-            "group": "15-19",
-            "cost_bn": 0.02
-          },
-          {
-            "group": "20-24",
-            "cost_bn": 0.019
-          },
-          {
-            "group": "25-29",
-            "cost_bn": 0.052
-          },
-          {
-            "group": "30-34",
             "cost_bn": 0.033
           },
           {
-            "group": "35-39",
-            "cost_bn": 0.034
+            "group": "East Midlands",
+            "cost_bn": 0.027
           },
           {
-            "group": "40-44",
-            "cost_bn": 0.03
+            "group": "East of England",
+            "cost_bn": 0.023
           },
           {
-            "group": "45-49",
-            "cost_bn": 0.022
+            "group": "Yorkshire",
+            "cost_bn": 0.023
           },
           {
-            "group": "50-54",
-            "cost_bn": 0.037
-          },
-          {
-            "group": "55-59",
-            "cost_bn": 0.037
-          },
-          {
-            "group": "60-64",
-            "cost_bn": 0.021
-          },
-          {
-            "group": "65-69",
+            "group": "South West",
             "cost_bn": 0.019
           },
           {
-            "group": "70-74",
+            "group": "West Midlands",
             "cost_bn": 0.018
           },
           {
-            "group": "75-79",
+            "group": "North East",
+            "cost_bn": 0.01
+          }
+        ],
+        "household_type": [
+          {
+            "group": "Couple No Children",
+            "cost_bn": 0.101
+          },
+          {
+            "group": "Couple With Children",
+            "cost_bn": 0.044
+          },
+          {
+            "group": "Single",
+            "cost_bn": 0.043
+          },
+          {
+            "group": "Lone Parent",
+            "cost_bn": 0.003
+          }
+        ],
+        "age_band": [
+          {
+            "group": "0-4",
+            "cost_bn": 0.004
+          },
+          {
+            "group": "5-9",
+            "cost_bn": 0.004
+          },
+          {
+            "group": "10-14",
+            "cost_bn": 0.003
+          },
+          {
+            "group": "15-19",
+            "cost_bn": 0.01
+          },
+          {
+            "group": "20-24",
+            "cost_bn": 0.01
+          },
+          {
+            "group": "25-29",
+            "cost_bn": 0.025
+          },
+          {
+            "group": "30-34",
+            "cost_bn": 0.014
+          },
+          {
+            "group": "35-39",
             "cost_bn": 0.013
           },
           {
+            "group": "40-44",
+            "cost_bn": 0.013
+          },
+          {
+            "group": "45-49",
+            "cost_bn": 0.008
+          },
+          {
+            "group": "50-54",
+            "cost_bn": 0.021
+          },
+          {
+            "group": "55-59",
+            "cost_bn": 0.02
+          },
+          {
+            "group": "60-64",
+            "cost_bn": 0.009
+          },
+          {
+            "group": "65-69",
+            "cost_bn": 0.01
+          },
+          {
+            "group": "70-74",
+            "cost_bn": 0.009
+          },
+          {
+            "group": "75-79",
+            "cost_bn": 0.005
+          },
+          {
             "group": "80+",
-            "cost_bn": 0.024
+            "cost_bn": 0.013
           }
         ],
         "income_quintile": [
           {
             "group": "Q1",
-            "cost_bn": 0.06
+            "cost_bn": 0.031
           },
           {
             "group": "Q2",
-            "cost_bn": 0.075
+            "cost_bn": 0.037
           },
           {
             "group": "Q3",
-            "cost_bn": 0.071
+            "cost_bn": 0.032
           },
           {
             "group": "Q4",
-            "cost_bn": 0.077
+            "cost_bn": 0.036
           },
           {
             "group": "Q5",
-            "cost_bn": 0.118
+            "cost_bn": 0.055
           }
         ]
+      },
+      "effect_breakdowns": {
+        "region": [
+          {
+            "group": "North West",
+            "cost_bn": 0.038
+          },
+          {
+            "group": "South East",
+            "cost_bn": 0.033
+          },
+          {
+            "group": "East Midlands",
+            "cost_bn": 0.027
+          },
+          {
+            "group": "East of England",
+            "cost_bn": 0.023
+          },
+          {
+            "group": "Yorkshire",
+            "cost_bn": 0.023
+          },
+          {
+            "group": "South West",
+            "cost_bn": 0.019
+          },
+          {
+            "group": "West Midlands",
+            "cost_bn": 0.018
+          },
+          {
+            "group": "North East",
+            "cost_bn": 0.01
+          }
+        ],
+        "household_type": [
+          {
+            "group": "Couple No Children",
+            "cost_bn": 0.101
+          },
+          {
+            "group": "Couple With Children",
+            "cost_bn": 0.044
+          },
+          {
+            "group": "Single",
+            "cost_bn": 0.043
+          },
+          {
+            "group": "Lone Parent",
+            "cost_bn": 0.003
+          }
+        ],
+        "age_band": [
+          {
+            "group": "0-4",
+            "cost_bn": 0.004
+          },
+          {
+            "group": "5-9",
+            "cost_bn": 0.004
+          },
+          {
+            "group": "10-14",
+            "cost_bn": 0.003
+          },
+          {
+            "group": "15-19",
+            "cost_bn": 0.01
+          },
+          {
+            "group": "20-24",
+            "cost_bn": 0.01
+          },
+          {
+            "group": "25-29",
+            "cost_bn": 0.025
+          },
+          {
+            "group": "30-34",
+            "cost_bn": 0.014
+          },
+          {
+            "group": "35-39",
+            "cost_bn": 0.013
+          },
+          {
+            "group": "40-44",
+            "cost_bn": 0.013
+          },
+          {
+            "group": "45-49",
+            "cost_bn": 0.008
+          },
+          {
+            "group": "50-54",
+            "cost_bn": 0.021
+          },
+          {
+            "group": "55-59",
+            "cost_bn": 0.02
+          },
+          {
+            "group": "60-64",
+            "cost_bn": 0.009
+          },
+          {
+            "group": "65-69",
+            "cost_bn": 0.01
+          },
+          {
+            "group": "70-74",
+            "cost_bn": 0.009
+          },
+          {
+            "group": "75-79",
+            "cost_bn": 0.005
+          },
+          {
+            "group": "80+",
+            "cost_bn": 0.013
+          }
+        ],
+        "income_quintile": [
+          {
+            "group": "Q1",
+            "cost_bn": 0.031
+          },
+          {
+            "group": "Q2",
+            "cost_bn": 0.037
+          },
+          {
+            "group": "Q3",
+            "cost_bn": 0.032
+          },
+          {
+            "group": "Q4",
+            "cost_bn": 0.036
+          },
+          {
+            "group": "Q5",
+            "cost_bn": 0.055
+          }
+        ]
+      },
+      "average_effect_breakdowns": {
+        "region": [
+          {
+            "group": "East Midlands",
+            "annual_effect_gbp": 11.82
+          },
+          {
+            "group": "North West",
+            "annual_effect_gbp": 10.97
+          },
+          {
+            "group": "Yorkshire",
+            "annual_effect_gbp": 9.07
+          },
+          {
+            "group": "East of England",
+            "annual_effect_gbp": 7.7
+          },
+          {
+            "group": "South East",
+            "annual_effect_gbp": 7.63
+          },
+          {
+            "group": "North East",
+            "annual_effect_gbp": 7.56
+          },
+          {
+            "group": "South West",
+            "annual_effect_gbp": 6.96
+          },
+          {
+            "group": "West Midlands",
+            "annual_effect_gbp": 6.68
+          }
+        ],
+        "household_type": [
+          {
+            "group": "Couple No Children",
+            "annual_effect_gbp": 11.9
+          },
+          {
+            "group": "Couple With Children",
+            "annual_effect_gbp": 10.46
+          },
+          {
+            "group": "Single",
+            "annual_effect_gbp": 4.99
+          },
+          {
+            "group": "Lone Parent",
+            "annual_effect_gbp": 1.84
+          }
+        ],
+        "age_band": [
+          {
+            "group": "0-4",
+            "annual_effect_gbp": 1.33
+          },
+          {
+            "group": "5-9",
+            "annual_effect_gbp": 1.3
+          },
+          {
+            "group": "10-14",
+            "annual_effect_gbp": 1.17
+          },
+          {
+            "group": "15-19",
+            "annual_effect_gbp": 3.56
+          },
+          {
+            "group": "20-24",
+            "annual_effect_gbp": 5.38
+          },
+          {
+            "group": "25-29",
+            "annual_effect_gbp": 5.83
+          },
+          {
+            "group": "30-34",
+            "annual_effect_gbp": 3.81
+          },
+          {
+            "group": "35-39",
+            "annual_effect_gbp": 4.77
+          },
+          {
+            "group": "40-44",
+            "annual_effect_gbp": 4.28
+          },
+          {
+            "group": "45-49",
+            "annual_effect_gbp": 2.67
+          },
+          {
+            "group": "50-54",
+            "annual_effect_gbp": 6.24
+          },
+          {
+            "group": "55-59",
+            "annual_effect_gbp": 6.11
+          },
+          {
+            "group": "60-64",
+            "annual_effect_gbp": 2.89
+          },
+          {
+            "group": "65-69",
+            "annual_effect_gbp": 4.1
+          },
+          {
+            "group": "70-74",
+            "annual_effect_gbp": 3.34
+          },
+          {
+            "group": "75-79",
+            "annual_effect_gbp": 2.9
+          },
+          {
+            "group": "80+",
+            "annual_effect_gbp": 4.72
+          }
+        ],
+        "income_quintile": [
+          {
+            "group": "Q1",
+            "annual_effect_gbp": 6.2
+          },
+          {
+            "group": "Q2",
+            "annual_effect_gbp": 6.85
+          },
+          {
+            "group": "Q3",
+            "annual_effect_gbp": 7.59
+          },
+          {
+            "group": "Q4",
+            "annual_effect_gbp": 9.68
+          },
+          {
+            "group": "Q5",
+            "annual_effect_gbp": 13.81
+          }
+        ]
+      },
+      "breakdown_metric": "estimated_household_benefit",
+      "ticket_level_savings_estimated": false,
+      "household_effect": {
+        "population": "All households in England outside London",
+        "annual_effect_average_gbp": 8.56,
+        "by_region": [
+          {
+            "region": "East Midlands",
+            "annual_effect_gbp": 11.82
+          },
+          {
+            "region": "North West",
+            "annual_effect_gbp": 10.97
+          },
+          {
+            "region": "Yorkshire",
+            "annual_effect_gbp": 9.07
+          },
+          {
+            "region": "East of England",
+            "annual_effect_gbp": 7.7
+          },
+          {
+            "region": "South East",
+            "annual_effect_gbp": 7.63
+          },
+          {
+            "region": "North East",
+            "annual_effect_gbp": 7.56
+          },
+          {
+            "region": "South West",
+            "annual_effect_gbp": 6.96
+          },
+          {
+            "region": "West Midlands",
+            "annual_effect_gbp": 6.68
+          }
+        ],
+        "allocation_base_bn": 0.191,
+        "method": "6.3% DfT observed all-ticket reduction applied to simulated fare spending"
       }
     }
   }

@@ -1,15 +1,10 @@
 """Bus fare reform pipeline.
 
-Costs two reforms on the PolicyEngine UK Enhanced FRS (household bus fares
-imputed from the LCFS and calibrated to DfT Annual Bus Statistics totals):
-
-  * **£1 bus fare cap** — a universal per-trip cap; and
-  * **Free buses for under-25s** — to help young people access training and work.
-
-Household bus fares are allocated to individuals by an NTS age profile, then
-each reform is costed against that baseline with: fiscal cost, people affected,
-and breakdowns by region, household type, age band and income quintile/quartile.
-Behaviour is static.
+Costs the £3-to-£2 English bus fare cap announced on 22 July 2026 using the
+PolicyEngine UK Enhanced FRS. Household bus-fare spending is allocated to people
+and reduced by the 6.3% whole-market fare reduction observed in DfT's evaluation
+of the previous £2 cap. The result is an independent, static microsimulation
+estimate; the government's £400m funding figure is retained only as a benchmark.
 """
 
 from __future__ import annotations
@@ -25,13 +20,7 @@ import pandas as pd
 
 from . import sources
 from .formulas import bus_fare_age_weight
-from .sources import (
-    ENGLAND_TO_UK_POPULATION_UPLIFT,
-    UNDER_25_AGE_LIMIT,
-    dft_average_fare,
-    fare_cap_reduction_high,
-    fare_cap_reduction_low,
-)
+from .sources import ENGLAND_TO_UK_POPULATION_UPLIFT
 
 REPO_ROOT = Path(__file__).resolve().parents[2]
 # Default simulation source: the PolicyEngine UK Enhanced FRS, downloaded from
@@ -89,6 +78,7 @@ def run(args: argparse.Namespace) -> None:
     age = np.asarray(sim.calculate("age", period=year, map_to="person").values, float)
     hid = np.asarray(sim.calculate("household_id", period=year, map_to="person").values)
     region = np.asarray(sim.calculate("region", period=year, map_to="person").values).astype(str)
+    region_label = np.asarray([_label(r) for r in region])
     famtype = np.asarray(sim.calculate("family_type", period=year, map_to="person").values).astype(
         str
     )
@@ -107,7 +97,17 @@ def run(args: argparse.Namespace) -> None:
     total_fare = float(fare_hh.sum())
     total_subsidy = float(sub_hh.sum())
     total_people = float(pw.sum())
-    under25 = age < UNDER_25_AGE_LIMIT
+    english_regions_outside_london = {
+        "North East",
+        "North West",
+        "Yorkshire",
+        "East Midlands",
+        "West Midlands",
+        "East of England",
+        "South East",
+        "South West",
+    }
+    in_policy_geography = np.isin(region_label, list(english_regions_outside_london))
 
     def wsum(values):
         return float((np.asarray(values) * pw).sum())
@@ -125,12 +125,12 @@ def run(args: argparse.Namespace) -> None:
         np.char.add(np.char.add(_bstart.astype(str), "-"), (_bstart + 4).astype(str)),
     )
 
-    def breakdown(value_p, eligible):
+    def breakdown(value_p, eligible, include_unknown=False, target_total_bn=None):
         v = np.asarray(value_p) * eligible * pw
         df = pd.DataFrame(
             {
                 "v": v,
-                "region": [_label(r) for r in region],
+                "region": region_label,
                 "household_type": [_label(f) for f in famtype],
                 "age_band": age_band_labels,
                 "income_quintile": [f"Q{n}" if n else "Unknown" for n in quintile],
@@ -141,7 +141,7 @@ def run(args: argparse.Namespace) -> None:
             rows = [
                 {"group": g, "cost_bn": round(float(c) / 1e9, 3)}
                 for g, c in df.groupby(dim)["v"].sum().items()
-                if g != "Unknown"
+                if (include_unknown or g != "Unknown") and c > 0
             ]
             if dim == "age_band":
                 rows.sort(key=lambda r: int(r["group"].split("-")[0].replace("+", "")))
@@ -149,41 +149,140 @@ def run(args: argparse.Namespace) -> None:
                 rows.sort(key=lambda r: r["group"])
             else:
                 rows.sort(key=lambda r: r["cost_bn"], reverse=True)
+            if target_total_bn is not None and rows:
+                current_total = sum(r["cost_bn"] for r in rows)
+                if current_total > 0:
+                    scale = target_total_bn / current_total
+                    for row in rows:
+                        row["cost_bn"] = round(row["cost_bn"] * scale, 3)
+                residual = round(target_total_bn - sum(r["cost_bn"] for r in rows), 3)
+                largest = max(rows, key=lambda r: r["cost_bn"])
+                largest["cost_bn"] = round(largest["cost_bn"] + residual, 3)
             out[dim] = rows
         return out
 
-    print("Step 3: Reform — free buses for under-25s ...")
-    free_under_25 = {
-        "label": "Free buses for under-25s",
-        "age_limit": UNDER_25_AGE_LIMIT,
-        "cost_bn": round(wsum(alloc * under25) / 1e9, 3),
-        "people_affected_m": round(wsum(under25 & (alloc > 0)) / 1e6, 2),
-        "breakdowns": breakdown(alloc, under25),
-    }
+    print("Step 3: Announced reform — £3 to £2 fare cap ...")
+    exposure_total_gbp = wsum(alloc * in_policy_geography)
+    reduction = sources.DFT_ALL_TICKET_FARE_REDUCTION
+    allocated_relief = alloc * in_policy_geography * reduction
+    estimated_cost_gbp = wsum(allocated_relief)
+    estimated_cost_bn = estimated_cost_gbp / 1e9
+    effect_breakdowns = breakdown(
+        allocated_relief,
+        np.ones_like(age, bool),
+        include_unknown=False,
+        target_total_bn=round(estimated_cost_bn, 3),
+    )
+    household_frame = pd.DataFrame(
+        {
+            "household_id": hid,
+            "region": region_label,
+            "household_type": [_label(f) for f in famtype],
+            "income_quintile": quintile,
+            "weight": pw,
+        }
+    ).drop_duplicates("household_id")
+    household_relief = (
+        pd.DataFrame({"household_id": hid, "relief": allocated_relief})
+        .groupby("household_id")["relief"]
+        .sum()
+    )
+    household_frame = household_frame.join(household_relief, on="household_id")
+    policy_household_frame = household_frame[
+        household_frame["region"].isin(english_regions_outside_london)
+    ]
 
-    print("Step 4: Reform — £1 fare cap (DfT-anchored range) ...")
-    # Approximate: with only annual fare spend, cut each fare by a flat fraction set
-    # by the DfT average fare (receipts / fare-paying journeys). The fare-paying
-    # denominator is uncertain: excluding only genuinely-free older/disabled journeys
-    # gives the lower bound (~£1.11 avg, ~9.5%); excluding all concessionary gives the
-    # upper bound (~£1.28 avg, ~21.6%). A flat fraction blends ticket types, so this is
-    # indicative, not the exact sum of max(fare - £1, 0) over single tickets.
-    red_low = fare_cap_reduction_low()
-    red_high = fare_cap_reduction_high()
+    def average_household_effect(dimension):
+        grouped = policy_household_frame.groupby(dimension).apply(
+            lambda group: np.average(group["relief"], weights=group["weight"]),
+            include_groups=False,
+        )
+        return [
+            {
+                "group": f"Q{int(group)}" if dimension == "income_quintile" else _label(group),
+                "annual_effect_gbp": round(float(value), 2),
+            }
+            for group, value in grouped.items()
+            if group not in (0, "Unknown")
+        ]
+
+    # Age is a person attribute, so age-band averages are per person, restricted
+    # to the policy geography (the other dimensions average per household).
+    age_effect_frame = pd.DataFrame(
+        {
+            "age_band": age_band_labels[in_policy_geography],
+            "relief": (allocated_relief * pw)[in_policy_geography],
+            "weight": pw[in_policy_geography],
+        }
+    )
+    age_effect = age_effect_frame.groupby("age_band").sum()
+    average_effect_breakdowns = {
+        "region": average_household_effect("region"),
+        "household_type": average_household_effect("household_type"),
+        "age_band": [
+            {
+                "group": group,
+                "annual_effect_gbp": round(float(row.relief / row.weight), 2),
+            }
+            for group, row in age_effect.iterrows()
+        ],
+        "income_quintile": average_household_effect("income_quintile"),
+    }
+    average_effect_breakdowns["region"].sort(key=lambda row: row["annual_effect_gbp"], reverse=True)
+    average_effect_breakdowns["household_type"].sort(
+        key=lambda row: row["annual_effect_gbp"], reverse=True
+    )
+    average_effect_breakdowns["age_band"].sort(
+        key=lambda row: int(row["group"].split("-")[0].replace("+", ""))
+    )
+    average_effect_breakdowns["income_quintile"].sort(key=lambda row: row["group"])
+    household_effect_by_region = [
+        {
+            "region": row["group"],
+            "annual_effect_gbp": row["annual_effect_gbp"],
+        }
+        for row in average_effect_breakdowns["region"]
+    ]
+    household_effect_average = round(
+        float(
+            np.average(
+                policy_household_frame["relief"],
+                weights=policy_household_frame["weight"],
+            )
+        ),
+        2,
+    )
     fare_cap = {
-        "label": "£1 bus fare cap",
-        "cap_gbp": sources.FARE_CAP_GBP,
-        "average_fare_low_gbp": round(dft_average_fare(free_only=True), 3),
-        "average_fare_high_gbp": round(dft_average_fare(free_only=False), 3),
-        "reduction_low": round(red_low, 3),
-        "reduction_high": round(red_high, 3),
-        "cost_low_bn": round(wsum(alloc * red_low) / 1e9, 3),
-        "cost_high_bn": round(wsum(alloc * red_high) / 1e9, 3),
-        "people_affected_m": round(wsum(alloc > 0) / 1e6, 2),
-        "breakdowns": breakdown(alloc * red_low, np.ones_like(age, bool)),
+        "label": "Announced £2 bus fare cap",
+        "baseline_cap_gbp": sources.BASELINE_FARE_CAP_GBP,
+        "reform_cap_gbp": sources.REFORM_FARE_CAP_GBP,
+        "start_date": sources.POLICY_START_DATE,
+        "end_date": sources.POLICY_END_DATE,
+        "geography": "England outside London",
+        "participating_services_only": True,
+        "people_potentially_affected_m": round(wsum(in_policy_geography & (alloc > 0)) / 1e6, 2),
+        "announced_cap_funding_bn": sources.ANNOUNCED_CAP_FUNDING_BN,
+        "announced_total_extra_funding_bn": sources.ANNOUNCED_TOTAL_EXTRA_FUNDING_BN,
+        "reported_scheme_cost_lower_bound_bn": sources.REPORTED_SCHEME_COST_LOWER_BOUND_BN,
+        "official_total_scheme_cost_published": False,
+        "estimated_cost_bn": round(estimated_cost_bn, 3),
+        "fare_reduction": reduction,
+        "baseline_fare_spending_bn": round(exposure_total_gbp / 1e9, 3),
+        "breakdowns": effect_breakdowns,
+        "effect_breakdowns": effect_breakdowns,
+        "average_effect_breakdowns": average_effect_breakdowns,
+        "breakdown_metric": "estimated_household_benefit",
+        "ticket_level_savings_estimated": False,
+        "household_effect": {
+            "population": "All households in England outside London",
+            "annual_effect_average_gbp": household_effect_average,
+            "by_region": household_effect_by_region,
+            "allocation_base_bn": round(estimated_cost_bn, 3),
+            "method": "6.3% DfT observed all-ticket reduction applied to simulated fare spending",
+        },
     }
 
-    print("Step 5: Baseline and official-statistic comparisons ...")
+    print("Step 4: Baseline and official-statistic comparisons ...")
     bands = [
         ("0-15", age < 16),
         ("16-24", (age >= 16) & (age < 25)),
@@ -200,12 +299,10 @@ def run(args: argparse.Namespace) -> None:
         }
         for n, m in bands
     ]
-    reg_df = pd.DataFrame(
-        {"region": [_label(r) for r in region], "f": alloc * pw, "u": alloc * under25 * pw}
-    )
+    reg_df = pd.DataFrame({"region": region_label, "f": alloc * pw})
     reg = reg_df.groupby("region").sum()
     by_region = [
-        {"region": r, "fare_bn": round(v.f / 1e9, 3), "under25_fare_bn": round(v.u / 1e9, 3)}
+        {"region": r, "fare_bn": round(v.f / 1e9, 3)}
         for r, v in reg.sort_values("f", ascending=False).iterrows()
     ]
 
@@ -237,7 +334,8 @@ def run(args: argparse.Namespace) -> None:
 
     output = {
         "year": year,
-        "fiscal_year_label": f"{year}-{(year + 1) % 100:02d}",
+        "projection_year_label": str(year),
+        "policy_period_label": "1 January–31 December 2027",
         "currency": "GBP",
         "dataset": (
             "populace_uk_2023"
@@ -256,19 +354,16 @@ def run(args: argparse.Namespace) -> None:
             "total_bus_fare_bn": round(total_fare / 1e9, 3),
             "total_bus_subsidy_bn": round(total_subsidy / 1e9, 3),
             "population_m": round(total_people / 1e6, 2),
-            "under_25_people_m": round(wsum(under25) / 1e6, 2),
             "fare_paying_people_m": round(wsum(alloc > 0) / 1e6, 2),
-            "under_25_fare_bn": round(wsum(alloc * under25) / 1e9, 3),
-            "under_25_share": round(wsum(alloc * under25) / total_fare, 3),
             "by_age_band": by_age,
             "by_region": by_region,
             "breakdowns": breakdown(alloc, np.ones_like(age, bool)),
             "official_comparison": official,
         },
-        "reforms": {"free_under_25": free_under_25, "fare_cap_1pound": fare_cap},
+        "reforms": {"announced_2pound_cap": fare_cap},
     }
 
-    print("Step 6: Writing results JSON ...")
+    print("Step 5: Writing results JSON ...")
     for dest in [
         REPO_ROOT / "data" / "bus_fare_cap_results.json",
         REPO_ROOT / "dashboard" / "public" / "data" / "bus_fare_cap_results.json",
@@ -277,8 +372,6 @@ def run(args: argparse.Namespace) -> None:
         dest.write_text(json.dumps(output, indent=2, default=str))
         print(f"    wrote {dest}")
     print(
-        f"Done. Free under-25s £{free_under_25['cost_bn']:.2f}bn "
-        f"({free_under_25['people_affected_m']:.1f}m people); "
-        f"£1 cap £{fare_cap['cost_low_bn']:.2f}–{fare_cap['cost_high_bn']:.2f}bn "
-        f"({fare_cap['people_affected_m']:.1f}m people)."
+        f"Done. Microsimulation estimate £{fare_cap['estimated_cost_bn']:.3f}bn; "
+        f"reported government scheme cost >£{fare_cap['reported_scheme_cost_lower_bound_bn']:.1f}bn."
     )

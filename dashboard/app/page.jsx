@@ -7,7 +7,7 @@ import MethodologyTab from "../src/components/MethodologyTab";
 import ReformTab from "../src/components/ReformTab";
 
 const TAB_OPTIONS = [
-  { id: "reform", label: "Reforms" },
+  { id: "reform", label: "Announcement" },
   { id: "baseline", label: "Baseline" },
   { id: "methodology", label: "Methodology" },
 ];
@@ -72,23 +72,16 @@ function Dashboard() {
         <p className="mb-3 text-[1.05rem] leading-relaxed text-slate-600">
           This dashboard uses{" "}
           <a href="https://policyengine.org" target="_blank" rel="noreferrer" className="underline">PolicyEngine</a>{" "}
-          UK&apos;s microsimulation (the Enhanced FRS, with household bus fares imputed from the LCFS
-          and calibrated to DfT Annual Bus Statistics) to cost two bus policies
-          {data ? ` for fiscal year ${data.fiscal_year_label}` : ""}: a{" "}
-          <strong>£1 bus fare cap</strong> (England already runs a{" "}
-          <a href="https://www.gov.uk/guidance/3-national-bus-fare-cap" target="_blank" rel="noreferrer" className="underline">national fare cap</a>
-          ) and <strong>free buses for under-25s</strong> (cf.{" "}
-          <a href="https://www.transport.gov.scot/concessionary-travel/young-persons-free-bus-travel-scheme/" target="_blank" rel="noreferrer" className="underline">Scotland&apos;s under-22 scheme</a>
-          ), to help young people access training and employment. The{" "}
-          <TabLink onSelect={() => handleTabChange("reform")}>Reforms</TabLink> tab shows each
-          policy&apos;s fiscal cost and breakdowns. The{" "}
+          UK&apos;s microsimulation to explain the <strong>£2 bus fare cap announced on 22 July
+          2026</strong>. The policy lowers the £3 maximum single fare on participating services in
+          England outside London for calendar 2027. The{" "}
+          <TabLink onSelect={() => handleTabChange("reform")}>Announcement</TabLink> tab separates
+          official funding figures from PolicyEngine&apos;s distribution of baseline fare exposure. The{" "}
           <TabLink onSelect={() => handleTabChange("baseline")}>Baseline</TabLink> tab shows the
           projected baseline bus fares by age and region. The{" "}
           <TabLink onSelect={() => handleTabChange("methodology")}>Methodology</TabLink> tab explains
-          how every result is computed, with a source for every assumption. These are{" "}
-          <strong>illustrative scenario estimates</strong>, not publication-grade costings: they do
-          not net out existing concessions or model ticket-level fares — see the Methodology tab for
-          the caveats.
+          how every result is computed, with a source for every assumption. The dashboard does not
+          estimate ticket-level savings because the survey data do not identify fares above £2.
         </p>
 
         <div className="mb-8 mt-8 flex w-fit flex-wrap border-b-2 border-slate-200">

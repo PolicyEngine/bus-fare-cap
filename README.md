@@ -1,41 +1,39 @@
-# Bus fare policies analysis
+# 2027 £2 bus fare cap analysis
 
-Costs two bus fare reforms on the PolicyEngine UK Enhanced FRS (household bus and coach fares imputed from the LCFS and calibrated to DfT Annual Bus Statistics totals).
+Source-backed analysis of the £2 bus fare cap announced by the UK government on 22 July 2026, with PolicyEngine UK distributional context from the Enhanced FRS.
 
 **Live dashboard:** https://bus-fare-cap.vercel.app
 
-## Headline results
+## Announced policy
 
-Default dataset `enhanced_frs_2024_25`, fiscal year 2027-28, static (no behavioural response).
+- Maximum single fare falls from £3 to £2.
+- Applies from 1 January through 31 December 2027.
+- Covers participating bus services in England outside London.
+- Government says total scheme cost will exceed £500m and identifies £454m of new funding, including funding that enables devolved governments to take similar action.
 
-| Reform | Fiscal cost / yr |
-|---|---|
-| Free buses for under-25s | ~£0.65bn |
-| £1 bus fare cap | ~£0.92bn (≈22% average-fare reduction) |
+The official announcement is the source for the fiscal headline. The analysis does not claim to reproduce it with microsimulation.
 
-Baseline: UK household bus and coach fares ≈ £4.2bn; under-25s ≈ 15.5% of fares.
+## Analysis
 
-The £1 cap figure uses an all-concessionary denominator for the average fare. A stricter free-only denominator (excluding only genuinely-free older/disabled journeys) gives a sensitivity of ~£0.40bn (≈9.5% reduction).
+PolicyEngine projects household bus and coach fare spending to 2027 and shows baseline fare exposure by English region outside London, family type, age and income quintile. Household fares are imputed from the LCFS, calibrated to DfT Annual Bus Statistics and allocated to household members with an NTS-derived age profile.
 
-## Method
-
-Household bus fares are allocated to individuals using a National Travel Survey bus-trips-by-age profile (concessionary-adjusted, so it tracks fares paid rather than trips). **Free buses for under-25s** is the fares allocated to that group. The **£1 cap** is approximated by a flat fare-reduction fraction set by the DfT average fare (receipts ÷ fare-paying journeys), since the dataset holds annual fare spend rather than per-trip fares. The dashboard Methodology tab gives a source for every number.
+This exposure is not estimated savings. The dataset records annual household spending rather than individual ticket prices, so it cannot calculate `journeys × max(current fare − £2, 0)`, identify participating routes, or remove places already charging £2 or less.
 
 ## Layout
 
-- `src/bus_fare_cap/` — the Python package (`formulas`, `sources`, `pipeline`, `cli`).
-- `dashboard/` — Next.js dashboard with Reforms, Baseline and Methodology tabs.
-- `data/` and `dashboard/public/data/` — generated results JSON.
+- `src/bus_fare_cap/` — Python analysis package.
+- `dashboard/` — Next.js dashboard with Announcement, Baseline and Methodology tabs.
+- `data/` and `dashboard/public/data/` — generated dashboard JSON.
 
 ## Run
 
 ```bash
 pip install -e ".[dev]"
-export HF_TOKEN=hf_xxx   # access to policyengine/policyengine-uk-data-private
-python -m bus_fare_cap --year 2027   # default: Enhanced FRS; regenerates the results JSON
+export HF_TOKEN=hf_xxx
+python -m bus_fare_cap --year 2027
 ```
 
-To cost the reforms on the Populace UK dataset instead (via policyengine.py `managed_microsimulation`), opt in with an environment variable. This path is kept available but off by default:
+The default private Enhanced FRS dataset is pinned for reproducibility. The optional Populace path remains available:
 
 ```bash
 BUS_FARE_CAP_POPULACE=1 python -m bus_fare_cap --year 2027
@@ -43,14 +41,16 @@ BUS_FARE_CAP_POPULACE=1 python -m bus_fare_cap --year 2027
 
 ## Caveats
 
-- **Young-adult undercount.** The Enhanced FRS undercounts 18-24s (~3.3m vs ONS ~5.9m) because the FRS misses young adults who have left home. The under-25 fare share and the free-under-25s cost are therefore a lower bound.
-- **Modelled age split.** The split across ages uses NTS age weights, not observed individual fares.
-- **Flat-fraction cap.** The £1 cap is a flat fare-reduction approximation, not a ticket-level calculation.
-- **Static.** No behavioural response — lower or zero fares would induce more trips (cf. Scotland's under-22 scheme) and raise both ridership and cost.
-- **Gross of concessions.** Costs are gross of existing youth and child concessions (e.g. Scotland's under-22 free travel).
+- Operator participation and detailed reimbursement rules for 2027 are not yet represented.
+- London and the devolved nations are excluded from the policy-geography analysis.
+- Existing local £2-or-lower fares cannot yet be identified in the household dataset.
+- People in fare-spending households are an exposure proxy, not observed passengers or confirmed beneficiaries.
+- An independent costing requires route/operator fare and journey distributions plus behavioural sensitivity analysis.
 
 ## Dashboard
 
 ```bash
-cd dashboard && bun install && bun run dev
+cd dashboard
+bun install
+bun run dev
 ```

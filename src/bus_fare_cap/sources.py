@@ -28,53 +28,19 @@ AGE_ALLOCATION_WEIGHTS = {
     "70+": 0.07,
 }
 
-# Reform levers.
-UNDER_25_AGE_LIMIT = 25
-FARE_CAP_GBP = 1
+# Policy announced on 22 July 2026.
+BASELINE_FARE_CAP_GBP = 3
+REFORM_FARE_CAP_GBP = 2
+POLICY_START_DATE = "2027-01-01"
+POLICY_END_DATE = "2027-12-31"
+ANNOUNCED_NEW_FUNDING_BN = 0.454
+OFFICIAL_SCHEME_COST_LOWER_BOUND_BN = 0.5
 
-# £1 cap anchored on DfT Annual Bus Statistics, year ending March 2025 (England) —
-# the same release the fare/subsidy calibration targets come from. The cap cost is
-# the fares forgone, fares - journeys x £1, expressed as a reduction fraction
-# (1 - £1 / average fare) applied to the calibrated fare total.
+# DfT Annual Bus Statistics, year ending March 2025 (England). These remain the
+# calibration anchors for household fare exposure, not a ticket-level estimate
+# of the newly announced £3-to-£2 cap.
 DFT_ENGLAND_FARE_RECEIPTS_BN = 3.4  # BUS05a: passenger fare receipts
 DFT_ENGLAND_PASSENGER_JOURNEYS_BN = 3.7  # BUS01: local bus passenger journeys
-# Genuinely-free statutory (older/disabled, ENCTS) journeys generate no fare receipts
-# (they are reimbursed as subsidy). Concessionary Travel Statistics, y/e March 2025.
-DFT_ENGLAND_FREE_CONCESSIONARY_JOURNEYS_BN = 0.624
-# All "concessionary" journeys in BUS01 (≈28%) also lump in youth concessions, who pay
-# reduced fares that ARE in the receipts — so this is only the upper-bound denominator.
-DFT_ENGLAND_CONCESSIONARY_JOURNEY_SHARE = 0.28
-
-
-def _cap_reduction(fare_paying_journeys_bn: float) -> float:
-    """Reduction = 1 - £1 / (receipts / fare-paying journeys)."""
-    avg_fare = DFT_ENGLAND_FARE_RECEIPTS_BN / fare_paying_journeys_bn
-    return 1 - FARE_CAP_GBP / avg_fare
-
-
-def dft_average_fare(free_only: bool = True) -> float:
-    """Average fare = receipts / fare-paying journeys. ``free_only`` excludes only the
-    genuinely-free older/disabled journeys (lower bound); otherwise all concessionary."""
-    excluded = (
-        DFT_ENGLAND_FREE_CONCESSIONARY_JOURNEYS_BN
-        if free_only
-        else DFT_ENGLAND_PASSENGER_JOURNEYS_BN * DFT_ENGLAND_CONCESSIONARY_JOURNEY_SHARE
-    )
-    return DFT_ENGLAND_FARE_RECEIPTS_BN / (DFT_ENGLAND_PASSENGER_JOURNEYS_BN - excluded)
-
-
-def fare_cap_reduction_low() -> float:
-    """Lower bound on cost: exclude only genuinely-free older/disabled journeys."""
-    return _cap_reduction(
-        DFT_ENGLAND_PASSENGER_JOURNEYS_BN - DFT_ENGLAND_FREE_CONCESSIONARY_JOURNEYS_BN
-    )
-
-
-def fare_cap_reduction_high() -> float:
-    """Upper bound on cost: exclude all concessionary journeys (incl. fare-paying youth)."""
-    return _cap_reduction(
-        DFT_ENGLAND_PASSENGER_JOURNEYS_BN * (1 - DFT_ENGLAND_CONCESSIONARY_JOURNEY_SHARE)
-    )
 
 
 @dataclass(frozen=True)
@@ -109,9 +75,8 @@ ONS_POPULATION = Source(
 DFT_JOURNEYS = Source(
     "3.7bn journeys (England), 28% concessionary",
     "DfT Annual Bus Statistics, year ending March 2025, table BUS01: 3.7 billion "
-    "local bus passenger journeys in England, of which 28% (1.0 billion) were free "
-    "concessionary journeys. With fare receipts this gives the average fare paid "
-    "(~£1.28), which anchors the £1 cap cost (fares - journeys x £1).",
+    "local bus passenger journeys in England, of which 28% (1.0 billion) were "
+    "concessionary. This provides context, but cannot identify tickets above £2.",
     "https://www.gov.uk/government/statistics/annual-bus-statistics-year-ending-march-2025/annual-bus-statistics-year-ending-march-2025",
 )
 NTS_AGE_PROFILE = Source(
@@ -120,44 +85,36 @@ NTS_AGE_PROFILE = Source(
     "to allocate household bus fares to individuals.",
     "https://www.gov.uk/government/statistics/national-travel-survey-2023/nts-2023-trips-by-purpose-age-mode-and-sex",
 )
-SCOTLAND_U22 = Source(
-    "Free bus travel for under-22s",
-    "Transport Scotland's under-22 free bus scheme — a real-world comparator for "
-    "a youth free-travel policy, and evidence of large induced demand.",
-    "https://www.transport.gov.scot/concessionary-travel/young-persons-free-bus-travel-scheme/",
-)
-
-FARE_CAP_POLICY = Source(
-    "£2 (2023) -> £3 (Jan 2025 - Mar 2027)",
-    "England's national bus fare cap: single fares capped at £2 from 2023, raised "
-    "to £3 from January 2025 and funded to March 2027. The real-world comparator "
-    "for a £1 cap.",
+CURRENT_FARE_CAP_POLICY = Source(
+    "£3 until 31 December 2026",
+    "The current maximum single fare on participating bus services in England "
+    "outside London, before the announced £2 cap begins.",
     "https://www.gov.uk/guidance/3-national-bus-fare-cap",
 )
 
-CPT_UNDER22_ESTIMATE = Source(
-    "£100-150m/yr (under-22, £1 fare)",
-    "Confederation of Passenger Transport estimate that a £1 fare for under-22s in "
-    "England would cost £100-150m/yr — an external comparator (this analysis costs "
-    "free travel for the wider under-25 group).",
-    "https://www.route-one.net/news/what-should-come-next-after-the-bus-fare-cap-scheme-in-england/",
+TWO_POUND_ANNOUNCEMENT = Source(
+    "£2 from 1 January 2027; >£500m scheme cost",
+    "Government announcement of a £2 maximum single fare on participating buses "
+    "in England outside London throughout 2027. It announces £454m of new funding, "
+    "including funding enabling devolved governments to take similar action, and "
+    "says total scheme cost will exceed £500m.",
+    "https://www.gov.uk/government/news/cheaper-travel-for-millions-with-a-third-off-fares",
 )
 
 
 def as_json() -> dict:
     return {
         "reform_definition": {
-            "under_25_age_limit": UNDER_25_AGE_LIMIT,
-            "fare_cap_gbp": FARE_CAP_GBP,
-            "england_to_uk_population_uplift": ENGLAND_TO_UK_POPULATION_UPLIFT,
+            "baseline_fare_cap_gbp": BASELINE_FARE_CAP_GBP,
+            "reform_fare_cap_gbp": REFORM_FARE_CAP_GBP,
+            "start_date": POLICY_START_DATE,
+            "end_date": POLICY_END_DATE,
+            "geography": "England outside London",
+            "participating_services_only": True,
         },
         "assumptions": {
             "age_allocation_weights": AGE_ALLOCATION_WEIGHTS,
-            "fare_cap_average_fare_low_gbp": round(dft_average_fare(free_only=True), 3),
-            "fare_cap_average_fare_high_gbp": round(dft_average_fare(free_only=False), 3),
-            "fare_cap_reduction_low": round(fare_cap_reduction_low(), 3),
-            "fare_cap_reduction_high": round(fare_cap_reduction_high(), 3),
-            "behavioural": "static (no induced demand)",
+            "incidence_method": "baseline household fare exposure; not estimated savings",
         },
         "sources": {
             "dft_fare": asdict(DFT_FARE),
@@ -165,8 +122,7 @@ def as_json() -> dict:
             "dft_journeys": asdict(DFT_JOURNEYS),
             "ons_population": asdict(ONS_POPULATION),
             "nts_age_profile": asdict(NTS_AGE_PROFILE),
-            "scotland_under_22": asdict(SCOTLAND_U22),
-            "fare_cap_policy": asdict(FARE_CAP_POLICY),
-            "cpt_under22_estimate": asdict(CPT_UNDER22_ESTIMATE),
+            "current_fare_cap_policy": asdict(CURRENT_FARE_CAP_POLICY),
+            "two_pound_announcement": asdict(TWO_POUND_ANNOUNCEMENT),
         },
     }

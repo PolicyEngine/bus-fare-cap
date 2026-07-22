@@ -1,11 +1,8 @@
-"""Bus fare reform analysis.
+"""Analysis of the announced 2027 £2 bus fare cap.
 
-Costs two reforms on the PolicyEngine UK Enhanced FRS:
-  * a £1 per-trip bus fare cap, and
-  * free bus travel for under-25s,
-to help young people access training and employment. Household bus fares
-(imputed from the LCFS, calibrated to DfT totals) are allocated to people by an
-NTS age profile; the reforms are costed against that baseline.
+PolicyEngine UK distributes baseline household bus-fare exposure across the
+policy geography. Official scheme cost is reported separately because the
+underlying survey data do not contain ticket-level fares.
 """
 
 from .formulas import bus_fare_age_weight, fare_cap_relief, household_fare_share

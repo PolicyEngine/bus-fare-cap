@@ -31,29 +31,22 @@ export default function BaselineTab({ data }) {
   return (
     <div className="space-y-10">
       <SectionHeading
-        title={`Projected baseline — bus fares and the population, ${data.fiscal_year_label}`}
-        description={`Household bus & coach fares (imputed from the LCFS, calibrated to DfT totals), government bus subsidy, and population in the PolicyEngine UK Enhanced FRS, projected to ${data.fiscal_year_label}. Fares are calibrated to DfT statistics for the year ending March 2025 (largely under the older £2 cap) and uplifted from England local-bus figures, so they reflect observed fares then — they do not explicitly model the £3 cap or 2027-28 policy. The chart allocates fares to people by an NTS age profile (concessionary-adjusted), then sums by the selected dimension. Figures are illustrative.`}
+        title={`Projected baseline — bus fares and population, ${data.projection_year_label}`}
+        description={`UK household bus & coach fares, government bus subsidy and population in the PolicyEngine UK Enhanced FRS, projected to ${data.projection_year_label}. Fares are imputed from the LCFS and calibrated to DfT statistics for the year ending March 2025, then allocated to people with an NTS age profile. This baseline provides distributional context; it does not model ticket prices, the £3 cap, or the announced £2 policy.`}
       />
 
       <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-        <Stat label="Passenger fares paid" value={bn(b.total_bus_fare_bn)} sub={`${data.fiscal_year_label}, UK households`} compare={c.total_bus_fare_bn} compareFmt={bn} />
+        <Stat label="Passenger fares paid" value={bn(b.total_bus_fare_bn)} sub={`${data.projection_year_label}, UK households`} compare={c.total_bus_fare_bn} compareFmt={bn} />
         <Stat label="Government bus subsidy" value={bn(b.total_bus_subsidy_bn)} sub="benefit-in-kind to households" compare={c.total_bus_subsidy_bn} compareFmt={bn} />
         <Stat label="Population" value={m(b.population_m)} sub="people" compare={c.population_m} compareFmt={m} />
         <Stat
-          label="Under-25s"
-          value={m(b.under_25_people_m)}
-          sub="people"
-          compare={{
-            kind: "Independent check",
-            official: 20.1,
-            official_label: "ONS UK mid-2023, aged 0–24 ≈20.1m",
-            url: "https://www.ons.gov.uk/peoplepopulationandcommunity/populationandmigration/populationestimates",
-          }}
-          compareFmt={m}
+          label="In fare-spending households"
+          value={m(b.fare_paying_people_m)}
+          sub="exposure proxy, not observed bus users"
         />
       </div>
 
-      <BreakdownChart breakdowns={b.breakdowns} metric="Fares" color={colors.primary[500]} period={data.fiscal_year_label} />
+      <BreakdownChart breakdowns={b.breakdowns} metric="Fares" color={colors.primary[500]} period={data.projection_year_label} />
     </div>
   );
 }

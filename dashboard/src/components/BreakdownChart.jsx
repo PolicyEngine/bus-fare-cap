@@ -16,8 +16,7 @@ const DIMENSIONS = [
 
 export default function BreakdownChart({ breakdowns, metric = "Cost", color = colors.primary[500], period }) {
   const [dim, setDim] = useState("region");
-  // Drop empty categories (e.g. the 25+ age bands under the under-25 reform,
-  // which carry £0) so the chart only shows bands with cost.
+  // Drop empty categories so the chart only shows groups with exposure.
   const rows = (breakdowns[dim] || []).filter((r) => r.cost_bn > 0);
   const dimLabel = DIMENSIONS.find((d) => d.id === dim).label.toLowerCase();
   return (

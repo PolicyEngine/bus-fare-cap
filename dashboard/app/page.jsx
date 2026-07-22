@@ -73,7 +73,7 @@ function Dashboard() {
           This dashboard uses{" "}
           <a href="https://policyengine.org" target="_blank" rel="noreferrer" className="underline">PolicyEngine</a>{" "}
           UK&apos;s microsimulation to explain the <strong>£2 bus fare cap announced on 22 July
-          2026</strong>. The policy lowers the £3 maximum single fare on participating services in
+          2026</strong>. The policy lowers the £3 maximum single fare to £2 on
           participating buses in England outside London for calendar 2027. The{" "}
           <TabLink onSelect={() => handleTabChange("reform")}>Announcement</TabLink> tab separates
           our microsimulation estimate from the government&apos;s published funding benchmark. The{" "}

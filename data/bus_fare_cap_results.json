@@ -725,71 +725,71 @@
         "age_band": [
           {
             "group": "0-4",
-            "annual_effect_gbp": 0.93
+            "annual_effect_gbp": 1.33
           },
           {
             "group": "5-9",
-            "annual_effect_gbp": 0.91
+            "annual_effect_gbp": 1.3
           },
           {
             "group": "10-14",
-            "annual_effect_gbp": 0.82
+            "annual_effect_gbp": 1.17
           },
           {
             "group": "15-19",
-            "annual_effect_gbp": 2.57
+            "annual_effect_gbp": 3.56
           },
           {
             "group": "20-24",
-            "annual_effect_gbp": 3.67
+            "annual_effect_gbp": 5.38
           },
           {
             "group": "25-29",
-            "annual_effect_gbp": 3.96
+            "annual_effect_gbp": 5.83
           },
           {
             "group": "30-34",
-            "annual_effect_gbp": 2.65
+            "annual_effect_gbp": 3.81
           },
           {
             "group": "35-39",
-            "annual_effect_gbp": 3.21
+            "annual_effect_gbp": 4.77
           },
           {
             "group": "40-44",
-            "annual_effect_gbp": 2.91
+            "annual_effect_gbp": 4.28
           },
           {
             "group": "45-49",
-            "annual_effect_gbp": 1.9
+            "annual_effect_gbp": 2.67
           },
           {
             "group": "50-54",
-            "annual_effect_gbp": 4.61
+            "annual_effect_gbp": 6.24
           },
           {
             "group": "55-59",
-            "annual_effect_gbp": 4.25
+            "annual_effect_gbp": 6.11
           },
           {
             "group": "60-64",
-            "annual_effect_gbp": 2.09
+            "annual_effect_gbp": 2.89
           },
           {
             "group": "65-69",
-            "annual_effect_gbp": 3.0
+            "annual_effect_gbp": 4.1
           },
           {
             "group": "70-74",
-            "annual_effect_gbp": 2.5
+            "annual_effect_gbp": 3.34
           },
           {
             "group": "75-79",
-            "annual_effect_gbp": 2.17
+            "annual_effect_gbp": 2.9
           },
           {
             "group": "80+",
-            "annual_effect_gbp": 3.56
+            "annual_effect_gbp": 4.72
           }
         ],
         "income_quintile": [

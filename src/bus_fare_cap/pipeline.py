@@ -206,11 +206,13 @@ def run(args: argparse.Namespace) -> None:
             if group not in (0, "Unknown")
         ]
 
+    # Age is a person attribute, so age-band averages are per person, restricted
+    # to the policy geography (the other dimensions average per household).
     age_effect_frame = pd.DataFrame(
         {
-            "age_band": age_band_labels,
-            "relief": allocated_relief * pw,
-            "weight": pw,
+            "age_band": age_band_labels[in_policy_geography],
+            "relief": (allocated_relief * pw)[in_policy_geography],
+            "weight": pw[in_policy_geography],
         }
     )
     age_effect = age_effect_frame.groupby("age_band").sum()

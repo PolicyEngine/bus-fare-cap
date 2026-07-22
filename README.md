@@ -17,7 +17,7 @@ The dashboard estimates the fiscal cost independently. The government figure is 
 
 PolicyEngine projects household bus and coach fare spending to 2027 by English region outside London, family type, age and income quintile. Household fares are imputed from the LCFS, calibrated to DfT Annual Bus Statistics and allocated to household members with an NTS-derived age profile.
 
-DfT's evaluation of the previous £2 cap found that average operator yield across all ticket types fell from £1.49 to £1.40, a 6.3% reduction. The pipeline applies that observed reduction to simulated fare spending in the policy geography. Household savings sum to the modelled fiscal cost; average household effects divide each group's savings by all households in that group. The official funding figures are not inputs.
+Fares are regionally recalibrated to DfT's London/outside-London receipts split (BUS05ai: London £1,347m of England's £3,417m), since the LCFS imputation under-captures London fares. The pipeline then applies a 12.5% all-ticket reduction (range 10–15%), derived from Table 6 of DfT's £2-cap evaluation re-weighted for the £3-cap counterfactual and cap-era ticket mix. Household savings sum to the modelled fiscal cost; average household effects divide each group's savings by all households in that group. The official funding figures are not inputs.
 
 ## Layout
 
@@ -43,7 +43,7 @@ BUS_FARE_CAP_POPULACE=1 python -m bus_fare_cap --year 2027
 
 - Operator participation and detailed reimbursement rules for 2027 are not yet represented.
 - London and the devolved nations are excluded from the policy-geography analysis.
-- The 6.3% evidence comes from the 2023 £2 cap; the 2027 counterfactual is the current £3 cap.
+- The 12.5% reduction is a derived re-weighting of 2023 £2-cap evidence, not an observed £3→£2 outcome.
 - Existing local £2-or-lower fares and individual ticket prices cannot be identified.
 - People in fare-spending households are an exposure proxy, not observed passengers or confirmed beneficiaries.
 - The estimate is static and excludes induced demand. Route/operator fare data would enable a stronger ticket-level model.

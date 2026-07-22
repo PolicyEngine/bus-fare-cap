@@ -36,7 +36,10 @@ def test_results_cost_is_microsimulated_and_official_cost_is_a_benchmark(results
     assert cap["people_potentially_affected_m"] > 0
     assert cap["breakdown_metric"] == "estimated_household_benefit"
     assert cap["ticket_level_savings_estimated"] is False
-    assert cap["fare_reduction"] == sources.DFT_ALL_TICKET_FARE_REDUCTION
+    assert cap["fare_reduction"] == sources.FARE_CAP_REDUCTION_CENTRAL
+    assert cap["fare_reduction_low"] == sources.FARE_CAP_REDUCTION_LOW
+    assert cap["fare_reduction_high"] == sources.FARE_CAP_REDUCTION_HIGH
+    assert cap["estimated_cost_low_bn"] < cap["estimated_cost_bn"] < cap["estimated_cost_high_bn"]
     assert cap["estimated_cost_bn"] == pytest.approx(
         cap["baseline_fare_spending_bn"] * cap["fare_reduction"], abs=0.002
     )

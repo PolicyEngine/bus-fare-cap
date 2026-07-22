@@ -2,9 +2,12 @@
 
 Costs the £3-to-£2 English bus fare cap announced on 22 July 2026 using the
 PolicyEngine UK Enhanced FRS. Household bus-fare spending is allocated to people
-and reduced by the 6.3% whole-market fare reduction observed in DfT's evaluation
-of the previous £2 cap. The result is an independent, static microsimulation
-estimate; the government's £400m funding figure is retained only as a benchmark.
+and reduced by a 12.5% (range 10-15%) all-ticket fare reduction derived from
+DfT's evaluation of the previous £2 cap, re-weighted for the £3-cap
+counterfactual and cap-era ticket mix. Fares are regionally recalibrated to
+DfT's London/outside-London receipts split. The result is an independent,
+static microsimulation estimate; the government's funding figures are retained
+only as benchmarks.
 """
 
 from __future__ import annotations
@@ -108,6 +111,30 @@ def run(args: argparse.Namespace) -> None:
         "South West",
     }
     in_policy_geography = np.isin(region_label, list(english_regions_outside_london))
+    is_london = region_label == "London"
+
+    def wsum_pre(values):
+        return float((np.asarray(values) * pw).sum())
+
+    # Recalibrate the within-England regional split to DfT BUS05ai. The LCFS
+    # imputation under-captures London fares (Oyster/contactless spend is poorly
+    # separated in household diaries), and national-only calibration smears the
+    # shortfall across the other English regions. Rescale London and
+    # outside-London fares to DfT's observed receipts split, preserving the
+    # model's England total; devolved nations are untouched.
+    model_england = wsum_pre(alloc * (in_policy_geography | is_london))
+    model_london = wsum_pre(alloc * is_london)
+    model_outside = model_england - model_london
+    london_share = sources.DFT_LONDON_FARE_SHARE_OF_ENGLAND
+    alloc = np.where(
+        is_london,
+        alloc * london_share * model_england / model_london,
+        np.where(
+            in_policy_geography,
+            alloc * (1 - london_share) * model_england / model_outside,
+            alloc,
+        ),
+    )
 
     def wsum(values):
         return float((np.asarray(values) * pw).sum())
@@ -163,7 +190,7 @@ def run(args: argparse.Namespace) -> None:
 
     print("Step 3: Announced reform — £3 to £2 fare cap ...")
     exposure_total_gbp = wsum(alloc * in_policy_geography)
-    reduction = sources.DFT_ALL_TICKET_FARE_REDUCTION
+    reduction = sources.FARE_CAP_REDUCTION_CENTRAL
     allocated_relief = alloc * in_policy_geography * reduction
     estimated_cost_gbp = wsum(allocated_relief)
     estimated_cost_bn = estimated_cost_gbp / 1e9
@@ -266,7 +293,15 @@ def run(args: argparse.Namespace) -> None:
         "reported_scheme_cost_lower_bound_bn": sources.REPORTED_SCHEME_COST_LOWER_BOUND_BN,
         "official_total_scheme_cost_published": False,
         "estimated_cost_bn": round(estimated_cost_bn, 3),
+        "estimated_cost_low_bn": round(
+            exposure_total_gbp * sources.FARE_CAP_REDUCTION_LOW / 1e9, 3
+        ),
+        "estimated_cost_high_bn": round(
+            exposure_total_gbp * sources.FARE_CAP_REDUCTION_HIGH / 1e9, 3
+        ),
         "fare_reduction": reduction,
+        "fare_reduction_low": sources.FARE_CAP_REDUCTION_LOW,
+        "fare_reduction_high": sources.FARE_CAP_REDUCTION_HIGH,
         "baseline_fare_spending_bn": round(exposure_total_gbp / 1e9, 3),
         "breakdowns": effect_breakdowns,
         "effect_breakdowns": effect_breakdowns,
@@ -278,7 +313,10 @@ def run(args: argparse.Namespace) -> None:
             "annual_effect_average_gbp": household_effect_average,
             "by_region": household_effect_by_region,
             "allocation_base_bn": round(estimated_cost_bn, 3),
-            "method": "6.3% DfT observed all-ticket reduction applied to simulated fare spending",
+            "method": (
+                "12.5% derived all-ticket reduction applied to simulated fare "
+                "spending, regionally recalibrated to DfT BUS05ai"
+            ),
         },
     }
 

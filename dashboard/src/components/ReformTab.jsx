@@ -77,11 +77,62 @@ export default function ReformTab({ data }) {
 
       <section>
         <SectionHeading
+          title="Why our estimate sits below the government's budget"
+          description={
+            <>
+              Our estimate and the government&apos;s budget answer different questions. Ours is the
+              static saving of moving from a £3 cap to a £2 cap, assuming a cap exists all year. The
+              government&apos;s budget also pays for wedges outside that scope.
+            </>
+          }
+        />
+        <div className="overflow-hidden rounded-2xl border border-slate-200 bg-white">
+          <table className="w-full text-left text-sm">
+            <tbody className="divide-y divide-slate-100">
+              <tr>
+                <th className="w-64 px-6 py-4 align-top text-slate-900">Cap existing at all, Apr–Dec 2027</th>
+                <td className="px-6 py-4 text-slate-600">
+                  {A(src.current_fare_cap_policy, "Existing £3 funding ends 31 March 2027")}, so the
+                  government prices nine months against no cap. {A(src.three_pound_cap_2025_cost, "The £3 cap alone cost £151m in calendar 2025")},
+                  implying roughly £115–150m for April–December — more if commercial fares rise above £3.
+                </td>
+              </tr>
+              <tr>
+                <th className="px-6 py-4 align-top text-slate-900">Reimbursement vs commercial fares</th>
+                <td className="px-6 py-4 text-slate-600">
+                  {A(src.reimbursement_mechanism, "Operators are reimbursed for revenue foregone against commercial average fares, indexed to fare increases")}{" "}
+                  — not against the capped £3 — adding roughly £30–60m. Generated (induced) trips are not reimbursed.
+                </td>
+              </tr>
+              <tr>
+                <th className="px-6 py-4 align-top text-slate-900">Budget contingency</th>
+                <td className="px-6 py-4 text-slate-600">
+                  {A(src.reimbursement_mechanism, "The £2 cap underspent its budget by 14% (£210m paid vs £245m budgeted)")},
+                  suggesting the 2027 budget carries similar headroom (~£30–70m).
+                </td>
+              </tr>
+              <tr>
+                <th className="px-6 py-4 align-top text-slate-900">Devolved-government funding</th>
+                <td className="px-6 py-4 text-slate-600">
+                  {A(src.two_pound_announcement, "£54m of the £454m is Barnett funding for Scotland, Wales and Northern Ireland")}{" "}
+                  — outside England, so never comparable to an England-only estimate.
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <section>
+        <SectionHeading
           title="Who has bus-fare exposure in the policy geography?"
           description={
             <>
               PolicyEngine estimates household bus and coach fare spending in English regions outside
-              London. We apply the <strong>6.3% reduction across all ticket types</strong> observed in{" "}
+              London, regionally recalibrated to{" "}
+              {A(src.dft_regional_fare_split, "DfT's London/outside-London fare-receipts split")}.
+              We apply a <strong>12.5% all-ticket reduction (range 10–15%)</strong>{" "}
+              {A(src.derived_fare_reduction, "derived")} from{" "}
               {A(src.dft_two_pound_cap_evaluation, "DfT's evaluation of the previous £2 cap")}. Simulated spending determines the cost and
               distribution; the government&apos;s £400m cap funding is only a benchmark. The estimate is
               static and does not model individual ticket prices, participating routes or induced demand.

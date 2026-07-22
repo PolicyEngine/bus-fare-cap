@@ -59,9 +59,13 @@ export default function MethodologyTab({ data }) {
           <p>
             The estimate is projected fare spending of households resident in the eight English
             regions outside London ({data.reforms?.announced_2pound_cap?.baseline_fare_spending_bn ? `£${data.reforms.announced_2pound_cap.baseline_fare_spending_bn.toFixed(2)}bn` : "the policy-geography base"})
-            multiplied by the 6.3% all-ticket reduction observed in{" "}
-            {L(src.dft_two_pound_cap_evaluation, "DfT's evaluation of the previous £2 cap")}{" "}
-            (average yield £1.49 → £1.40). Region, family-type and quintile averages
+            multiplied by a <strong>12.5% all-ticket reduction (range 10–15%)</strong>{" "}
+            {L(src.derived_fare_reduction, "derived")} from Table 6 of{" "}
+            {L(src.dft_two_pound_cap_evaluation, "DfT's evaluation of the previous £2 cap")}:
+            singles at the £3 cap save £1 (33%), those between £2 and £3 save less (~27% single-yield
+            reduction), weighted by a cap-era single trip share of 0.35–0.50. Fares are regionally
+            recalibrated to {L(src.dft_regional_fare_split, "DfT's London/outside-London receipts split")}{" "}
+            before the reduction is applied. Region, family-type and quintile averages
             divide each group&apos;s saving by all its households, including non-bus users; age-band
             averages are per person in the policy geography. The government&apos;s funding figures are
             not inputs. Treating passenger savings as fiscal cost assumes pound-for-pound operator
@@ -71,12 +75,10 @@ export default function MethodologyTab({ data }) {
         <div>
           <h3 className="font-semibold text-slate-900">4 · Limitations</h3>
           <p>
-            This is not a ticket-level model. The{" "}
-            {L(src.dft_two_pound_cap_evaluation, "6.3% was measured against 2023 uncapped fares")},
-            while the 2027 counterfactual is a £3 cap, so the true marginal reduction is likely
-            smaller. Calibration is to the England total only — the London/outside-London split is
-            not separately calibrated, and the model&apos;s London share is below{" "}
-            {L(src.dft_journeys, "DfT's")}, which can overstate the outside-London base. Spending includes coach fares the cap does not cover;
+            This is not a ticket-level model. The 12.5% reduction is a derived re-weighting of{" "}
+            {L(src.dft_two_pound_cap_evaluation, "2023 evaluation evidence")}, not an observed
+            outcome of a £3→£2 change; the 10–15% band reflects uncertainty in the cap-era single
+            trip share. Spending includes coach fares the cap does not cover;
             geography is where households live, not where journeys happen. Non-participating routes,
             local fares already at £2 or less, and induced demand are not modelled.
           </p>

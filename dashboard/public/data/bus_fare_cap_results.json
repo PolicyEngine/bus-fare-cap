@@ -357,6 +357,7 @@
       "end_date": "2027-12-31",
       "geography": "England outside London",
       "participating_services_only": true,
+      "people_potentially_affected_m": 14.18,
       "announced_new_funding_bn": 0.454,
       "official_scheme_cost_lower_bound_bn": 0.5,
       "breakdowns": {

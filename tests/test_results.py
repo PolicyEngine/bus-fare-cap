@@ -31,6 +31,7 @@ def test_results_keep_official_cost_separate_from_exposure(results):
     cap = results["reforms"]["announced_2pound_cap"]
     assert cap["official_scheme_cost_lower_bound_bn"] == 0.5
     assert cap["announced_new_funding_bn"] == 0.454
+    assert cap["people_potentially_affected_m"] > 0
     assert cap["breakdown_metric"] == "baseline_fare_exposure"
     assert cap["ticket_level_savings_estimated"] is False
     effect = cap["household_effect"]

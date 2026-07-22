@@ -17,8 +17,6 @@ function Stat({ label, value, sub }) {
 export default function ReformTab({ data }) {
   const cap = data.reforms.announced_2pound_cap;
   const householdEffect = cap.household_effect;
-  const highestRegionalEffect = householdEffect.by_region[0];
-  const lowestRegionalEffect = householdEffect.by_region[householdEffect.by_region.length - 1];
   const src = data.sources || {};
   const A = (s, text) => (s ? <a href={s.url} target="_blank" rel="noreferrer" className="underline">{text}</a> : text);
 
@@ -51,9 +49,9 @@ export default function ReformTab({ data }) {
             sub="Modelled Q3 average across England outside London."
           />
           <Stat
-            label="Estimated regional household range"
-            value={`£${lowestRegionalEffect.annual_effect_gbp}–£${highestRegionalEffect.annual_effect_gbp}/year`}
-            sub={`Our Q3 range, ${lowestRegionalEffect.region} to ${highestRegionalEffect.region}.`}
+            label="Estimated people potentially affected"
+            value={`${cap.people_potentially_affected_m.toFixed(2)}m`}
+            sub="People in modelled fare-spending households; government benchmark: millions benefit."
           />
         </div>
 

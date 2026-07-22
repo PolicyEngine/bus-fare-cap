@@ -216,6 +216,9 @@ def run(args: argparse.Namespace) -> None:
         "end_date": sources.POLICY_END_DATE,
         "geography": "England outside London",
         "participating_services_only": True,
+        "people_potentially_affected_m": round(
+            wsum(in_policy_geography & (alloc > 0)) / 1e6, 2
+        ),
         "announced_new_funding_bn": sources.ANNOUNCED_NEW_FUNDING_BN,
         "official_scheme_cost_lower_bound_bn": sources.OFFICIAL_SCHEME_COST_LOWER_BOUND_BN,
         "breakdowns": policy_breakdowns,

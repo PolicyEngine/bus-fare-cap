@@ -28,9 +28,6 @@ export default function BreakdownChart({ breakdowns, metric = "Cost", color = co
     : metric;
   const unit = showAlternate ? "£/year" : "£bn";
   const dataKey = showAlternate ? "annual_effect_gbp" : "cost_bn";
-  const breakdownTotalBn = showAlternate
-    ? null
-    : rows.reduce((total, row) => total + Number(row.cost_bn), 0);
   return (
     <div className="rounded-2xl border border-slate-200 bg-white p-6">
       <div className="mb-5 grid gap-3 sm:grid-cols-2">
@@ -70,12 +67,6 @@ export default function BreakdownChart({ breakdowns, metric = "Cost", color = co
           </Bar>
         </BarChart>
       </ResponsiveContainer>
-      {!showAlternate ? (
-        <div className="mt-2 flex justify-end border-t border-slate-100 pt-3 text-sm text-slate-600">
-          Breakdown total: <strong className="ml-1 text-slate-900">£{Math.round(breakdownTotalBn * 1000)}m</strong>
-          <span className="ml-1 text-slate-500">· matches estimated fiscal cost</span>
-        </div>
-      ) : null}
     </div>
   );
 }

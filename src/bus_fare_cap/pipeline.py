@@ -206,7 +206,7 @@ def run(args: argparse.Namespace) -> None:
     ]
     middle_income_effect_by_region.sort(key=lambda row: row["annual_effect_gbp"], reverse=True)
     middle_income_effect_average = round(
-        float(middle_income_relief.sum()) / float(middle_income_households.sum())
+        float(middle_income_relief.sum()) / float(middle_income_households.sum()), 2
     )
     fare_cap = {
         "label": "Announced £2 bus fare cap",

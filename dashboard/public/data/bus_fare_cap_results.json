@@ -659,7 +659,7 @@
       "ticket_level_savings_estimated": false,
       "household_effect": {
         "income_group": "Middle income (Q3)",
-        "annual_effect_average_gbp": 20,
+        "annual_effect_average_gbp": 19.83,
         "by_region": [
           {
             "region": "Yorkshire",

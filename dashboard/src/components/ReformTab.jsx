@@ -42,18 +42,18 @@ export default function ReformTab({ data }) {
         <div className="grid gap-4 sm:grid-cols-3">
           <Stat
             label="Estimated fiscal cost"
-            value="£500m+"
-            sub="Analysis floor. Government benchmark: >£500m, including £454m of new funding."
+            value=">£500m"
+            sub="Published lower bound, not an exact total; includes £454m of new funding."
           />
           <Stat
             label="Estimated middle-income household effect"
-            value={`£${householdEffect.annual_effect_average_gbp}/year`}
-            sub="Our Q3 average. No comparable published household benchmark found."
+            value={`£${householdEffect.annual_effect_average_gbp.toFixed(2)}/year`}
+            sub="Modelled Q3 average across England outside London."
           />
           <Stat
             label="Estimated regional household range"
             value={`£${lowestRegionalEffect.annual_effect_gbp}–£${highestRegionalEffect.annual_effect_gbp}/year`}
-            sub={`Our Q3 range, ${lowestRegionalEffect.region} to ${highestRegionalEffect.region}. No like-for-like benchmark found.`}
+            sub={`Our Q3 range, ${lowestRegionalEffect.region} to ${highestRegionalEffect.region}.`}
           />
         </div>
 

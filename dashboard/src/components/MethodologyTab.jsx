@@ -63,9 +63,10 @@ export default function MethodologyTab({ data }) {
             {L(src.derived_fare_reduction, "derived")} from Table 6 of{" "}
             {L(src.dft_two_pound_cap_evaluation, "DfT's evaluation of the previous £2 cap")}:
             singles at the £3 cap save £1 (33%), those between £2 and £3 save less (~27% single-yield
-            reduction), weighted by a cap-era single trip share of 0.35–0.50. Fares are regionally
-            recalibrated to {L(src.dft_regional_fare_split, "DfT's London/outside-London receipts split")}{" "}
-            before the reduction is applied. Region, family-type and quintile averages
+            reduction), weighted by a cap-era single trip share of 0.35–0.50. Fares arrive already
+            calibrated in the dataset build to{" "}
+            {L(src.dft_regional_fare_split, "DfT's London/outside-London receipts split")} and{" "}
+            {L(src.dft_income_quintile_trips, "NTS trip rates by income quintile")}. Region, family-type and quintile averages
             divide each group&apos;s saving by all its households, including non-bus users; age-band
             averages are per person in the policy geography. The government&apos;s funding figures are
             not inputs. Treating passenger savings as fiscal cost assumes pound-for-pound operator

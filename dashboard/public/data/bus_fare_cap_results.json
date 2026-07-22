@@ -812,40 +812,40 @@
       "breakdown_metric": "estimated_household_benefit",
       "ticket_level_savings_estimated": false,
       "household_effect": {
-        "income_group": "Middle income (Q3)",
-        "annual_effect_average_gbp": 7.59,
+        "population": "All households in England outside London",
+        "annual_effect_average_gbp": 8.56,
         "by_region": [
           {
-            "region": "Yorkshire",
-            "annual_effect_gbp": 12
-          },
-          {
-            "region": "North East",
-            "annual_effect_gbp": 9
-          },
-          {
-            "region": "East of England",
-            "annual_effect_gbp": 8
-          },
-          {
-            "region": "South West",
-            "annual_effect_gbp": 8
-          },
-          {
             "region": "East Midlands",
-            "annual_effect_gbp": 6
-          },
-          {
-            "region": "South East",
-            "annual_effect_gbp": 6
-          },
-          {
-            "region": "West Midlands",
-            "annual_effect_gbp": 6
+            "annual_effect_gbp": 11.82
           },
           {
             "region": "North West",
-            "annual_effect_gbp": 5
+            "annual_effect_gbp": 10.97
+          },
+          {
+            "region": "Yorkshire",
+            "annual_effect_gbp": 9.07
+          },
+          {
+            "region": "East of England",
+            "annual_effect_gbp": 7.7
+          },
+          {
+            "region": "South East",
+            "annual_effect_gbp": 7.63
+          },
+          {
+            "region": "North East",
+            "annual_effect_gbp": 7.56
+          },
+          {
+            "region": "South West",
+            "annual_effect_gbp": 6.96
+          },
+          {
+            "region": "West Midlands",
+            "annual_effect_gbp": 6.68
           }
         ],
         "allocation_base_bn": 0.191,

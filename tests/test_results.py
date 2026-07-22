@@ -41,7 +41,7 @@ def test_results_cost_is_microsimulated_and_official_cost_is_a_benchmark(results
     )
     assert cap["estimated_cost_bn"] != cap["announced_cap_funding_bn"]
     effect = cap["household_effect"]
-    assert effect["income_group"] == "Middle income (Q3)"
+    assert effect["population"] == "All households in England outside London"
     assert effect["annual_effect_average_gbp"] > 0
     assert effect["allocation_base_bn"] == cap["estimated_cost_bn"]
     assert len(effect["by_region"]) == 8
@@ -77,10 +77,8 @@ def test_effect_breakdowns_reconcile_to_modelled_cost(results):
     }
 
 
-def test_average_effect_breakdowns_are_positive_and_q3_matches_headline(results):
+def test_average_effect_breakdowns_are_positive(results):
     cap = results["reforms"]["announced_2pound_cap"]
     averages = cap["average_effect_breakdowns"]
     assert set(averages) == {"region", "household_type", "age_band", "income_quintile"}
     assert all(row["annual_effect_gbp"] >= 0 for rows in averages.values() for row in rows)
-    q3 = next(row for row in averages["income_quintile"] if row["group"] == "Q3")
-    assert q3["annual_effect_gbp"] == cap["household_effect"]["annual_effect_average_gbp"]

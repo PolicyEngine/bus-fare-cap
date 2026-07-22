@@ -234,36 +234,21 @@ def run(args: argparse.Namespace) -> None:
         key=lambda row: int(row["group"].split("-")[0].replace("+", ""))
     )
     average_effect_breakdowns["income_quintile"].sort(key=lambda row: row["group"])
-    middle_income_households = (
-        household_frame[
-            household_frame["region"].isin(english_regions_outside_london)
-            & (household_frame["income_quintile"] == 3)
-        ]
-        .groupby("region")["weight"]
-        .sum()
-    )
-    relief_frame = pd.DataFrame(
+    household_effect_by_region = [
         {
-            "region": region_label,
-            "income_quintile": quintile,
-            "relief": allocated_relief * pw,
+            "region": row["group"],
+            "annual_effect_gbp": row["annual_effect_gbp"],
         }
-    )
-    middle_income_relief = (
-        relief_frame[relief_frame["income_quintile"] == 3].groupby("region")["relief"].sum()
-    )
-    middle_income_effect_by_region = [
-        {
-            "region": region_name,
-            "annual_effect_gbp": round(
-                float(middle_income_relief.get(region_name, 0)) / household_count
-            ),
-        }
-        for region_name, household_count in middle_income_households.items()
+        for row in average_effect_breakdowns["region"]
     ]
-    middle_income_effect_by_region.sort(key=lambda row: row["annual_effect_gbp"], reverse=True)
-    middle_income_effect_average = round(
-        float(middle_income_relief.sum()) / float(middle_income_households.sum()), 2
+    household_effect_average = round(
+        float(
+            np.average(
+                policy_household_frame["relief"],
+                weights=policy_household_frame["weight"],
+            )
+        ),
+        2,
     )
     fare_cap = {
         "label": "Announced £2 bus fare cap",
@@ -286,9 +271,9 @@ def run(args: argparse.Namespace) -> None:
         "breakdown_metric": "estimated_household_benefit",
         "ticket_level_savings_estimated": False,
         "household_effect": {
-            "income_group": "Middle income (Q3)",
-            "annual_effect_average_gbp": middle_income_effect_average,
-            "by_region": middle_income_effect_by_region,
+            "population": "All households in England outside London",
+            "annual_effect_average_gbp": household_effect_average,
+            "by_region": household_effect_by_region,
             "allocation_base_bn": round(estimated_cost_bn, 3),
             "method": "6.3% DfT observed all-ticket reduction applied to simulated fare spending",
         },

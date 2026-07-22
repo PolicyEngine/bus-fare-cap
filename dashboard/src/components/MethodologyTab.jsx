@@ -21,9 +21,10 @@ export default function MethodologyTab({ data }) {
             The 22 July 2026 government announcement is the source for the £2 cap, calendar-2027
             dates, England-outside-London geography, participating-bus condition, £400m of extra
             funding backing the cap and £454m of total extra funding including devolved-government
-            funding. The announcement does not publish a total scheme cost. These funding figures are
-            comparison benchmarks, not inputs to our estimate, and neither is presented as England-only
-            passenger savings.
+            funding. The GOV.UK announcement does not publish a total scheme cost; contemporaneous
+            ITV/PA reporting says the government expects it to exceed £500m, with the balance above
+            the new funding coming from existing DfT bus allocations. These figures are comparison
+            benchmarks, not inputs to our estimate, and none is presented as England-only passenger savings.
           </p>
         </div>
         <div>
@@ -54,6 +55,8 @@ export default function MethodologyTab({ data }) {
             The resulting household savings sum to our fiscal-cost estimate. Average household effects
             divide each group&apos;s modelled saving by all households in that group, including non-bus users.
             The government&apos;s funding figures are not used anywhere in this calculation.
+            Treating passenger savings as fiscal cost assumes operators are reimbursed pound for pound;
+            actual 2027 reimbursement will use operator data and rules that are not yet published.
           </p>
         </div>
         <div>

@@ -35,6 +35,7 @@ POLICY_START_DATE = "2027-01-01"
 POLICY_END_DATE = "2027-12-31"
 ANNOUNCED_CAP_FUNDING_BN = 0.4
 ANNOUNCED_TOTAL_EXTRA_FUNDING_BN = 0.454
+REPORTED_SCHEME_COST_LOWER_BOUND_BN = 0.5
 
 # Independent empirical costing assumption. DfT's evaluation of the first ten
 # months of the previous £2 cap found that average yield across *all ticket
@@ -132,6 +133,15 @@ DFT_TWO_POUND_CAP_EVALUATION = Source(
     "https://www.gov.uk/government/publications/evaluation-of-the-2-bus-fare-cap",
 )
 
+REPORTED_SCHEME_COST = Source(
+    ">£500m expected total scheme cost",
+    "Contemporaneous ITV/PA reporting says the government expects the scheme to "
+    "cost more than £500m. It reports £454m of new funding, with the balance from "
+    "Department for Transport funding already allocated to buses. The GOV.UK press "
+    "release itself does not state the total.",
+    "https://www.itv.com/news/2026-07-22/burnham-announces-2-bus-fare-cap-from-january",
+)
+
 
 def as_json() -> dict:
     return {
@@ -160,5 +170,6 @@ def as_json() -> dict:
             "current_fare_cap_policy": asdict(CURRENT_FARE_CAP_POLICY),
             "two_pound_announcement": asdict(TWO_POUND_ANNOUNCEMENT),
             "dft_two_pound_cap_evaluation": asdict(DFT_TWO_POUND_CAP_EVALUATION),
+            "reported_scheme_cost": asdict(REPORTED_SCHEME_COST),
         },
     }

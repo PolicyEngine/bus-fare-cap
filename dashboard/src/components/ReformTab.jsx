@@ -42,16 +42,16 @@ export default function ReformTab({ data }) {
           <Stat
             label="Estimated fiscal cost"
             value={`£${Math.round(cap.estimated_cost_bn * 1000)}m`}
-            sub={<>Our static microsimulation. {A(src.two_pound_announcement, "Government funding benchmark: £400m.")}</>}
+            sub={<>Our static reimbursement proxy. {A(src.reported_scheme_cost, `Reported government estimate: >£${Math.round(cap.reported_scheme_cost_lower_bound_bn * 1000)}m.`)}</>}
           />
           <Stat
             label="Estimated average household effect"
-            value={`£${householdEffect.annual_effect_average_gbp.toFixed(2)}/year`}
+            value={`£${householdEffect.annual_effect_average_gbp.toFixed(1)}/year`}
             sub="Modelled average across all households in England outside London."
           />
           <Stat
             label="Estimated people potentially affected"
-            value={`${cap.people_potentially_affected_m.toFixed(2)}m`}
+            value={`${cap.people_potentially_affected_m.toFixed(1)}m`}
             sub="People in modelled fare-spending households."
           />
         </div>
@@ -68,7 +68,7 @@ export default function ReformTab({ data }) {
                 <tr><th className="px-6 py-4 text-slate-900">Where</th><td className="px-6 py-4 text-slate-600">Participating buses in all areas of England outside London. The 2027 operator and route list is not yet published.</td></tr>
                 <tr><th className="px-6 py-4 text-slate-900">When</th><td className="px-6 py-4 text-slate-600">1 January–31 December 2027.</td></tr>
                 <tr><th className="px-6 py-4 text-slate-900">How</th><td className="px-6 py-4 text-slate-600">Participation is confirmed, but detailed 2027 eligibility and reimbursement terms have not yet been published.</td></tr>
-                <tr><th className="px-6 py-4 text-slate-900">Funding</th><td className="px-6 py-4 text-slate-600">£400m extra funding backs the cap. The wider £454m includes funding for devolved governments through the Barnett formula. No total scheme cost is published.</td></tr>
+                <tr><th className="px-6 py-4 text-slate-900">Funding</th><td className="px-6 py-4 text-slate-600">£400m is the principal new funding source. The wider £454m includes funding for devolved governments through the Barnett formula. ITV/PA reports an expected total scheme cost above £500m, with the balance from existing DfT bus funding; the GOV.UK release does not state that total.</td></tr>
               </tbody>
             </table>
           </div>

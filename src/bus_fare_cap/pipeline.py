@@ -261,6 +261,7 @@ def run(args: argparse.Namespace) -> None:
         "people_potentially_affected_m": round(wsum(in_policy_geography & (alloc > 0)) / 1e6, 2),
         "announced_cap_funding_bn": sources.ANNOUNCED_CAP_FUNDING_BN,
         "announced_total_extra_funding_bn": sources.ANNOUNCED_TOTAL_EXTRA_FUNDING_BN,
+        "reported_scheme_cost_lower_bound_bn": sources.REPORTED_SCHEME_COST_LOWER_BOUND_BN,
         "official_total_scheme_cost_published": False,
         "estimated_cost_bn": round(estimated_cost_bn, 3),
         "fare_reduction": reduction,
@@ -370,5 +371,5 @@ def run(args: argparse.Namespace) -> None:
         print(f"    wrote {dest}")
     print(
         f"Done. Microsimulation estimate £{fare_cap['estimated_cost_bn']:.3f}bn; "
-        f"government cap-funding benchmark £{fare_cap['announced_cap_funding_bn']:.1f}bn."
+        f"reported government scheme cost >£{fare_cap['reported_scheme_cost_lower_bound_bn']:.1f}bn."
     )

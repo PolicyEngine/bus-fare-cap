@@ -31,6 +31,7 @@ def test_results_cost_is_microsimulated_and_official_cost_is_a_benchmark(results
     cap = results["reforms"]["announced_2pound_cap"]
     assert cap["announced_cap_funding_bn"] == 0.4
     assert cap["announced_total_extra_funding_bn"] == 0.454
+    assert cap["reported_scheme_cost_lower_bound_bn"] == 0.5
     assert cap["official_total_scheme_cost_published"] is False
     assert cap["people_potentially_affected_m"] > 0
     assert cap["breakdown_metric"] == "estimated_household_benefit"

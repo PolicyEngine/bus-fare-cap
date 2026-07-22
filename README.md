@@ -9,7 +9,7 @@ Source-backed analysis of the £2 bus fare cap announced by the UK government on
 - Maximum single fare falls from £3 to £2.
 - Applies from 1 January through 31 December 2027.
 - Covers participating bus services in England outside London.
-- Government says £400m of extra funding backs the cap and reports £454m of extra funding in total, including funding for devolved governments through the Barnett formula. It does not publish a total scheme cost.
+- Government says £400m of extra funding backs the cap and reports £454m of extra funding in total, including funding for devolved governments through the Barnett formula. ITV/PA reports an expected total scheme cost above £500m, with the balance from existing DfT bus funding; the GOV.UK release does not state that total.
 
 The dashboard estimates the fiscal cost independently. The government figure is shown only as a benchmark.
 

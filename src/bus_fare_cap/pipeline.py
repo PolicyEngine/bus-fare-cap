@@ -28,11 +28,12 @@ from .sources import ENGLAND_TO_UK_POPULATION_UPLIFT
 
 REPO_ROOT = Path(__file__).resolve().parents[2]
 # Default simulation source: the PolicyEngine UK Enhanced FRS, downloaded from
-# the private release at a pinned revision for reproducibility
-# (policyengine-uk-data 1.56.5, built with policyengine-uk 2.89.2).
+# the private release at a pinned revision for reproducibility. This revision
+# includes the BUS05ai/NTS0705a distributional calibration of
+# bus_fare_spending (PolicyEngine/policyengine-uk-data#447).
 DATASET = "enhanced_frs_2024_25.h5"
 PRIVATE_REPO = "policyengine/policyengine-uk-data-private"
-DATASET_REVISION = "8a43d256f0f59c8be26f1416343d0798098cc6b6"
+DATASET_REVISION = "32543d455762ce973791f364805621966b083825"
 # Opt-in alternative: the Populace UK dataset, simulated through the
 # policyengine.py wrapper (managed_microsimulation). Kept available but NOT
 # triggered by default — set BUS_FARE_CAP_POPULACE=1 to use it.

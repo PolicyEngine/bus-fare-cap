@@ -4,8 +4,10 @@ Costs the £3-to-£2 English bus fare cap announced on 22 July 2026 using the
 PolicyEngine UK Enhanced FRS. Household bus-fare spending is allocated to people
 and reduced by a 12.5% (range 10-15%) all-ticket fare reduction derived from
 DfT's evaluation of the previous £2 cap, re-weighted for the £3-cap
-counterfactual and cap-era ticket mix. Distributional calibration of fares
-(BUS05ai regional split, NTS0705a income anchoring) happens upstream in
+counterfactual and cap-era ticket mix. A second scenario prices the
+announcement against current law, under which the £3 cap's funding expires on
+31 March 2027. Distributional calibration of fares (BUS05ai regional split,
+NTS0705a income anchoring) happens upstream in
 policyengine-uk-data. The result is an independent,
 static microsimulation estimate; the government's funding figures are retained
 only as benchmarks.
@@ -174,6 +176,38 @@ def run(args: argparse.Namespace) -> None:
     print("Step 3: Announced reform — £3 to £2 fare cap ...")
     exposure_total_gbp = wsum(alloc * in_policy_geography)
     reduction = sources.FARE_CAP_REDUCTION_CENTRAL
+
+    # Two counterfactuals. The announced reduction (a £3 cap runs all year) is
+    # the headline; current law (the £3 cap's funding expires on 31 March, so
+    # nine months would be uncapped) is what the government's own funding
+    # figure is closest to.
+    months = sources.MONTHS_VS_THREE_POUND_CAP + sources.MONTHS_VS_NO_CAP
+
+    def _blended(fare_cap_reduction):
+        """All-ticket reduction vs current law, weighted across the year."""
+        uncapped = fare_cap_reduction + sources.CAP_EXISTENCE_REDUCTION
+        return (
+            sources.MONTHS_VS_THREE_POUND_CAP * fare_cap_reduction
+            + sources.MONTHS_VS_NO_CAP * uncapped
+        ) / months
+
+    blended_reduction = _blended(reduction)
+    funding_expiry = {
+        "label": "Versus current-law funding expiry",
+        "counterfactual": (
+            f"£3 cap for {sources.MONTHS_VS_THREE_POUND_CAP} months, "
+            f"no cap for {sources.MONTHS_VS_NO_CAP} months"
+        ),
+        "blended_reduction": round(blended_reduction, 4),
+        "cap_existence_reduction": sources.CAP_EXISTENCE_REDUCTION,
+        "estimated_cost_bn": round(exposure_total_gbp * blended_reduction / 1e9, 3),
+        "estimated_cost_low_bn": round(
+            exposure_total_gbp * _blended(sources.FARE_CAP_REDUCTION_LOW) / 1e9, 3
+        ),
+        "estimated_cost_high_bn": round(
+            exposure_total_gbp * _blended(sources.FARE_CAP_REDUCTION_HIGH) / 1e9, 3
+        ),
+    }
     allocated_relief = alloc * in_policy_geography * reduction
     estimated_cost_gbp = wsum(allocated_relief)
     estimated_cost_bn = estimated_cost_gbp / 1e9
@@ -285,6 +319,8 @@ def run(args: argparse.Namespace) -> None:
         "fare_reduction": reduction,
         "fare_reduction_low": sources.FARE_CAP_REDUCTION_LOW,
         "fare_reduction_high": sources.FARE_CAP_REDUCTION_HIGH,
+        "counterfactual": "£3 cap continues for the full year",
+        "vs_funding_expiry": funding_expiry,
         "baseline_fare_spending_bn": round(exposure_total_gbp / 1e9, 3),
         "breakdowns": effect_breakdowns,
         "effect_breakdowns": effect_breakdowns,
@@ -394,6 +430,7 @@ def run(args: argparse.Namespace) -> None:
         dest.write_text(json.dumps(output, indent=2, default=str))
         print(f"    wrote {dest}")
     print(
-        f"Done. Microsimulation estimate £{fare_cap['estimated_cost_bn']:.3f}bn; "
-        f"reported government scheme cost >£{fare_cap['reported_scheme_cost_lower_bound_bn']:.1f}bn."
+        f"Done. Fare reduction £{fare_cap['estimated_cost_bn']:.3f}bn; "
+        f"vs funding expiry £{funding_expiry['estimated_cost_bn']:.3f}bn; "
+        f"announced England funding £{fare_cap['announced_cap_funding_bn']:.1f}bn."
     )

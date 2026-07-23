@@ -74,7 +74,22 @@ export default function MethodologyTab({ data }) {
           </p>
         </div>
         <div>
-          <h3 className="font-semibold text-slate-900">4 · Limitations</h3>
+          <h3 className="font-semibold text-slate-900">4 · Two counterfactuals</h3>
+          <p>
+            The headline prices the announced reduction against a £3 cap running all year. But{" "}
+            {L(src.funding_expiry_counterfactual, "current law funds the £3 cap only to 31 March 2027")},
+            so for nine of twelve months there would be no cap. Against that current-law baseline the
+            announcement also buys the cap&apos;s continued existence, worth a further 8.3% of fare
+            spending — derived from{" "}
+            {L(src.three_pound_cap_2025_cost, "the £151m one-year cost of the £3 cap")}, converted
+            from operator reimbursement to household savings by uprating 2025 fares to 2027 and
+            grossing up ~90% operator participation. Blending three months at 12.5% with nine at
+            20.8% gives 18.7%. This second figure is the one comparable with the government&apos;s
+            funding.
+          </p>
+        </div>
+        <div>
+          <h3 className="font-semibold text-slate-900">5 · Limitations</h3>
           <p>
             This is not a ticket-level model. The 12.5% reduction is a derived re-weighting of{" "}
             {L(src.dft_two_pound_cap_evaluation, "2023 evaluation evidence")}, not an observed
@@ -85,7 +100,7 @@ export default function MethodologyTab({ data }) {
           </p>
         </div>
         <div>
-          <h3 className="font-semibold text-slate-900">5 · Interpretation</h3>
+          <h3 className="font-semibold text-slate-900">6 · Interpretation</h3>
           <p>
             The policy runs 1 January–31 December 2027, so results are calendar-2027, not fiscal-year.
             Family type is the benefit unit. Income quintiles fold household income deciles. People in

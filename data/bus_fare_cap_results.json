@@ -29,8 +29,11 @@
     "fare_cap_reduction": 0.125,
     "fare_cap_reduction_low": 0.1,
     "fare_cap_reduction_high": 0.15,
+    "cap_existence_reduction": 0.083,
+    "months_vs_three_pound_cap": 3,
+    "months_vs_no_cap": 9,
     "distributional_calibration": "Upstream in policyengine-uk-data: BUS05ai regional split and NTS0705a income-quintile anchoring",
-    "incidence_method": "Derived all-ticket reduction applied to household fare spending, regionally recalibrated to DfT BUS05ai",
+    "incidence_method": "Derived all-ticket reduction applied to household fare spending, distributionally calibrated upstream in policyengine-uk-data",
     "behavioural": "static (no induced demand)"
   },
   "sources": {
@@ -95,9 +98,14 @@
       "url": "https://www.gov.uk/government/statistical-data-sets/bus-statistics-data-tables"
     },
     "three_pound_cap_2025_cost": {
-      "value": "\u00a3151m for the \u00a33 cap in calendar 2025",
-      "description": "DfT allocations for the \u00a33 national bus fare cap in 2025 totalled \u00a3151m \u2014 the annual cost of having a \u00a33 cap at all versus uncapped commercial fares. The government's 2027 budget prices April-December against no cap, since existing \u00a33 funding ends on 31 March 2027.",
+      "value": "\u00a3151m one-year \u00a33 cap extension (2025) \u2192 8.3% cap-existence wedge",
+      "description": "DfT put the one-year extension of the \u00a33 national bus fare cap at \u00a3151m for calendar 2025 \u2014 the cost of having a \u00a33 cap at all, versus uncapped commercial fares. That is operator reimbursement, so this analysis converts it to a household-savings basis by uprating 2025 fares to 2027 (~4%/yr) and grossing up the ~90% operator participation DfT achieved, giving ~\u00a3181m or 8.3% of projected outside-London fare spending.",
       "url": "https://www.gov.uk/government/publications/bus-service-improvement-plans-local-transport-authority-allocations/bus-service-operators-grant-local-transport-authority-final-allocations-2025-to-2026"
+    },
+    "funding_expiry_counterfactual": {
+      "value": "\u00a33 cap funded only to 31 March 2027",
+      "description": "Under current law the \u00a33 cap expires on 31 March 2027, so for nine of the twelve months of 2027 there would be no cap. Measured against that current-law counterfactual, the announcement buys three months of a \u00a33 \u2192 \u00a32 reduction plus nine months of uncapped \u2192 \u00a32, which is the basis the government's own funding figure is closest to.",
+      "url": "https://www.gov.uk/guidance/3-national-bus-fare-cap"
     },
     "reimbursement_mechanism": {
       "value": "Revenue foregone vs commercial fares; indexed to fare rises",
@@ -403,6 +411,16 @@
       "fare_reduction": 0.125,
       "fare_reduction_low": 0.1,
       "fare_reduction_high": 0.15,
+      "counterfactual": "\u00a33 cap continues for the full year",
+      "vs_funding_expiry": {
+        "label": "Versus current-law funding expiry",
+        "counterfactual": "\u00a33 cap for 3 months, no cap for 9 months",
+        "blended_reduction": 0.1872,
+        "cap_existence_reduction": 0.083,
+        "estimated_cost_bn": 0.409,
+        "estimated_cost_low_bn": 0.354,
+        "estimated_cost_high_bn": 0.463
+      },
       "baseline_fare_spending_bn": 2.182,
       "breakdowns": {
         "region": [

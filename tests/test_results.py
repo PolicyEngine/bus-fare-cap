@@ -51,6 +51,30 @@ def test_results_cost_is_microsimulated_and_official_cost_is_a_benchmark(results
     assert len(effect["by_region"]) == 8
 
 
+def test_funding_expiry_scenario_exceeds_fare_reduction(results):
+    """The current-law scenario also buys the cap's existence, so costs more."""
+    cap = results["reforms"]["announced_2pound_cap"]
+    expiry = cap["vs_funding_expiry"]
+    assert expiry["cap_existence_reduction"] == sources.CAP_EXISTENCE_REDUCTION
+    # Blended = 3 months at the fare-reduction rate, 9 months at that rate plus
+    # the cap-existence wedge.
+    months = sources.MONTHS_VS_THREE_POUND_CAP + sources.MONTHS_VS_NO_CAP
+    expected = (
+        sources.MONTHS_VS_THREE_POUND_CAP * cap["fare_reduction"]
+        + sources.MONTHS_VS_NO_CAP * (cap["fare_reduction"] + sources.CAP_EXISTENCE_REDUCTION)
+    ) / months
+    assert expiry["blended_reduction"] == pytest.approx(expected, abs=1e-4)
+    assert expiry["estimated_cost_bn"] > cap["estimated_cost_bn"]
+    assert (
+        expiry["estimated_cost_low_bn"]
+        < expiry["estimated_cost_bn"]
+        < expiry["estimated_cost_high_bn"]
+    )
+    assert expiry["estimated_cost_bn"] == pytest.approx(
+        cap["baseline_fare_spending_bn"] * expiry["blended_reduction"], abs=0.002
+    )
+
+
 def test_results_breakdowns_have_no_quartile(results):
     cap = results["reforms"]["announced_2pound_cap"]
     dims = set(cap["breakdowns"])

@@ -17,7 +17,9 @@ The dashboard estimates the fiscal cost independently. The government figure is 
 
 PolicyEngine projects household bus and coach fare spending to 2027 by English region outside London, family type, age and income quintile. Household fares are imputed from the LCFS, calibrated to DfT Annual Bus Statistics and allocated to household members with an NTS-derived age profile.
 
-Distributional calibration of household fares — DfT's London/outside-London receipts split (BUS05ai) and NTS0705a local-bus trip rates by income quintile — happens upstream in the policyengine-uk-data build (PolicyEngine/policyengine-uk-data#447); this repo consumes the calibrated dataset. The pipeline applies a 12.5% all-ticket reduction (range 10–15%), derived from Table 6 of DfT's £2-cap evaluation re-weighted for the £3-cap counterfactual and cap-era ticket mix. Household savings sum to the modelled fiscal cost; average household effects divide each group's savings by all households in that group. The official funding figures are not inputs.
+Distributional calibration of household fares — DfT's London/outside-London receipts split (BUS05ai) and NTS0705a local-bus trip rates by income quintile — happens upstream in the policyengine-uk-data build (PolicyEngine/policyengine-uk-data#447); this repo consumes the calibrated dataset. The pipeline applies a 12.5% all-ticket reduction (range 10–15%), derived from Table 6 of DfT's £2-cap evaluation re-weighted for the £3-cap counterfactual and cap-era ticket mix.
+
+Results are reported against two counterfactuals. The **fare reduction** (~£273m) assumes a £3 cap runs throughout 2027. **Versus funding expiry** (~£409m) reflects current law, under which £3 funding ends on 31 March 2027, so nine of twelve months would otherwise be uncapped; it adds an 8.3% cap-existence wedge derived from the £151m one-year cost of the £3 cap. The second figure is the like-for-like comparison with the government's £400m of England funding. Household savings sum to the modelled fiscal cost; average household effects divide each group's savings by all households in that group. The official funding figures are not inputs.
 
 ## Layout
 

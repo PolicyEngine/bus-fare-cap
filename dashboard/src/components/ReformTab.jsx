@@ -129,8 +129,9 @@ export default function ReformTab({ data }) {
           description={
             <>
               PolicyEngine estimates household bus and coach fare spending in English regions outside
-              London, regionally recalibrated to{" "}
-              {A(src.dft_regional_fare_split, "DfT's London/outside-London fare-receipts split")}.
+              London, calibrated in the PolicyEngine UK dataset build to{" "}
+              {A(src.dft_regional_fare_split, "DfT's London/outside-London fare-receipts split")} and{" "}
+              {A(src.dft_income_quintile_trips, "NTS local-bus trip rates by income quintile")}.
               We apply a <strong>12.5% all-ticket reduction (range 10–15%)</strong>{" "}
               {A(src.derived_fare_reduction, "derived")} from{" "}
               {A(src.dft_two_pound_cap_evaluation, "DfT's evaluation of the previous £2 cap")}. Simulated spending determines the cost and

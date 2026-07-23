@@ -49,13 +49,10 @@ FARE_CAP_REDUCTION_LOW = 0.10
 FARE_CAP_REDUCTION_CENTRAL = 0.125
 FARE_CAP_REDUCTION_HIGH = 0.15
 
-# DfT BUS05ai, year ending March 2025: England passenger fare receipts £3,417m,
-# of which London £1,347m and England outside London £2,070m. Used to
-# recalibrate the model's within-England regional fare split, which the
-# LCFS imputation alone gets wrong (it under-captures London fares).
-DFT_ENGLAND_FARE_RECEIPTS_M = 3417
-DFT_LONDON_FARE_RECEIPTS_M = 1347
-DFT_LONDON_FARE_SHARE_OF_ENGLAND = DFT_LONDON_FARE_RECEIPTS_M / DFT_ENGLAND_FARE_RECEIPTS_M
+# Distributional calibration of bus_fare_spending (DfT BUS05ai regional split,
+# NTS0705a income anchoring) is applied upstream in policyengine-uk-data
+# (calibrate_bus_fare_spending, PolicyEngine/policyengine-uk-data#447); the
+# dataset arrives already calibrated. Sources below document those anchors.
 
 # DfT Annual Bus Statistics, year ending March 2025 (England). These remain the
 # calibration anchors for household fare exposure, not a ticket-level estimate
@@ -107,10 +104,13 @@ DFT_OUTSIDE_LONDON_JOURNEYS = Source(
     "https://www.gov.uk/government/statistics/annual-bus-statistics-year-ending-march-2025/annual-bus-statistics-year-ending-march-2025",
 )
 DFT_INCOME_QUINTILE_TRIPS = Source(
-    "Q1: 66 trips/person; Q5: 29",
-    "National Travel Survey 2024 benchmark reported by DfT. This measures local "
-    "bus trips, not household fare spending, so it is a directional comparison.",
-    "https://www.gov.uk/government/statistics/annual-bus-statistics-year-ending-march-2025/annual-bus-statistics-year-ending-march-2025",
+    "Local bus trips/person/year, 2024: Q1 47.6 … Q5 13.0",
+    "National Travel Survey table NTS0705a, 2024, 'Other local bus' (outside "
+    "London): average trips per person per year by household income quintile — "
+    "Q1 47.6, Q2 37.5, Q3 24.8, Q4 18.5, Q5 13.0. Anchors the income "
+    "distribution of household fare spending in the policyengine-uk-data build "
+    "(assuming a common average fare per trip across quintiles).",
+    "https://www.gov.uk/government/statistical-data-sets/nts07-car-ownership-and-access",
 )
 NTS_AGE_PROFILE = Source(
     "Bus trips by age; 17-20 peak",
@@ -157,9 +157,9 @@ DERIVED_FARE_REDUCTION = Source(
 DFT_REGIONAL_FARE_SPLIT = Source(
     "England £3,417m: London £1,347m / outside London £2,070m",
     "DfT Annual Bus Statistics table BUS05ai, year ending March 2025: passenger "
-    "fare receipts by area. The model's within-England regional fare split is "
-    "recalibrated to this London/outside-London split, since the LCFS "
-    "imputation under-captures London fares.",
+    "fare receipts by area. The within-England regional fare split is "
+    "calibrated to this London/outside-London split in the policyengine-uk-data "
+    "build, since the LCFS imputation under-captures London fares.",
     "https://www.gov.uk/government/statistical-data-sets/bus-statistics-data-tables",
 )
 
@@ -208,7 +208,10 @@ def as_json() -> dict:
             "fare_cap_reduction": FARE_CAP_REDUCTION_CENTRAL,
             "fare_cap_reduction_low": FARE_CAP_REDUCTION_LOW,
             "fare_cap_reduction_high": FARE_CAP_REDUCTION_HIGH,
-            "london_fare_share_of_england": round(DFT_LONDON_FARE_SHARE_OF_ENGLAND, 4),
+            "distributional_calibration": (
+                "Upstream in policyengine-uk-data: BUS05ai regional split and "
+                "NTS0705a income-quintile anchoring"
+            ),
             "incidence_method": (
                 "Derived all-ticket reduction applied to household fare spending, "
                 "regionally recalibrated to DfT BUS05ai"

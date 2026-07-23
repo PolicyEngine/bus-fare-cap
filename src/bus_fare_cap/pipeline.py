@@ -4,8 +4,9 @@ Costs the £3-to-£2 English bus fare cap announced on 22 July 2026 using the
 PolicyEngine UK Enhanced FRS. Household bus-fare spending is allocated to people
 and reduced by a 12.5% (range 10-15%) all-ticket fare reduction derived from
 DfT's evaluation of the previous £2 cap, re-weighted for the £3-cap
-counterfactual and cap-era ticket mix. Fares are regionally recalibrated to
-DfT's London/outside-London receipts split. The result is an independent,
+counterfactual and cap-era ticket mix. Distributional calibration of fares
+(BUS05ai regional split, NTS0705a income anchoring) happens upstream in
+policyengine-uk-data. The result is an independent,
 static microsimulation estimate; the government's funding figures are retained
 only as benchmarks.
 """
@@ -27,11 +28,12 @@ from .sources import ENGLAND_TO_UK_POPULATION_UPLIFT
 
 REPO_ROOT = Path(__file__).resolve().parents[2]
 # Default simulation source: the PolicyEngine UK Enhanced FRS, downloaded from
-# the private release at a pinned revision for reproducibility
-# (policyengine-uk-data 1.56.5, built with policyengine-uk 2.89.2).
+# the private release at a pinned revision for reproducibility. This revision
+# includes the BUS05ai/NTS0705a distributional calibration of
+# bus_fare_spending (PolicyEngine/policyengine-uk-data#447).
 DATASET = "enhanced_frs_2024_25.h5"
 PRIVATE_REPO = "policyengine/policyengine-uk-data-private"
-DATASET_REVISION = "8a43d256f0f59c8be26f1416343d0798098cc6b6"
+DATASET_REVISION = "32543d455762ce973791f364805621966b083825"
 # Opt-in alternative: the Populace UK dataset, simulated through the
 # policyengine.py wrapper (managed_microsimulation). Kept available but NOT
 # triggered by default — set BUS_FARE_CAP_POPULACE=1 to use it.
@@ -111,30 +113,11 @@ def run(args: argparse.Namespace) -> None:
         "South West",
     }
     in_policy_geography = np.isin(region_label, list(english_regions_outside_london))
-    is_london = region_label == "London"
 
-    def wsum_pre(values):
-        return float((np.asarray(values) * pw).sum())
-
-    # Recalibrate the within-England regional split to DfT BUS05ai. The LCFS
-    # imputation under-captures London fares (Oyster/contactless spend is poorly
-    # separated in household diaries), and national-only calibration smears the
-    # shortfall across the other English regions. Rescale London and
-    # outside-London fares to DfT's observed receipts split, preserving the
-    # model's England total; devolved nations are untouched.
-    model_england = wsum_pre(alloc * (in_policy_geography | is_london))
-    model_london = wsum_pre(alloc * is_london)
-    model_outside = model_england - model_london
-    london_share = sources.DFT_LONDON_FARE_SHARE_OF_ENGLAND
-    alloc = np.where(
-        is_london,
-        alloc * london_share * model_england / model_london,
-        np.where(
-            in_policy_geography,
-            alloc * (1 - london_share) * model_england / model_outside,
-            alloc,
-        ),
-    )
+    # Distributional calibration (BUS05ai regional split, NTS0705a income
+    # anchoring) lives upstream in policyengine-uk-data
+    # (calibrate_bus_fare_spending); this repo only applies reform modelling
+    # to the built dataset. See PolicyEngine/policyengine-uk-data#447.
 
     def wsum(values):
         return float((np.asarray(values) * pw).sum())
@@ -315,7 +298,8 @@ def run(args: argparse.Namespace) -> None:
             "allocation_base_bn": round(estimated_cost_bn, 3),
             "method": (
                 "12.5% derived all-ticket reduction applied to simulated fare "
-                "spending, regionally recalibrated to DfT BUS05ai"
+                "spending (distributionally calibrated upstream in "
+                "policyengine-uk-data)"
             ),
         },
     }

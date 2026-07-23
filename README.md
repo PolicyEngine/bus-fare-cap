@@ -17,7 +17,7 @@ The dashboard estimates the fiscal cost independently. The government figure is 
 
 PolicyEngine projects household bus and coach fare spending to 2027 by English region outside London, family type, age and income quintile. Household fares are imputed from the LCFS, calibrated to DfT Annual Bus Statistics and allocated to household members with an NTS-derived age profile.
 
-Fares are regionally recalibrated to DfT's London/outside-London receipts split (BUS05ai: London £1,347m of England's £3,417m), since the LCFS imputation under-captures London fares. The pipeline then applies a 12.5% all-ticket reduction (range 10–15%), derived from Table 6 of DfT's £2-cap evaluation re-weighted for the £3-cap counterfactual and cap-era ticket mix. Household savings sum to the modelled fiscal cost; average household effects divide each group's savings by all households in that group. The official funding figures are not inputs.
+Distributional calibration of household fares — DfT's London/outside-London receipts split (BUS05ai) and NTS0705a local-bus trip rates by income quintile — happens upstream in the policyengine-uk-data build (PolicyEngine/policyengine-uk-data#447); this repo consumes the calibrated dataset. The pipeline applies a 12.5% all-ticket reduction (range 10–15%), derived from Table 6 of DfT's £2-cap evaluation re-weighted for the £3-cap counterfactual and cap-era ticket mix. Household savings sum to the modelled fiscal cost; average household effects divide each group's savings by all households in that group. The official funding figures are not inputs.
 
 ## Layout
 

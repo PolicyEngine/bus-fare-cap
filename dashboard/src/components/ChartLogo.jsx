@@ -1,8 +1,10 @@
+const basePath = process.env.NEXT_PUBLIC_BASE_PATH ?? "";
+
 export default function ChartLogo() {
   return (
     <div style={{ display: "flex", justifyContent: "flex-end", marginTop: 8 }}>
       <img
-        src="/assets/logos/policyengine-teal.png"
+        src={`${basePath}/assets/logos/policyengine-teal.png`}
         alt=""
         style={{
           width: 80,

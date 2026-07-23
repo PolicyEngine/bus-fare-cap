@@ -43,7 +43,9 @@ function Dashboard() {
   useEffect(() => {
     async function loadData() {
       try {
-        const res = await fetch("/data/bus_fare_cap_results.json");
+        const res = await fetch(
+          `${process.env.NEXT_PUBLIC_BASE_PATH ?? ""}/data/bus_fare_cap_results.json`,
+        );
         if (!res.ok) throw new Error("bus_fare_cap_results.json not found; run the pipeline first");
         setData(await res.json());
       } catch (err) {

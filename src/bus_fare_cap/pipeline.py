@@ -364,8 +364,13 @@ def run(args: argparse.Namespace) -> None:
         for r, v in reg.sort_values("f", ascending=False).iterrows()
     ]
 
-    uk_fare = 3.4 * ENGLAND_TO_UK_POPULATION_UPLIFT
-    uk_sub = 3.0 * ENGLAND_TO_UK_POPULATION_UPLIFT
+    # DfT Annual Bus Statistics, year ending March 2025 (England): BUS05aii
+    # passenger fare receipts £3.4bn and BUS05bii net government support
+    # £3.0bn, uplifted England -> UK by population. These are the dataset's own
+    # calibration targets, shown here only to display what the build hit.
+    # https://www.gov.uk/government/statistics/annual-bus-statistics-year-ending-march-2025/annual-bus-statistics-year-ending-march-2025
+    uk_fare = sources.DFT_ENGLAND_FARE_RECEIPTS_BN * ENGLAND_TO_UK_POPULATION_UPLIFT
+    uk_sub = sources.DFT_ENGLAND_SUBSIDY_BN * ENGLAND_TO_UK_POPULATION_UPLIFT
     official = {
         "total_bus_fare_bn": {
             "ours": round(total_fare / 1e9, 2),
@@ -383,9 +388,9 @@ def run(args: argparse.Namespace) -> None:
         },
         "population_m": {
             "ours": round(total_people / 1e6, 1),
-            "official": 68.3,
+            "official": sources.ONS_UK_POPULATION_M,
             "kind": "Independent check",
-            "official_label": "ONS UK mid-2023 population 68.3m",
+            "official_label": (f"ONS UK mid-2023 population {sources.ONS_UK_POPULATION_M}m"),
             "url": sources.ONS_POPULATION.url,
         },
     }

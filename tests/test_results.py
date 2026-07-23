@@ -11,7 +11,7 @@ RESULTS = Path(__file__).parent.parent / "data" / "bus_fare_cap_results.json"
 
 
 def test_as_json_exposes_announced_policy():
-    policy = sources.as_json()["reform_definition"]
+    policy = sources.as_json({"0-16": 0.5})["reform_definition"]
     assert policy == {
         "baseline_fare_cap_gbp": 3,
         "reform_fare_cap_gbp": 2,

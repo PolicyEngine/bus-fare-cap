@@ -26,6 +26,9 @@ dependencies = [
   # the bundle version alone identifies the whole simulation stack. The Populace
   # UK dataset is loaded via policyengine.tax_benefit_models.uk.
   "policyengine[uk]>=4.17.10",
+  # person_bus_fare_spending and gov.dft.bus.fare_allocation_weight_by_age,
+  # which this analysis reads instead of allocating fares itself.
+  "policyengine-uk>=2.89.3",
 ]
 
 [project.optional-dependencies]

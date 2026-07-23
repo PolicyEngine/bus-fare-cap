@@ -25,7 +25,6 @@ import numpy as np
 import pandas as pd
 
 from . import sources
-from .formulas import bus_fare_age_weight
 from .sources import ENGLAND_TO_UK_POPULATION_UPLIFT
 
 REPO_ROOT = Path(__file__).resolve().parents[2]
@@ -55,6 +54,24 @@ def _label(level: str) -> str:
     return str(level).replace("_", " ").title().replace(" Of ", " of ")
 
 
+def _age_allocation_weights(sim, year) -> dict:
+    """The model's NTS age profile, labelled by the age band it applies to.
+
+    Read from gov.dft.bus.fare_allocation_weight_by_age so the dashboard shows
+    the profile the simulation applied, rather than a local copy of it.
+    """
+    scale = sim.tax_benefit_system.parameters(
+        f"{year}-01-01"
+    ).gov.dft.bus.fare_allocation_weight_by_age
+    thresholds = [int(t) for t in scale.thresholds]
+    amounts = list(scale.amounts)
+    labels = [
+        f"{start}-{thresholds[i + 1] - 1}" if i + 1 < len(thresholds) else f"{start}+"
+        for i, start in enumerate(thresholds)
+    ]
+    return dict(zip(labels, amounts, strict=True))
+
+
 def _load_sim():
     if _use_populace():
         # Populace UK via policyengine.py. managed_microsimulation returns a
@@ -78,10 +95,7 @@ def run(args: argparse.Namespace) -> None:
     print(f"Step 1: Microsimulation on {DATASET} ...")
     sim = _load_sim()
 
-    print("Step 2: Person-level arrays and age allocation ...")
-    fare_p = np.asarray(
-        sim.calculate("bus_fare_spending", period=year, map_to="person").values, float
-    )
+    print("Step 2: Person-level arrays ...")
     age = np.asarray(sim.calculate("age", period=year, map_to="person").values, float)
     hid = np.asarray(sim.calculate("household_id", period=year, map_to="person").values)
     region = np.asarray(sim.calculate("region", period=year, map_to="person").values).astype(str)
@@ -94,10 +108,14 @@ def run(args: argparse.Namespace) -> None:
     )
     pw = np.asarray(sim.calculate("bus_fare_spending", period=year, map_to="person").weights, float)
 
-    aw = bus_fare_age_weight(age)
-    hh_total_aw = pd.Series(aw).groupby(hid).transform("sum").to_numpy()
-    share = np.where(hh_total_aw > 0, aw / hh_total_aw, 0.0)
-    alloc = fare_p * share  # person's allocated annual bus fare; sums to hh fare
+    # Person's allocated annual bus fare; sums to the household total. The
+    # allocation (an NTS age profile of bus use, adjusted for concessionary
+    # travel) is modelled upstream as gov.dft.bus.fare_allocation_weight_by_age
+    # — see PolicyEngine/policyengine-uk#1801.
+    alloc = np.asarray(
+        sim.calculate("person_bus_fare_spending", period=year, map_to="person").values,
+        float,
+    )
 
     fare_hh = sim.calculate("bus_fare_spending", period=year, map_to="household")
     sub_hh = sim.calculate("bus_subsidy_spending", period=year, map_to="household")
@@ -435,7 +453,7 @@ def run(args: argparse.Namespace) -> None:
             else "policyengine-uk (direct)"
         ),
         "policyengine_uk_version": importlib.metadata.version("policyengine-uk"),
-        **sources.as_json(),
+        **sources.as_json(_age_allocation_weights(sim, year)),
         "baseline": {
             "total_bus_fare_bn": round(total_fare / 1e9, 3),
             "total_bus_subsidy_bn": round(total_subsidy / 1e9, 3),

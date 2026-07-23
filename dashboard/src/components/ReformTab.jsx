@@ -42,7 +42,7 @@ export default function ReformTab({ data }) {
           <Stat
             label="Estimated cost"
             value={`£${Math.round(expiry.estimated_cost_bn * 1000)}m`}
-            sub={<>{A(src.funding_expiry_counterfactual, "Counterfactual: no cap after 31 March")}, when the £3 cap&apos;s funding expires — so this covers both the £3-to-£2 reduction (£{Math.round(cap.estimated_cost_bn * 1000)}m on its own) and keeping a cap for the rest of 2027. Government funding backing the cap: £{Math.round(cap.announced_cap_funding_bn * 1000)}m.</>}
+            sub={<>{A(src.funding_expiry_counterfactual, "Counterfactual: no cap after 31 March")}, when the £3 cap&apos;s funding expires — so this covers both the £3-to-£2 reduction (£{Math.round(cap.estimated_cost_bn * 1000)}m on its own) and keeping a cap for the rest of 2027. {A(src.two_pound_announcement, `Government funding backing the cap: £${Math.round(cap.announced_cap_funding_bn * 1000)}m.`)}</>}
           />
           <Stat
             label="Estimated average household effect"
@@ -52,7 +52,7 @@ export default function ReformTab({ data }) {
           <Stat
             label="Estimated people potentially affected"
             value={`${cap.people_potentially_affected_m.toFixed(1)}m`}
-            sub="People in modelled fare-spending households."
+            sub="People in modelled fare-spending households in England outside London."
           />
         </div>
 
@@ -89,8 +89,7 @@ export default function ReformTab({ data }) {
               {A(src.dft_two_pound_cap_evaluation, "DfT's evaluation of the previous £2 cap")}. The
               breakdown below assumes{" "}
               {A(src.funding_expiry_counterfactual, "no cap after 31 March")}, current law once the
-              £3 cap&apos;s funding expires, and so totals{" "}
-              <strong>£{Math.round(expiry.estimated_cost_bn * 1000)}m</strong> of household savings.
+              £3 cap&apos;s funding expires.
               Simulated spending alone determines both the total and its distribution. The estimate is
               static and does not model individual ticket prices, participating routes or induced demand.
             </>

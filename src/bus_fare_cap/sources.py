@@ -49,6 +49,23 @@ FARE_CAP_REDUCTION_LOW = 0.10
 FARE_CAP_REDUCTION_CENTRAL = 0.125
 FARE_CAP_REDUCTION_HIGH = 0.15
 
+# Cap-existence wedge: the saving from having a £3 cap at all, versus uncapped
+# commercial fares. DfT costed the one-year £3 cap extension for calendar 2025
+# at £151m. That is a reimbursement figure, so converting it to the
+# household-savings basis used here means uprating 2025 -> 2027 fares (~4%/yr,
+# CPT cost monitor) and grossing up the ~90% operator participation DfT
+# achieved: 151 * 1.08 / 0.90 ~ £181m, or ~8.3% of projected outside-London
+# fare spending. Smaller than the £3 -> £2 step because only singles that
+# would price above £3 are affected, rather than every single above £2.
+CAP_EXISTENCE_REDUCTION = 0.083
+THREE_POUND_CAP_2025_COST_M = 151
+
+# Under current law the £3 cap is funded only to 31 March 2027, so nine of the
+# twelve months of 2027 would have no cap at all. The announcement is
+# therefore measured against two different counterfactuals.
+MONTHS_VS_THREE_POUND_CAP = 3
+MONTHS_VS_NO_CAP = 9
+
 # Distributional calibration of bus_fare_spending (DfT BUS05ai regional split,
 # NTS0705a income anchoring) is applied upstream in policyengine-uk-data
 # (calibrate_bus_fare_spending, PolicyEngine/policyengine-uk-data#447); the
@@ -174,12 +191,24 @@ REPORTED_SCHEME_COST = Source(
 
 
 THREE_POUND_CAP_2025_COST = Source(
-    "£151m for the £3 cap in calendar 2025",
-    "DfT allocations for the £3 national bus fare cap in 2025 totalled £151m — "
-    "the annual cost of having a £3 cap at all versus uncapped commercial "
-    "fares. The government's 2027 budget prices April-December against no cap, "
-    "since existing £3 funding ends on 31 March 2027.",
+    "£151m one-year £3 cap extension (2025) → 8.3% cap-existence wedge",
+    "DfT put the one-year extension of the £3 national bus fare cap at £151m "
+    "for calendar 2025 — the cost of having a £3 cap at all, versus uncapped "
+    "commercial fares. That is operator reimbursement, so this analysis "
+    "converts it to a household-savings basis by uprating 2025 fares to 2027 "
+    "(~4%/yr) and grossing up the ~90% operator participation DfT achieved, "
+    "giving ~£181m or 8.3% of projected outside-London fare spending.",
     "https://www.gov.uk/government/publications/bus-service-improvement-plans-local-transport-authority-allocations/bus-service-operators-grant-local-transport-authority-final-allocations-2025-to-2026",
+)
+
+FUNDING_EXPIRY_COUNTERFACTUAL = Source(
+    "£3 cap funded only to 31 March 2027",
+    "Under current law the £3 cap expires on 31 March 2027, so for nine of the "
+    "twelve months of 2027 there would be no cap. Measured against that "
+    "current-law counterfactual, the announcement buys three months of a £3 → "
+    "£2 reduction plus nine months of uncapped → £2, which is the basis the "
+    "government's own funding figure is closest to.",
+    "https://www.gov.uk/guidance/3-national-bus-fare-cap",
 )
 
 REIMBURSEMENT_MECHANISM = Source(
@@ -208,13 +237,16 @@ def as_json() -> dict:
             "fare_cap_reduction": FARE_CAP_REDUCTION_CENTRAL,
             "fare_cap_reduction_low": FARE_CAP_REDUCTION_LOW,
             "fare_cap_reduction_high": FARE_CAP_REDUCTION_HIGH,
+            "cap_existence_reduction": CAP_EXISTENCE_REDUCTION,
+            "months_vs_three_pound_cap": MONTHS_VS_THREE_POUND_CAP,
+            "months_vs_no_cap": MONTHS_VS_NO_CAP,
             "distributional_calibration": (
                 "Upstream in policyengine-uk-data: BUS05ai regional split and "
                 "NTS0705a income-quintile anchoring"
             ),
             "incidence_method": (
                 "Derived all-ticket reduction applied to household fare spending, "
-                "regionally recalibrated to DfT BUS05ai"
+                "distributionally calibrated upstream in policyengine-uk-data"
             ),
             "behavioural": "static (no induced demand)",
         },
@@ -232,6 +264,7 @@ def as_json() -> dict:
             "derived_fare_reduction": asdict(DERIVED_FARE_REDUCTION),
             "dft_regional_fare_split": asdict(DFT_REGIONAL_FARE_SPLIT),
             "three_pound_cap_2025_cost": asdict(THREE_POUND_CAP_2025_COST),
+            "funding_expiry_counterfactual": asdict(FUNDING_EXPIRY_COUNTERFACTUAL),
             "reimbursement_mechanism": asdict(REIMBURSEMENT_MECHANISM),
             "reported_scheme_cost": asdict(REPORTED_SCHEME_COST),
         },

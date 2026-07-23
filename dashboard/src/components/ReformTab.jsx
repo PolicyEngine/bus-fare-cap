@@ -16,6 +16,7 @@ function Stat({ label, value, sub }) {
 
 export default function ReformTab({ data }) {
   const cap = data.reforms.announced_2pound_cap;
+  const expiry = cap.vs_funding_expiry;
   const householdEffect = cap.household_effect;
   const src = data.sources || {};
   const A = (s, text) => (s ? <a href={s.url} target="_blank" rel="noreferrer" className="underline">{text}</a> : text);
@@ -38,11 +39,16 @@ export default function ReformTab({ data }) {
             </>
           }
         />
-        <div className="grid gap-4 sm:grid-cols-3">
+        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
           <Stat
-            label="Estimated fiscal cost"
+            label="Cost of the fare reduction"
             value={`£${Math.round(cap.estimated_cost_bn * 1000)}m`}
-            sub={<>Our static reimbursement proxy. {A(src.reported_scheme_cost, `Reported government estimate: >£${Math.round(cap.reported_scheme_cost_lower_bound_bn * 1000)}m.`)}</>}
+            sub={`£${Math.round(cap.estimated_cost_low_bn * 1000)}–${Math.round(cap.estimated_cost_high_bn * 1000)}m. Counterfactual: a £3 cap runs all year.`}
+          />
+          <Stat
+            label="Cost versus funding expiry"
+            value={`£${Math.round(expiry.estimated_cost_bn * 1000)}m`}
+            sub={<>£{Math.round(expiry.estimated_cost_low_bn * 1000)}–{Math.round(expiry.estimated_cost_high_bn * 1000)}m. {A(src.funding_expiry_counterfactual, "Counterfactual: no cap after 31 March")}. Compare with £{Math.round(cap.announced_cap_funding_bn * 1000)}m of England funding.</>}
           />
           <Stat
             label="Estimated average household effect"
@@ -77,12 +83,12 @@ export default function ReformTab({ data }) {
 
       <section>
         <SectionHeading
-          title="Why our estimate sits below the government's budget"
+          title="How our estimate compares with the government's budget"
           description={
             <>
-              Our estimate and the government&apos;s budget answer different questions. Ours is the
-              static saving of moving from a £3 cap to a £2 cap, assuming a cap exists all year. The
-              government&apos;s budget also pays for wedges outside that scope.
+              On the same counterfactual the two are close: our £{Math.round(expiry.estimated_cost_bn * 1000)}m
+              against £{Math.round(cap.announced_cap_funding_bn * 1000)}m of England funding. The
+              remaining differences are accounting scope, not disagreement about the policy.
             </>
           }
         />
@@ -90,11 +96,15 @@ export default function ReformTab({ data }) {
           <table className="w-full text-left text-sm">
             <tbody className="divide-y divide-slate-100">
               <tr>
-                <th className="w-64 px-6 py-4 align-top text-slate-900">Cap existing at all, Apr–Dec 2027</th>
+                <th className="w-64 px-6 py-4 align-top text-slate-900">Which counterfactual</th>
                 <td className="px-6 py-4 text-slate-600">
-                  {A(src.current_fare_cap_policy, "Existing £3 funding ends 31 March 2027")}, so the
-                  government prices nine months against no cap. {A(src.three_pound_cap_2025_cost, "The £3 cap alone cost £151m in calendar 2025")},
-                  implying roughly £115–150m for April–December — more if commercial fares rise above £3.
+                  The largest difference. {A(src.current_fare_cap_policy, "Existing £3 funding ends 31 March 2027")},
+                  so the government prices nine of twelve months against no cap at all. Our
+                  £{Math.round(cap.estimated_cost_bn * 1000)}m fare-reduction figure instead assumes a
+                  £3 cap runs all year; on the government&apos;s counterfactual we get
+                  £{Math.round(expiry.estimated_cost_bn * 1000)}m, using{" "}
+                  {A(src.three_pound_cap_2025_cost, "the £151m cost of the £3 cap itself")} for the
+                  uncapped months.
                 </td>
               </tr>
               <tr>

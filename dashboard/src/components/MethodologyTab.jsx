@@ -43,12 +43,11 @@ export default function MethodologyTab({ data }) {
             Household bus &amp; coach spending is imputed from the Living Costs and Food Survey in the
             PolicyEngine UK Enhanced FRS, calibrated to{" "}
             {L(src.dft_fare, "DfT's England-wide fare-receipts total")} and
-            uprated by PolicyEngine to {data.projection_year_label}. Each household&apos;s fare is split
-            across its members using a{" "}
-            {src.nts_age_profile ? (
-              <a href={src.nts_age_profile.url} target="_blank" rel="noreferrer" className="text-[color:var(--pe-color-primary-600)] underline">National Travel Survey bus-trips-by-age</a>
-            ) : "National Travel Survey bus-trips-by-age"}{" "}
-            profile adjusted for concessionary ages.
+            uprated by PolicyEngine to {data.projection_year_label}. The model splits each
+            household&apos;s fare across its members with a{" "}
+            {L(src.nts_age_profile, "National Travel Survey bus-trips-by-age")} profile adjusted for
+            concessionary ages, so pension-age passengers — who travel free — carry almost no fare
+            weight. These weights are the model&apos;s own parameter, not an assumption made here.
           </p>
           <div className="mt-3 flex flex-wrap gap-2 text-sm">
             {Object.entries(weights).map(([band, w]) => (

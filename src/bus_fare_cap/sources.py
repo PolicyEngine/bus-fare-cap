@@ -17,20 +17,6 @@ from typing import Any
 # https://www.ons.gov.uk/peoplepopulationandcommunity/populationandmigration/populationestimates
 ENGLAND_TO_UK_POPULATION_UPLIFT = 68.3 / 57.7  # ~1.18
 
-# NTS-derived, concessionary-adjusted fare allocation weight by age. Mirrors
-# gov.dft.bus.fare_allocation_weight_by_age (PolicyEngine/policyengine-uk#1801),
-# and is reported here only so the dashboard can display the profile.
-# https://www.gov.uk/government/statistics/national-travel-survey-2023/nts-2023-trips-by-purpose-age-mode-and-sex
-AGE_ALLOCATION_WEIGHTS = {
-    "0-16": 0.5,
-    "17-20": 3.9,
-    "21-29": 1.8,
-    "30-39": 1.0,
-    "40-49": 0.8,
-    "50-59": 0.7,
-    "60-69": 0.3,
-    "70+": 0.07,
-}
 
 # Policy announced on 22 July 2026. Cap levels, dates, geography and the £400m
 # / £454m funding figures all come from the announcement; the >£500m total is
@@ -226,7 +212,13 @@ FUNDING_EXPIRY_COUNTERFACTUAL = Source(
 )
 
 
-def as_json() -> dict:
+def as_json(age_allocation_weights: dict) -> dict:
+    """Registry as emitted to the results JSON.
+
+    ``age_allocation_weights`` is read from the model at run time
+    (gov.dft.bus.fare_allocation_weight_by_age) rather than duplicated here, so
+    the dashboard displays the profile the simulation actually applied.
+    """
     return {
         "reform_definition": {
             "baseline_fare_cap_gbp": BASELINE_FARE_CAP_GBP,
@@ -237,7 +229,7 @@ def as_json() -> dict:
             "participating_services_only": True,
         },
         "assumptions": {
-            "age_allocation_weights": AGE_ALLOCATION_WEIGHTS,
+            "age_allocation_weights": age_allocation_weights,
             "fare_cap_reduction": FARE_CAP_REDUCTION_CENTRAL,
             "fare_cap_reduction_low": FARE_CAP_REDUCTION_LOW,
             "fare_cap_reduction_high": FARE_CAP_REDUCTION_HIGH,

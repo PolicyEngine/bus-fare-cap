@@ -6,7 +6,7 @@
   "dataset": "PolicyEngine UK Enhanced FRS (enhanced_frs_2024_25)",
   "dataset_source": "enhanced-frs",
   "simulation_stack": "policyengine-uk (direct)",
-  "policyengine_uk_version": "2.89.2",
+  "policyengine_uk_version": "2.89.3",
   "reform_definition": {
     "baseline_fare_cap_gbp": 3,
     "reform_fare_cap_gbp": 2,

@@ -208,6 +208,10 @@ def run(args: argparse.Namespace) -> None:
             exposure_total_gbp * _blended(sources.FARE_CAP_REDUCTION_HIGH) / 1e9, 3
         ),
     }
+    # The current-law scenario is a pure scalar multiple of the fare-reduction
+    # one (the same allocation, a larger reduction), so its distribution has
+    # the same shape and can be scaled exactly.
+    expiry_scale = blended_reduction / reduction
     allocated_relief = alloc * in_policy_geography * reduction
     estimated_cost_gbp = wsum(allocated_relief)
     estimated_cost_bn = estimated_cost_gbp / 1e9
@@ -295,6 +299,25 @@ def run(args: argparse.Namespace) -> None:
             )
         ),
         2,
+    )
+    funding_expiry["effect_breakdowns"] = breakdown(
+        alloc * in_policy_geography * blended_reduction,
+        np.ones_like(age, bool),
+        include_unknown=False,
+        target_total_bn=funding_expiry["estimated_cost_bn"],
+    )
+    funding_expiry["average_effect_breakdowns"] = {
+        dim: [
+            {
+                "group": row["group"],
+                "annual_effect_gbp": round(row["annual_effect_gbp"] * expiry_scale, 2),
+            }
+            for row in rows
+        ]
+        for dim, rows in average_effect_breakdowns.items()
+    }
+    funding_expiry["household_effect_average_gbp"] = round(
+        household_effect_average * expiry_scale, 2
     )
     fare_cap = {
         "label": "Announced £2 bus fare cap",

@@ -73,6 +73,15 @@ def test_funding_expiry_scenario_exceeds_fare_reduction(results):
     assert expiry["estimated_cost_bn"] == pytest.approx(
         cap["baseline_fare_spending_bn"] * expiry["blended_reduction"], abs=0.002
     )
+    # The dashboard headlines this scenario, so its breakdowns must reconcile.
+    for rows in expiry["effect_breakdowns"].values():
+        assert sum(row["cost_bn"] for row in rows) == pytest.approx(
+            expiry["estimated_cost_bn"], abs=0.01
+        )
+    assert (
+        expiry["household_effect_average_gbp"]
+        > cap["household_effect"]["annual_effect_average_gbp"]
+    )
 
 
 def test_results_breakdowns_have_no_quartile(results):

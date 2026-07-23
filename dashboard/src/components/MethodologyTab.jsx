@@ -26,13 +26,15 @@ export default function MethodologyTab({ data }) {
           <p>
             The {L(src.two_pound_announcement, "22 July 2026 government announcement")} is the
             source for the £2 cap, calendar-2027 dates, England-outside-London geography,
-            participating-bus condition, £400m of extra funding backing the cap and £454m of total
-            extra funding including devolved-government funding. The GOV.UK announcement does not
-            publish a total scheme cost; {L(src.reported_scheme_cost, "contemporaneous ITV/PA reporting")}{" "}
-            says the government expects it to exceed £500m, with the balance above the new funding
-            coming from existing DfT bus allocations. The £3 cap it replaces was{" "}
-            {L(src.current_fare_cap_policy, "funded through 31 March 2027")}. These figures are comparison
-            benchmarks, not inputs to our estimate, and none is presented as England-only passenger savings.
+            participating-bus condition and the funding figures: the cap is backed by £400m of extra
+            funding, within £454m of extra funding in total that comes from reprioritising the DESNZ
+            budget and includes money for devolved governments. Devolved governments receive Barnett
+            consequentials &ldquo;in the usual way&rdquo;, but no amount is published for them, so the
+            England / devolved split of the £454m is not stated. Nor is a total scheme cost:{" "}
+            {L(src.reported_scheme_cost, "contemporaneous PA reporting")} says the government expects
+            it to exceed £500m, with the balance from existing DfT bus allocations. The £3 cap it
+            replaces was {L(src.current_fare_cap_policy, "funded through 31 March 2027")}. All of
+            these are comparison benchmarks, never inputs to our estimate.
           </p>
         </div>
         <div>
@@ -74,18 +76,19 @@ export default function MethodologyTab({ data }) {
           </p>
         </div>
         <div>
-          <h3 className="font-semibold text-slate-900">4 · Two counterfactuals</h3>
+          <h3 className="font-semibold text-slate-900">4 · The counterfactual</h3>
           <p>
-            The headline prices the announced reduction against a £3 cap running all year. But{" "}
-            {L(src.funding_expiry_counterfactual, "current law funds the £3 cap only to 31 March 2027")},
-            so for nine of twelve months there would be no cap. Against that current-law baseline the
-            announcement also buys the cap&apos;s continued existence, worth a further 8.3% of fare
-            spending — derived from{" "}
-            {L(src.three_pound_cap_2025_cost, "the £151m one-year cost of the £3 cap")}, converted
+            Results are reported against current law, under which{" "}
+            {L(src.funding_expiry_counterfactual, "the £3 cap is funded only to 31 March 2027")} — so
+            for nine of twelve months there would be no cap at all. The announcement therefore buys
+            both the £3-to-£2 reduction and the cap&apos;s continued existence. The second part is
+            worth a further 8.3% of fare spending, derived from{" "}
+            {L(src.three_pound_cap_2025_cost, "the £151m one-year cost of the £3 cap")} and converted
             from operator reimbursement to household savings by uprating 2025 fares to 2027 and
             grossing up ~90% operator participation. Blending three months at 12.5% with nine at
-            20.8% gives 18.7%. This second figure is the one comparable with the government&apos;s
-            funding.
+            20.8% gives 18.7%. Priced instead against a £3 cap running all year — the fare reduction
+            alone — the estimate is{" "}
+            £{Math.round((data.reforms?.announced_2pound_cap?.estimated_cost_bn || 0) * 1000)}m.
           </p>
         </div>
         <div>

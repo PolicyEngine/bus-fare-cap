@@ -5,7 +5,7 @@ import {
   Bar, BarChart, CartesianGrid, Cell, ResponsiveContainer, Tooltip, XAxis, YAxis,
 } from "recharts";
 import { colors } from "../lib/colors";
-import { formatBn } from "../lib/formatters";
+import { formatMn } from "../lib/formatters";
 
 const DIMENSIONS = [
   { id: "region", label: "Region" },
@@ -21,13 +21,16 @@ export default function BreakdownChart({ breakdowns, metric = "Cost", color = co
   // Drop empty categories so the chart only shows groups with exposure.
   const rows = showAlternate
     ? (alternateMetric.breakdowns[dim] || []).filter((r) => r.annual_effect_gbp > 0)
-    : (breakdowns[dim] || []).filter((r) => r.cost_bn > 0);
+    : (breakdowns[dim] || [])
+        .filter((r) => r.cost_bn > 0)
+        // Results are stored in £bn; the chart reads better in £m at this scale.
+        .map((r) => ({ ...r, cost_m: r.cost_bn * 1000 }));
   const dimLabel = DIMENSIONS.find((d) => d.id === dim).label.toLowerCase();
   const chartMetric = showAlternate
     ? dim === "age_band" ? "Average person effect" : alternateMetric.label
     : metric;
-  const unit = showAlternate ? "£/year" : "£bn";
-  const dataKey = showAlternate ? "annual_effect_gbp" : "cost_bn";
+  const unit = showAlternate ? "£/year" : "£m";
+  const dataKey = showAlternate ? "annual_effect_gbp" : "cost_m";
   return (
     <div className="rounded-2xl border border-slate-200 bg-white p-6">
       <div className="mb-5 grid gap-3 sm:grid-cols-2">
@@ -61,7 +64,7 @@ export default function BreakdownChart({ breakdowns, metric = "Cost", color = co
           <CartesianGrid strokeDasharray="3 3" stroke={colors.border.light} />
           <XAxis dataKey="group" angle={-30} textAnchor="end" interval={0} height={72} tick={{ fontSize: 11 }} />
           <YAxis tick={{ fontSize: 12 }} />
-          <Tooltip formatter={(v) => showAlternate ? `£${Number(v).toFixed(2)}` : formatBn(v)} />
+          <Tooltip formatter={(v) => showAlternate ? `£${Number(v).toFixed(2)}` : formatMn(v)} />
           <Bar dataKey={dataKey} radius={[4, 4, 0, 0]}>
             {rows.map((_, i) => <Cell key={i} fill={color} />)}
           </Bar>

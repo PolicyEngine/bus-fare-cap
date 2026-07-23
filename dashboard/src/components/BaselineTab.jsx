@@ -35,10 +35,9 @@ export default function BaselineTab({ data }) {
         description={`UK household bus & coach fares, government bus subsidy and population in the PolicyEngine UK Enhanced FRS, projected to ${data.projection_year_label}. Fares are imputed from the LCFS and calibrated to DfT statistics for the year ending March 2025, then allocated to people with an NTS age profile. This baseline provides distributional context; it does not model ticket prices, the £3 cap, or the announced £2 policy.`}
       />
 
-      <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+      <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
         <Stat label="Passenger fares paid" value={bn(b.total_bus_fare_bn)} sub={`${data.projection_year_label}, UK households`} compare={c.total_bus_fare_bn} compareFmt={bn} />
         <Stat label="Government bus subsidy" value={bn(b.total_bus_subsidy_bn)} sub="benefit-in-kind to households" compare={c.total_bus_subsidy_bn} compareFmt={bn} />
-        <Stat label="Population" value={m(b.population_m)} sub="people" compare={c.population_m} compareFmt={m} />
         <Stat
           label="In fare-spending households"
           value={m(b.fare_paying_people_m)}

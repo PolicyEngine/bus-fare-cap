@@ -17,7 +17,6 @@ function Stat({ label, value, sub }) {
 export default function ReformTab({ data }) {
   const cap = data.reforms.announced_2pound_cap;
   const expiry = cap.vs_funding_expiry;
-  const householdEffect = cap.household_effect;
   const src = data.sources || {};
   const A = (s, text) => (s ? <a href={s.url} target="_blank" rel="noreferrer" className="underline">{text}</a> : text);
 
@@ -39,20 +38,15 @@ export default function ReformTab({ data }) {
             </>
           }
         />
-        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+        <div className="grid gap-4 sm:grid-cols-3">
           <Stat
-            label="Cost of the fare reduction"
-            value={`£${Math.round(cap.estimated_cost_bn * 1000)}m`}
-            sub={`£${Math.round(cap.estimated_cost_low_bn * 1000)}–${Math.round(cap.estimated_cost_high_bn * 1000)}m. Counterfactual: a £3 cap runs all year.`}
-          />
-          <Stat
-            label="Cost versus funding expiry"
+            label="Estimated cost"
             value={`£${Math.round(expiry.estimated_cost_bn * 1000)}m`}
-            sub={<>£{Math.round(expiry.estimated_cost_low_bn * 1000)}–{Math.round(expiry.estimated_cost_high_bn * 1000)}m. {A(src.funding_expiry_counterfactual, "Counterfactual: no cap after 31 March")}. Compare with £{Math.round(cap.announced_cap_funding_bn * 1000)}m of England funding.</>}
+            sub={<>{A(src.funding_expiry_counterfactual, "Counterfactual: no cap after 31 March")}, when the £3 cap&apos;s funding expires — so this covers both the £3-to-£2 reduction (£{Math.round(cap.estimated_cost_bn * 1000)}m on its own) and keeping a cap for the rest of 2027. Government funding backing the cap: £{Math.round(cap.announced_cap_funding_bn * 1000)}m.</>}
           />
           <Stat
             label="Estimated average household effect"
-            value={`£${householdEffect.annual_effect_average_gbp.toFixed(1)}/year`}
+            value={`£${expiry.household_effect_average_gbp.toFixed(1)}/year`}
             sub="Modelled average across all households in England outside London."
           />
           <Stat
@@ -83,58 +77,6 @@ export default function ReformTab({ data }) {
 
       <section>
         <SectionHeading
-          title="How our estimate compares with the government's budget"
-          description={
-            <>
-              On the same counterfactual the two are close: our £{Math.round(expiry.estimated_cost_bn * 1000)}m
-              against £{Math.round(cap.announced_cap_funding_bn * 1000)}m of England funding. The
-              remaining differences are accounting scope, not disagreement about the policy.
-            </>
-          }
-        />
-        <div className="overflow-hidden rounded-2xl border border-slate-200 bg-white">
-          <table className="w-full text-left text-sm">
-            <tbody className="divide-y divide-slate-100">
-              <tr>
-                <th className="w-64 px-6 py-4 align-top text-slate-900">Which counterfactual</th>
-                <td className="px-6 py-4 text-slate-600">
-                  The largest difference. {A(src.current_fare_cap_policy, "Existing £3 funding ends 31 March 2027")},
-                  so the government prices nine of twelve months against no cap at all. Our
-                  £{Math.round(cap.estimated_cost_bn * 1000)}m fare-reduction figure instead assumes a
-                  £3 cap runs all year; on the government&apos;s counterfactual we get
-                  £{Math.round(expiry.estimated_cost_bn * 1000)}m, using{" "}
-                  {A(src.three_pound_cap_2025_cost, "the £151m cost of the £3 cap itself")} for the
-                  uncapped months.
-                </td>
-              </tr>
-              <tr>
-                <th className="px-6 py-4 align-top text-slate-900">Reimbursement vs commercial fares</th>
-                <td className="px-6 py-4 text-slate-600">
-                  {A(src.reimbursement_mechanism, "Operators are reimbursed for revenue foregone against commercial average fares, indexed to fare increases")}{" "}
-                  — not against the capped £3 — adding roughly £30–60m. Generated (induced) trips are not reimbursed.
-                </td>
-              </tr>
-              <tr>
-                <th className="px-6 py-4 align-top text-slate-900">Budget contingency</th>
-                <td className="px-6 py-4 text-slate-600">
-                  {A(src.reimbursement_mechanism, "The £2 cap underspent its budget by 14% (£210m paid vs £245m budgeted)")},
-                  suggesting the 2027 budget carries similar headroom (~£30–70m).
-                </td>
-              </tr>
-              <tr>
-                <th className="px-6 py-4 align-top text-slate-900">Devolved-government funding</th>
-                <td className="px-6 py-4 text-slate-600">
-                  {A(src.two_pound_announcement, "£54m of the £454m is Barnett funding for Scotland, Wales and Northern Ireland")}{" "}
-                  — outside England, so never comparable to an England-only estimate.
-                </td>
-              </tr>
-            </tbody>
-          </table>
-        </div>
-      </section>
-
-      <section>
-        <SectionHeading
           title="Who has bus-fare exposure in the policy geography?"
           description={
             <>
@@ -144,21 +86,25 @@ export default function ReformTab({ data }) {
               {A(src.dft_income_quintile_trips, "NTS local-bus trip rates by income quintile")}.
               We apply a <strong>12.5% all-ticket reduction (range 10–15%)</strong>{" "}
               {A(src.derived_fare_reduction, "derived")} from{" "}
-              {A(src.dft_two_pound_cap_evaluation, "DfT's evaluation of the previous £2 cap")}. Simulated spending determines the cost and
-              distribution; the government&apos;s £400m cap funding is only a benchmark. The estimate is
+              {A(src.dft_two_pound_cap_evaluation, "DfT's evaluation of the previous £2 cap")}. The
+              breakdown below assumes{" "}
+              {A(src.funding_expiry_counterfactual, "no cap after 31 March")}, current law once the
+              £3 cap&apos;s funding expires, and so totals{" "}
+              <strong>£{Math.round(expiry.estimated_cost_bn * 1000)}m</strong> of household savings.
+              Simulated spending alone determines both the total and its distribution. The estimate is
               static and does not model individual ticket prices, participating routes or induced demand.
             </>
           }
         />
         <BreakdownChart
-          breakdowns={cap.effect_breakdowns}
+          breakdowns={expiry.effect_breakdowns}
           metric="Total estimated benefit"
           color={colors.primary[400]}
           period={data.projection_year_label}
           defaultDimension="income_quintile"
           alternateMetric={{
             label: "Average household effect",
-            breakdowns: cap.average_effect_breakdowns,
+            breakdowns: expiry.average_effect_breakdowns,
           }}
         />
       </section>

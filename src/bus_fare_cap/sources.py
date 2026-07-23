@@ -95,7 +95,6 @@ MONTHS_VS_NO_CAP = 9
 # https://www.gov.uk/government/statistics/annual-bus-statistics-year-ending-march-2025/annual-bus-statistics-year-ending-march-2025
 DFT_ENGLAND_FARE_RECEIPTS_BN = 3.4  # BUS05aii: passenger fare receipts
 DFT_ENGLAND_SUBSIDY_BN = 3.0  # BUS05bii: net government support
-DFT_ENGLAND_PASSENGER_JOURNEYS_BN = 3.7  # BUS01: local bus passenger journeys
 
 # ONS mid-2023 UK population, the independent check on the dataset's weights.
 # https://www.ons.gov.uk/peoplepopulationandcommunity/populationandmigration/populationestimates
@@ -131,19 +130,6 @@ ONS_POPULATION = Source(
     "finance to a UK total. Indicative: bus use per head varies by nation.",
     "https://www.ons.gov.uk/peoplepopulationandcommunity/populationandmigration/populationestimates",
 )
-DFT_JOURNEYS = Source(
-    "3.7bn journeys (England), 28% concessionary",
-    "DfT Annual Bus Statistics, year ending March 2025, table BUS01: 3.7 billion "
-    "local bus passenger journeys in England, of which 28% (1.0 billion) were "
-    "concessionary. This provides context, but cannot identify tickets above £2.",
-    "https://www.gov.uk/government/statistics/annual-bus-statistics-year-ending-march-2025/annual-bus-statistics-year-ending-march-2025",
-)
-DFT_OUTSIDE_LONDON_JOURNEYS = Source(
-    "1.85bn passenger journeys",
-    "DfT Annual Bus Statistics, year ending March 2025: passenger journeys on "
-    "local buses in England outside London.",
-    "https://www.gov.uk/government/statistics/annual-bus-statistics-year-ending-march-2025/annual-bus-statistics-year-ending-march-2025",
-)
 DFT_INCOME_QUINTILE_TRIPS = Source(
     "Local bus trips/person/year, 2024: Q1 47.6 … Q5 13.0",
     "National Travel Survey table NTS0705a, 2024, 'Other local bus' (outside "
@@ -170,9 +156,13 @@ CURRENT_FARE_CAP_POLICY = Source(
 TWO_POUND_ANNOUNCEMENT = Source(
     "£2 from 1 January 2027; £400m backs the cap",
     "Government announcement of a £2 maximum single fare on participating buses "
-    "in England outside London throughout 2027. It says £400m of extra funding "
-    "backs the cap and separately reports £454m of extra funding including Barnett "
-    "funding for devolved governments. It does not publish a total scheme cost.",
+    "in England outside London throughout 2027. It says the cap is backed by "
+    "£400m of extra funding, and that the £454m of extra funding in total "
+    "(which includes funding for devolved governments) comes from "
+    "reprioritising the DESNZ budget. Devolved governments receive Barnett "
+    "consequentials 'in the usual way', but no amount is published for them, "
+    "so the England / devolved split of the £454m is not stated. It does not "
+    "publish a total scheme cost either.",
     "https://www.gov.uk/government/news/cheaper-travel-for-millions-with-a-third-off-fares",
 )
 
@@ -235,16 +225,6 @@ FUNDING_EXPIRY_COUNTERFACTUAL = Source(
     "https://www.gov.uk/guidance/3-national-bus-fare-cap",
 )
 
-REIMBURSEMENT_MECHANISM = Source(
-    "Revenue foregone vs commercial fares; indexed to fare rises",
-    "DfT reimbursement guidance: operators are compensated for revenue foregone "
-    "measured against commercial average fares, indexed to fare increases. "
-    "Generated (induced) trips are not reimbursed. The £2 cap evaluation "
-    "reports £210m paid over ten months against a £245m budget, a 14% "
-    "underspend, indicating budget contingency.",
-    "https://www.gov.uk/government/publications/evaluation-of-the-2-bus-fare-cap",
-)
-
 
 def as_json() -> dict:
     return {
@@ -277,8 +257,6 @@ def as_json() -> dict:
         "sources": {
             "dft_fare": asdict(DFT_FARE),
             "dft_subsidy": asdict(DFT_SUBSIDY),
-            "dft_journeys": asdict(DFT_JOURNEYS),
-            "dft_outside_london_journeys": asdict(DFT_OUTSIDE_LONDON_JOURNEYS),
             "dft_income_quintile_trips": asdict(DFT_INCOME_QUINTILE_TRIPS),
             "ons_population": asdict(ONS_POPULATION),
             "nts_age_profile": asdict(NTS_AGE_PROFILE),
@@ -289,7 +267,6 @@ def as_json() -> dict:
             "dft_regional_fare_split": asdict(DFT_REGIONAL_FARE_SPLIT),
             "three_pound_cap_2025_cost": asdict(THREE_POUND_CAP_2025_COST),
             "funding_expiry_counterfactual": asdict(FUNDING_EXPIRY_COUNTERFACTUAL),
-            "reimbursement_mechanism": asdict(REIMBURSEMENT_MECHANISM),
             "reported_scheme_cost": asdict(REPORTED_SCHEME_COST),
         },
     }

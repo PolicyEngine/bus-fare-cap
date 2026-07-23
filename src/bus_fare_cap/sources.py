@@ -14,9 +14,13 @@ from dataclasses import asdict, dataclass
 from typing import Any
 
 # England -> UK uplift for England-only DfT bus finance (ONS mid-2023 pop).
+# https://www.ons.gov.uk/peoplepopulationandcommunity/populationandmigration/populationestimates
 ENGLAND_TO_UK_POPULATION_UPLIFT = 68.3 / 57.7  # ~1.18
 
-# NTS-derived, concessionary-adjusted fare allocation weight by age.
+# NTS-derived, concessionary-adjusted fare allocation weight by age. Mirrors
+# gov.dft.bus.fare_allocation_weight_by_age (PolicyEngine/policyengine-uk#1801),
+# and is reported here only so the dashboard can display the profile.
+# https://www.gov.uk/government/statistics/national-travel-survey-2023/nts-2023-trips-by-purpose-age-mode-and-sex
 AGE_ALLOCATION_WEIGHTS = {
     "0-16": 0.5,
     "17-20": 3.9,
@@ -28,7 +32,11 @@ AGE_ALLOCATION_WEIGHTS = {
     "70+": 0.07,
 }
 
-# Policy announced on 22 July 2026.
+# Policy announced on 22 July 2026. Cap levels, dates, geography and the £400m
+# / £454m funding figures all come from the announcement; the >£500m total is
+# PA reporting, not the GOV.UK release.
+# https://www.gov.uk/government/news/cheaper-travel-for-millions-with-a-third-off-fares
+# https://www.newburytoday.co.uk/national/burnham-announces-2-bus-fare-cap-from-january-169628/
 BASELINE_FARE_CAP_GBP = 3
 REFORM_FARE_CAP_GBP = 2
 POLICY_START_DATE = "2027-01-01"
@@ -45,6 +53,9 @@ REPORTED_SCHEME_COST_LOWER_BOUND_BN = 0.5
 # regimes singles rose to ~85% of tickets sold. Re-weighting the evaluation's
 # affected-single reduction (~27%) by a cap-era single trip share of 0.35-0.50
 # gives an all-ticket reduction of 10-15%, central 12.5%.
+# Evaluation (Table 6, single-ticket shares in Fig 25):
+# https://www.gov.uk/government/publications/evaluation-of-the-2-bus-fare-cap
+# https://assets.publishing.service.gov.uk/media/681b355b9ef97b58cce3e4e0/evaluation-of-the-first-10-months-of-the-2-bus-fare-cap.pdf
 FARE_CAP_REDUCTION_LOW = 0.10
 FARE_CAP_REDUCTION_CENTRAL = 0.125
 FARE_CAP_REDUCTION_HIGH = 0.15
@@ -57,12 +68,19 @@ FARE_CAP_REDUCTION_HIGH = 0.15
 # achieved: 151 * 1.08 / 0.90 ~ £181m, or ~8.3% of projected outside-London
 # fare spending. Smaller than the £3 -> £2 step because only singles that
 # would price above £3 are affected, rather than every single above £2.
+# £151m one-year cost of the £3 cap:
+# https://www.gov.uk/government/publications/bus-service-improvement-plans-local-transport-authority-allocations/bus-service-operators-grant-local-transport-authority-final-allocations-2025-to-2026
+# ~90% operator participation and the reimbursement mechanism (Fig 2):
+# https://assets.publishing.service.gov.uk/media/681b355b9ef97b58cce3e4e0/evaluation-of-the-first-10-months-of-the-2-bus-fare-cap.pdf
+# ~4%/yr bus cost inflation (CPT Cost Monitor):
+# https://www.cpt-uk.org/news/cpt-cost-monitor-operating-costs-across-great-britain-s-bus-sector-rise-4-over-the-past-year/
 CAP_EXISTENCE_REDUCTION = 0.083
 THREE_POUND_CAP_2025_COST_M = 151
 
 # Under current law the £3 cap is funded only to 31 March 2027, so nine of the
 # twelve months of 2027 would have no cap at all. The announcement is
 # therefore measured against two different counterfactuals.
+# https://www.gov.uk/guidance/3-national-bus-fare-cap
 MONTHS_VS_THREE_POUND_CAP = 3
 MONTHS_VS_NO_CAP = 9
 
@@ -74,8 +92,14 @@ MONTHS_VS_NO_CAP = 9
 # DfT Annual Bus Statistics, year ending March 2025 (England). These remain the
 # calibration anchors for household fare exposure, not a ticket-level estimate
 # of the newly announced £3-to-£2 cap.
-DFT_ENGLAND_FARE_RECEIPTS_BN = 3.4  # BUS05a: passenger fare receipts
+# https://www.gov.uk/government/statistics/annual-bus-statistics-year-ending-march-2025/annual-bus-statistics-year-ending-march-2025
+DFT_ENGLAND_FARE_RECEIPTS_BN = 3.4  # BUS05aii: passenger fare receipts
+DFT_ENGLAND_SUBSIDY_BN = 3.0  # BUS05bii: net government support
 DFT_ENGLAND_PASSENGER_JOURNEYS_BN = 3.7  # BUS01: local bus passenger journeys
+
+# ONS mid-2023 UK population, the independent check on the dataset's weights.
+# https://www.ons.gov.uk/peoplepopulationandcommunity/populationandmigration/populationestimates
+ONS_UK_POPULATION_M = 68.3
 
 
 @dataclass(frozen=True)

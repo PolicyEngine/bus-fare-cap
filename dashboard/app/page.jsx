@@ -120,10 +120,11 @@ function Dashboard() {
               PolicyEngine/bus-fare-cap
             </a>
             . Built with{" "}
-            <a href="https://pypi.org/project/policyengine-uk/" target="_blank" rel="noreferrer">
-              policyengine-uk
+            <a href="https://pypi.org/project/policyengine/" target="_blank" rel="noreferrer">
+              policyengine
             </a>{" "}
-            v{data?.policyengine_uk_version || "2.89.2"}.
+            v{data?.policyengine_version} (policyengine-uk v{data?.policyengine_uk_version}) on{" "}
+            {data?.dataset_name}.
           </p>
         </footer>
       </main>

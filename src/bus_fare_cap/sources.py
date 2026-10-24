@@ -1,8 +1,8 @@
 """Single registry of every non-PolicyEngine number used in the analysis.
 
-Quantities PolicyEngine UK models (bus fares/subsidy imputed and calibrated in
-the Enhanced FRS, ages, region, weights) come from the dataset at run time.
-Everything else — the calibration targets, the England->UK uplift, the NTS age
+Quantities PolicyEngine UK models (bus fares and subsidy, ages, region, weights
+in the Microcosm UK dataset) come from the simulation at run time.
+Everything else — the DfT benchmarks, the England->UK uplift, the NTS age
 profile, empirical assumptions, and validation context — lives here with a
 value, a description and a source URL, and is emitted verbatim into the results
 JSON so the dashboard renders no hardcoded numbers.
@@ -70,14 +70,9 @@ THREE_POUND_CAP_2025_COST_M = 151
 MONTHS_VS_THREE_POUND_CAP = 3
 MONTHS_VS_NO_CAP = 9
 
-# Distributional calibration of bus_fare_spending (DfT BUS05ai regional split,
-# NTS0705a income anchoring) is applied upstream in policyengine-uk-data
-# (calibrate_bus_fare_spending, PolicyEngine/policyengine-uk-data#447); the
-# dataset arrives already calibrated. Sources below document those anchors.
-
-# DfT Annual Bus Statistics, year ending March 2025 (England). These remain the
-# calibration anchors for household fare exposure, not a ticket-level estimate
-# of the newly announced £3-to-£2 cap.
+# DfT Annual Bus Statistics, year ending March 2025 (England). Shown as
+# benchmarks for the simulated fare and subsidy totals; the Microcosm UK
+# pipeline prices imputed journeys rather than calibrating to these here.
 # https://www.gov.uk/government/statistics/annual-bus-statistics-year-ending-march-2025/annual-bus-statistics-year-ending-march-2025
 DFT_ENGLAND_FARE_RECEIPTS_BN = 3.4  # BUS05aii: passenger fare receipts
 DFT_ENGLAND_SUBSIDY_BN = 3.0  # BUS05bii: net government support
@@ -98,7 +93,7 @@ DFT_FARE = Source(
     "£3.4bn (England)",
     "DfT Annual Bus Statistics, year ending March 2025, table BUS05aii: passenger "
     "fare receipts on local bus services (England), ~52% of £6.6bn operating "
-    "revenue. Calibration target for bus_fare_spending, uplifted England->UK by "
+    "revenue. Benchmark for bus_fare_spending, uplifted England->UK by "
     "population.",
     "https://www.gov.uk/government/statistics/annual-bus-statistics-year-ending-march-2025/annual-bus-statistics-year-ending-march-2025",
 )
@@ -106,7 +101,7 @@ DFT_SUBSIDY = Source(
     "£3.0bn (England)",
     "DfT Annual Bus Statistics, year ending March 2025, table BUS05bii: total net "
     "government support for local bus services (England), of which £0.8bn "
-    "concessionary travel reimbursement. Calibration target for "
+    "concessionary travel reimbursement. Benchmark for "
     "bus_subsidy_spending, uplifted England->UK by population.",
     "https://www.gov.uk/government/statistics/annual-bus-statistics-year-ending-march-2025/annual-bus-statistics-year-ending-march-2025",
 )
@@ -120,15 +115,15 @@ DFT_INCOME_QUINTILE_TRIPS = Source(
     "Local bus trips/person/year, 2024: Q1 47.6 … Q5 13.0",
     "National Travel Survey table NTS0705a, 2024, 'Other local bus' (outside "
     "London): average trips per person per year by household income quintile — "
-    "Q1 47.6, Q2 37.5, Q3 24.8, Q4 18.5, Q5 13.0. Anchors the income "
-    "distribution of household fare spending in the policyengine-uk-data build "
-    "(assuming a common average fare per trip across quintiles).",
+    "Q1 47.6, Q2 37.5, Q3 24.8, Q4 18.5, Q5 13.0. Reference for the income "
+    "gradient of bus use; not a calibration input in this pipeline.",
     "https://www.gov.uk/government/statistical-data-sets/nts07-car-ownership-and-access",
 )
 NTS_AGE_PROFILE = Source(
     "Bus trips by age; 17-20 peak",
-    "National Travel Survey 2023 bus trips by age (concessionary-adjusted), used "
-    "to allocate household bus fares to individuals.",
+    "National Travel Survey 2023 bus trips by age (concessionary-adjusted). "
+    "policyengine-uk uses this profile only to allocate reported household "
+    "spending when journey data is absent; Microcosm UK supplies journeys.",
     "https://www.gov.uk/government/statistics/national-travel-survey-2023/nts-2023-trips-by-purpose-age-mode-and-sex",
 )
 CURRENT_FARE_CAP_POLICY = Source(
@@ -174,9 +169,8 @@ DERIVED_FARE_REDUCTION = Source(
 DFT_REGIONAL_FARE_SPLIT = Source(
     "England £3,417m: London £1,347m / outside London £2,070m",
     "DfT Annual Bus Statistics table BUS05ai, year ending March 2025: passenger "
-    "fare receipts by area. The within-England regional fare split is "
-    "calibrated to this London/outside-London split in the policyengine-uk-data "
-    "build, since the LCFS imputation under-captures London fares.",
+    "fare receipts by area. Benchmark for the London/outside-London split of "
+    "simulated fares.",
     "https://www.gov.uk/government/statistical-data-sets/bus-statistics-data-tables",
 )
 
@@ -236,13 +230,14 @@ def as_json(age_allocation_weights: dict) -> dict:
             "cap_existence_reduction": CAP_EXISTENCE_REDUCTION,
             "months_vs_three_pound_cap": MONTHS_VS_THREE_POUND_CAP,
             "months_vs_no_cap": MONTHS_VS_NO_CAP,
-            "distributional_calibration": (
-                "Upstream in policyengine-uk-data: BUS05ai regional split and "
-                "NTS0705a income-quintile anchoring"
+            "fare_spending_method": (
+                "policyengine-uk prices each person's imputed local-bus trips in "
+                "Microcosm UK at DfT receipts per fare-paying boarding; "
+                "concessionary pass holders pay nothing"
             ),
             "incidence_method": (
-                "Derived all-ticket reduction applied to household fare spending, "
-                "distributionally calibrated upstream in policyengine-uk-data"
+                "Derived all-ticket reduction applied to simulated person-level "
+                "fare spending under a £3 cap held all year"
             ),
             "behavioural": "static (no induced demand)",
         },

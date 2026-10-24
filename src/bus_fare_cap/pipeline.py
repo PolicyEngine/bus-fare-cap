@@ -1,14 +1,12 @@
 """Bus fare reform pipeline.
 
 Costs the £3-to-£2 English bus fare cap announced on 22 July 2026 using the
-PolicyEngine UK Enhanced FRS. Household bus-fare spending is allocated to people
-and reduced by a 12.5% (range 10-15%) all-ticket fare reduction derived from
+certified PolicyEngine Microcosm UK dataset. Person-level bus-fare spending
+(imputed NTS journeys priced at DfT yields per boarding) is reduced by a 12.5% (range 10-15%) all-ticket fare reduction derived from
 DfT's evaluation of the previous £2 cap, re-weighted for the £3-cap
 counterfactual and cap-era ticket mix. A second scenario prices the
 announcement against current law, under which the £3 cap's funding expires on
-31 March 2027. Distributional calibration of fares (BUS05ai regional split,
-NTS0705a income anchoring) happens upstream in
-policyengine-uk-data. The result is an independent,
+31 March 2027. The result is an independent,
 static microsimulation estimate; the government's funding figures are retained
 only as benchmarks.
 """
@@ -16,7 +14,6 @@ only as benchmarks.
 from __future__ import annotations
 
 import argparse
-import importlib.metadata
 import json
 import os
 from pathlib import Path
@@ -28,26 +25,20 @@ from . import sources
 from .sources import ENGLAND_TO_UK_POPULATION_UPLIFT
 
 REPO_ROOT = Path(__file__).resolve().parents[2]
-# Default simulation source: the PolicyEngine UK Enhanced FRS, downloaded from
-# the private release at a pinned revision for reproducibility. This revision
-# includes the BUS05ai/NTS0705a distributional calibration of
-# bus_fare_spending (PolicyEngine/policyengine-uk-data#447).
-DATASET = "enhanced_frs_2024_25.h5"
-PRIVATE_REPO = "policyengine/policyengine-uk-data-private"
-DATASET_REVISION = "32543d455762ce973791f364805621966b083825"
-# Opt-in alternative: the Populace UK dataset, simulated through the
-# policyengine.py wrapper (managed_microsimulation). Kept available but NOT
-# triggered by default — set BUS_FARE_CAP_POPULACE=1 to use it.
-POPULACE_DATASET = "populace_uk_2023"
-
-
-def _use_populace() -> bool:
-    return os.environ.get("BUS_FARE_CAP_POPULACE", "").strip().lower() not in (
-        "",
-        "0",
-        "false",
-        "no",
-    )
+# Simulation source: the Microcosm UK dataset certified by the installed
+# policyengine.py release bundle, loaded through managed_microsimulation. The
+# bundle pins policyengine-uk and the dataset build together, so the model
+# version, dataset name and revision recorded in the output are exactly what
+# produced the numbers.
+#
+# From policyengine-uk 2.13x, current law already contains the announced £2 cap
+# from 1 January 2027 (gov.dft.bus.fares.cap), and person_bus_fare_spending
+# prices imputed journeys at DfT yields per boarding. The analysis is defined
+# against a £3 cap running all year, so the simulation holds the cap at £3 over
+# the model's 2027 cap year (which runs to 5 April 2028). The model's
+# representative uncapped single fare (£2.748) sits below £3, so this
+# counterfactual equals uncapped fares in the model.
+COUNTERFACTUAL_REFORM = {"gov.dft.bus.fares.cap": {"2027-01-01.2028-12-31": 3}}
 
 
 def _label(level: str) -> str:
@@ -73,27 +64,41 @@ def _age_allocation_weights(sim, year) -> dict:
 
 
 def _load_sim():
-    if _use_populace():
-        # Populace UK via policyengine.py. managed_microsimulation returns a
-        # real policyengine_uk.Microsimulation, so .calculate(...) is unchanged.
-        from policyengine.tax_benefit_models.uk import managed_microsimulation
+    """Certified Microcosm UK simulation under the £3-cap counterfactual."""
+    if not os.environ.get("HUGGING_FACE_TOKEN"):
+        # The UK dataset is private; reuse a saved Hugging Face login if present.
+        from huggingface_hub import get_token
 
-        return managed_microsimulation(dataset=POPULACE_DATASET)
+        token = get_token()
+        if token:
+            os.environ["HUGGING_FACE_TOKEN"] = token
+    import policyengine as pe
 
-    from huggingface_hub import hf_hub_download
-    from policyengine_uk import Microsimulation
-    from policyengine_uk.data import UKSingleYearDataset
+    return pe.uk.managed_microsimulation(reform=COUNTERFACTUAL_REFORM)
 
-    path = hf_hub_download(
-        repo_id=PRIVATE_REPO, filename=DATASET, repo_type="model", revision=DATASET_REVISION
-    )
-    return Microsimulation(dataset=UKSingleYearDataset(path))
+
+def _provenance(sim) -> dict:
+    bundle = getattr(sim, "policyengine_bundle", {}) or {}
+    return {
+        "policyengine_version": bundle.get("policyengine_version"),
+        "policyengine_uk_version": bundle.get("model_version"),
+        "policyengine_bundle_id": bundle.get("bundle_id"),
+        "dataset_name": bundle.get("runtime_dataset"),
+        "dataset_revision": bundle.get("runtime_dataset_revision"),
+        "dataset_sha256": bundle.get("runtime_dataset_sha256"),
+    }
 
 
 def run(args: argparse.Namespace) -> None:
     year = args.year
-    print(f"Step 1: Microsimulation on {DATASET} ...")
+    print("Step 1: Microsimulation on the certified Microcosm UK dataset ...")
     sim = _load_sim()
+    provenance = _provenance(sim)
+    print(
+        f"    policyengine {provenance['policyengine_version']}, policyengine-uk "
+        f"{provenance['policyengine_uk_version']}, {provenance['dataset_name']} "
+        f"@ {provenance['dataset_revision']}"
+    )
 
     print("Step 2: Person-level arrays ...")
     age = np.asarray(sim.calculate("age", period=year, map_to="person").values, float)
@@ -108,10 +113,10 @@ def run(args: argparse.Namespace) -> None:
     )
     pw = np.asarray(sim.calculate("bus_fare_spending", period=year, map_to="person").weights, float)
 
-    # Person's allocated annual bus fare; sums to the household total. The
-    # allocation (an NTS age profile of bus use, adjusted for concessionary
-    # travel) is modelled upstream as gov.dft.bus.fare_allocation_weight_by_age
-    # — see PolicyEngine/policyengine-uk#1801.
+    # Person's annual bus fare; sums to the household total. With journey
+    # data (as in Microcosm) policyengine-uk prices each person's imputed
+    # local-bus trips at DfT yields per boarding, with concessionary pass
+    # holders paying nothing.
     alloc = np.asarray(
         sim.calculate("person_bus_fare_spending", period=year, map_to="person").values,
         float,
@@ -133,11 +138,6 @@ def run(args: argparse.Namespace) -> None:
         "South West",
     }
     in_policy_geography = np.isin(region_label, list(english_regions_outside_london))
-
-    # Distributional calibration (BUS05ai regional split, NTS0705a income
-    # anchoring) lives upstream in policyengine-uk-data
-    # (calibrate_bus_fare_spending); this repo only applies reform modelling
-    # to the built dataset. See PolicyEngine/policyengine-uk-data#447.
 
     def wsum(values):
         return float((np.asarray(values) * pw).sum())
@@ -375,8 +375,8 @@ def run(args: argparse.Namespace) -> None:
             "allocation_base_bn": round(estimated_cost_bn, 3),
             "method": (
                 "12.5% derived all-ticket reduction applied to simulated fare "
-                "spending (distributionally calibrated upstream in "
-                "policyengine-uk-data)"
+                "spending (imputed journeys priced at DfT yields per boarding "
+                "in policyengine-uk)"
             ),
         },
     }
@@ -407,8 +407,8 @@ def run(args: argparse.Namespace) -> None:
 
     # DfT Annual Bus Statistics, year ending March 2025 (England): BUS05aii
     # passenger fare receipts £3.4bn and BUS05bii net government support
-    # £3.0bn, uplifted England -> UK by population. These are the dataset's own
-    # calibration targets, shown here only to display what the build hit.
+    # £3.0bn, uplifted England -> UK by population. Shown as benchmarks for
+    # the simulated totals; they are not inputs to this pipeline.
     # https://www.gov.uk/government/statistics/annual-bus-statistics-year-ending-march-2025/annual-bus-statistics-year-ending-march-2025
     uk_fare = sources.DFT_ENGLAND_FARE_RECEIPTS_BN * ENGLAND_TO_UK_POPULATION_UPLIFT
     uk_sub = sources.DFT_ENGLAND_SUBSIDY_BN * ENGLAND_TO_UK_POPULATION_UPLIFT
@@ -416,14 +416,14 @@ def run(args: argparse.Namespace) -> None:
         "total_bus_fare_bn": {
             "ours": round(total_fare / 1e9, 2),
             "official": round(uk_fare, 2),
-            "kind": "Calibration target",
+            "kind": "Benchmark",
             "official_label": "DfT England £3.4bn (BUS05aii) × 1.18 UK uplift",
             "url": sources.DFT_FARE.url,
         },
         "total_bus_subsidy_bn": {
             "ours": round(total_subsidy / 1e9, 2),
             "official": round(uk_sub, 2),
-            "kind": "Calibration target",
+            "kind": "Benchmark",
             "official_label": "DfT England £3.0bn (BUS05bii) × 1.18 UK uplift",
             "url": sources.DFT_SUBSIDY.url,
         },
@@ -441,18 +441,11 @@ def run(args: argparse.Namespace) -> None:
         "projection_year_label": str(year),
         "policy_period_label": "1 January–31 December 2027",
         "currency": "GBP",
-        "dataset": (
-            "populace_uk_2023"
-            if _use_populace()
-            else "PolicyEngine UK Enhanced FRS (enhanced_frs_2024_25)"
-        ),
-        "dataset_source": "populace-uk" if _use_populace() else "enhanced-frs",
-        "simulation_stack": (
-            "policyengine.py (managed_microsimulation)"
-            if _use_populace()
-            else "policyengine-uk (direct)"
-        ),
-        "policyengine_uk_version": importlib.metadata.version("policyengine-uk"),
+        "dataset": f"PolicyEngine Microcosm UK ({provenance['dataset_name']})",
+        "dataset_source": "microcosm-uk",
+        "simulation_stack": "policyengine.py (managed_microsimulation)",
+        "counterfactual_reform": COUNTERFACTUAL_REFORM,
+        **provenance,
         **sources.as_json(_age_allocation_weights(sim, year)),
         "baseline": {
             "total_bus_fare_bn": round(total_fare / 1e9, 3),

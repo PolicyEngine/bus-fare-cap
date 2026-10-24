@@ -52,7 +52,7 @@ export default function ReformTab({ data }) {
           <Stat
             label="Estimated people potentially affected"
             value={`${cap.people_potentially_affected_m.toFixed(1)}m`}
-            sub="People in modelled fare-spending households in England outside London."
+            sub="People with modelled bus fare spending in England outside London."
           />
         </div>
 
@@ -80,10 +80,9 @@ export default function ReformTab({ data }) {
           title="Who has bus-fare exposure in the policy geography?"
           description={
             <>
-              PolicyEngine estimates household bus and coach fare spending in English regions outside
-              London, calibrated in the PolicyEngine UK dataset build to{" "}
-              {A(src.dft_regional_fare_split, "DfT's London/outside-London fare-receipts split")} and{" "}
-              {A(src.dft_income_quintile_trips, "NTS local-bus trip rates by income quintile")}.
+              PolicyEngine estimates bus fare spending in English regions outside London by pricing
+              each person&apos;s imputed local-bus trips at DfT receipts per fare-paying boarding,
+              with the £3 cap in force all year.
               We apply a <strong>12.5% all-ticket reduction (range 10–15%)</strong>{" "}
               {A(src.derived_fare_reduction, "derived")} from{" "}
               {A(src.dft_two_pound_cap_evaluation, "DfT's evaluation of the previous £2 cap")}. The

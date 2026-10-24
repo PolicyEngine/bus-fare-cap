@@ -4,7 +4,6 @@ import SectionHeading from "./SectionHeading";
 
 export default function MethodologyTab({ data }) {
   const src = data.sources || {};
-  const weights = data.assumptions?.age_allocation_weights || {};
   const L = (s, text) =>
     s ? (
       <a href={s.url} target="_blank" rel="noreferrer" className="text-[color:var(--pe-color-primary-600)] underline">{text}</a>
@@ -40,20 +39,14 @@ export default function MethodologyTab({ data }) {
         <div>
           <h3 className="font-semibold text-slate-900">2 · Household microsimulation</h3>
           <p>
-            Household bus &amp; coach spending is imputed from the Living Costs and Food Survey in the
-            PolicyEngine UK Enhanced FRS, calibrated to{" "}
-            {L(src.dft_fare, "DfT's England-wide fare-receipts total")} and
-            uprated by PolicyEngine to {data.projection_year_label}. The model splits each
-            household&apos;s fare across its members with a{" "}
-            {L(src.nts_age_profile, "National Travel Survey bus-trips-by-age")} profile adjusted for
-            concessionary ages, so pension-age passengers — who travel free — carry almost no fare
-            weight. These weights are the model&apos;s own parameter, not an assumption made here.
+            Fare spending comes from the {data.dataset || "PolicyEngine Microcosm UK dataset"}, run
+            through policyengine-uk&apos;s bus fare model. Each person&apos;s imputed local-bus trips
+            are priced at DfT passenger receipts per fare-paying boarding for their area, with single
+            tickets priced at the fare cap in force. People eligible for a concessionary bus pass pay
+            no fares, so pension-age passengers carry no fare spending. Fares are compared with{" "}
+            {L(src.dft_fare, "DfT's England-wide fare-receipts total")} as a benchmark, not
+            calibrated to it here.
           </p>
-          <div className="mt-3 flex flex-wrap gap-2 text-sm">
-            {Object.entries(weights).map(([band, w]) => (
-              <span key={band} className="rounded-lg bg-slate-100 px-3 py-1 text-slate-700">{band}: <strong>{w}</strong></span>
-            ))}
-          </div>
         </div>
         <div>
           <h3 className="font-semibold text-slate-900">3 · Costing the £2 cap</h3>
@@ -64,10 +57,10 @@ export default function MethodologyTab({ data }) {
             {L(src.derived_fare_reduction, "derived")} from Table 6 of{" "}
             {L(src.dft_two_pound_cap_evaluation, "DfT's evaluation of the previous £2 cap")}:
             singles at the £3 cap save £1 (33%), those between £2 and £3 save less (~27% single-yield
-            reduction), weighted by a cap-era single trip share of 0.35–0.50. Fares arrive already
-            calibrated in the dataset build to{" "}
-            {L(src.dft_regional_fare_split, "DfT's London/outside-London receipts split")} and{" "}
-            {L(src.dft_income_quintile_trips, "NTS trip rates by income quintile")}. Region, family-type and quintile averages
+            reduction), weighted by a cap-era single trip share of 0.35–0.50. The base holds the £3 cap
+            in force all year; current law in policyengine-uk already applies the £2 cap from January
+            2027, so the pipeline overrides that cap to £3 before measuring spending. Region,
+            family-type and quintile averages
             divide each group&apos;s saving by all its households, including non-bus users; age-band
             averages are per person in the policy geography. The government&apos;s funding figures are
             not inputs. Treating passenger savings as fiscal cost assumes pound-for-pound operator
@@ -105,8 +98,13 @@ export default function MethodologyTab({ data }) {
           <h3 className="font-semibold text-slate-900">6 · Interpretation</h3>
           <p>
             The policy runs 1 January–31 December 2027, so results are calendar-2027, not fiscal-year.
-            Family type is the benefit unit. Income quintiles fold household income deciles. People in
-            fare-spending households are an exposure proxy, not confirmed beneficiaries.
+            Family type is the benefit unit. Income quintiles fold household income deciles. People
+            with modelled fare spending are an exposure proxy, not confirmed beneficiaries.
+          </p>
+          <p className="mt-2">
+            Results were produced with policyengine {data.policyengine_version} (policyengine-uk{" "}
+            {data.policyengine_uk_version}) on the certified {data.dataset_name} dataset, build{" "}
+            <code className="text-xs">{data.dataset_revision}</code>.
           </p>
         </div>
       </div>

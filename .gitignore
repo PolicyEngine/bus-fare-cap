@@ -8,3 +8,5 @@ node_modules/
 .next/
 .vercel/
 .vercel
+data/*.h5
+.venv/

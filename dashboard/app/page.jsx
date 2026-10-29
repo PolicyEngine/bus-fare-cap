@@ -82,8 +82,11 @@ function Dashboard() {
           <TabLink onSelect={() => handleTabChange("baseline")}>Baseline</TabLink> tab shows the
           projected baseline bus fares by age and region. The{" "}
           <TabLink onSelect={() => handleTabChange("methodology")}>Methodology</TabLink> tab explains
-          how every result is computed, with a source for every assumption. The estimate applies
-          DfT&apos;s observed 6.3% all-ticket reduction to simulated household fare spending.
+          how every result is computed, with a source for every assumption. The estimate applies a
+          12.5% all-ticket reduction (range 10–15%) for the £3-to-£2 step to simulated household
+          fare spending. We derive it from DfT&apos;s evaluation of the previous £2 cap, which
+          observed a 6.3% all-ticket fall on a pre-cap ticket mix; against current law, the headline
+          also counts the cap&apos;s continued existence once the £3 cap&apos;s funding expires.
         </p>
 
         <div className="mb-8 mt-8 flex w-fit flex-wrap border-b-2 border-slate-200">
@@ -120,10 +123,11 @@ function Dashboard() {
               PolicyEngine/bus-fare-cap
             </a>
             . Built with{" "}
-            <a href="https://pypi.org/project/policyengine-uk/" target="_blank" rel="noreferrer">
-              policyengine-uk
+            <a href="https://pypi.org/project/policyengine/" target="_blank" rel="noreferrer">
+              policyengine
             </a>{" "}
-            v{data?.policyengine_uk_version || "2.89.2"}.
+            v{data?.policyengine_version} (policyengine-uk v{data?.policyengine_uk_version}) on{" "}
+            {data?.dataset_name}.
           </p>
         </footer>
       </main>

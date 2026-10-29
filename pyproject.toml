@@ -22,13 +22,10 @@ dependencies = [
   "pandas>=2.0",
   "tables>=3.9",
   "huggingface_hub>=0.20",
-  # The policyengine.py wrapper. Its [uk] extra exact-pins policyengine-uk
-  # (==2.89.2 as of bundle 5.0.1), which conflicts with the >=2.89.3 floor
-  # below, so policyengine-uk is installed directly instead of via the extra.
-  "policyengine>=4.17.10",
-  # person_bus_fare_spending and gov.dft.bus.fare_allocation_weight_by_age,
-  # which this analysis reads instead of allocating fares itself.
-  "policyengine-uk>=2.89.3",
+  # The policyengine.py release bundle. Its [uk] extra exact-pins
+  # policyengine-uk (2.132.6 in 6.10.2) and certifies the Microcosm UK dataset
+  # built with it, so policyengine-uk is not pinned separately here.
+  "policyengine[uk]==6.10.2",
 ]
 
 [project.optional-dependencies]

@@ -119,3 +119,17 @@ def test_average_effect_breakdowns_are_positive(results):
     averages = cap["average_effect_breakdowns"]
     assert set(averages) == {"region", "household_type", "age_band", "income_quintile"}
     assert all(row["annual_effect_gbp"] >= 0 for rows in averages.values() for row in rows)
+
+
+def test_results_record_certified_provenance(results):
+    """The page states which model and data build produced the numbers."""
+    assert results["simulation_stack"] == "policyengine.py (managed_microsimulation)"
+    for key in (
+        "policyengine_version",
+        "policyengine_uk_version",
+        "dataset_name",
+        "dataset_revision",
+        "dataset_sha256",
+    ):
+        assert results[key]
+    assert results["dataset_name"].startswith("microcosm_uk")

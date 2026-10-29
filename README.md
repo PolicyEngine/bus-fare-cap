@@ -2,7 +2,7 @@
 
 Source-backed analysis of the £2 bus fare cap announced by the UK government on 22 July 2026, with PolicyEngine UK distributional context from the Enhanced FRS.
 
-**Live dashboard:** https://bus-fare-cap.vercel.app
+**Live dashboard:** https://policyengine.org/uk/bus-fare-cap
 
 ## Announced policy
 

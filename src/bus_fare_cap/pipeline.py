@@ -35,14 +35,18 @@ REPO_ROOT = Path(__file__).resolve().parents[2]
 DATASET = "enhanced_frs_2024_25.h5"
 PRIVATE_REPO = "policyengine/policyengine-uk-data-private"
 DATASET_REVISION = "32543d455762ce973791f364805621966b083825"
-# Opt-in alternative: the Populace UK dataset, simulated through the
+# Opt-in alternative: the Microcosm UK dataset, simulated through the
 # policyengine.py wrapper (managed_microsimulation). Kept available but NOT
-# triggered by default — set BUS_FARE_CAP_POPULACE=1 to use it.
-POPULACE_DATASET = "populace_uk_2023"
+# triggered by default — set BUS_FARE_CAP_MICROCOSM=1 to use it.
+MICROCOSM_DATASET = "populace_uk_2023"
+POPULACE_DATASET = MICROCOSM_DATASET  # compat: populace alias, remove after 0.2.0
 
 
-def _use_populace() -> bool:
-    return os.environ.get("BUS_FARE_CAP_POPULACE", "").strip().lower() not in (
+def _use_microcosm() -> bool:
+    return os.environ.get(
+        "BUS_FARE_CAP_MICROCOSM",
+        os.environ.get("BUS_FARE_CAP_POPULACE", ""),  # compat: populace alias, remove after 0.2.0
+    ).strip().lower() not in (
         "",
         "0",
         "false",
@@ -73,12 +77,12 @@ def _age_allocation_weights(sim, year) -> dict:
 
 
 def _load_sim():
-    if _use_populace():
-        # Populace UK via policyengine.py. managed_microsimulation returns a
+    if _use_microcosm():
+        # Microcosm UK via policyengine.py. managed_microsimulation returns a
         # real policyengine_uk.Microsimulation, so .calculate(...) is unchanged.
         from policyengine.tax_benefit_models.uk import managed_microsimulation
 
-        return managed_microsimulation(dataset=POPULACE_DATASET)
+        return managed_microsimulation(dataset=MICROCOSM_DATASET)
 
     from huggingface_hub import hf_hub_download
     from policyengine_uk import Microsimulation
@@ -443,13 +447,13 @@ def run(args: argparse.Namespace) -> None:
         "currency": "GBP",
         "dataset": (
             "populace_uk_2023"
-            if _use_populace()
+            if _use_microcosm()
             else "PolicyEngine UK Enhanced FRS (enhanced_frs_2024_25)"
         ),
-        "dataset_source": "populace-uk" if _use_populace() else "enhanced-frs",
+        "dataset_source": "populace-uk" if _use_microcosm() else "enhanced-frs",
         "simulation_stack": (
             "policyengine.py (managed_microsimulation)"
-            if _use_populace()
+            if _use_microcosm()
             else "policyengine-uk (direct)"
         ),
         "policyengine_uk_version": importlib.metadata.version("policyengine-uk"),

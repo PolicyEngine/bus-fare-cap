@@ -35,10 +35,10 @@ export HF_TOKEN=hf_xxx
 python -m bus_fare_cap --year 2027
 ```
 
-The default private Enhanced FRS dataset is pinned for reproducibility. The optional Populace path remains available:
+The default private Enhanced FRS dataset is pinned for reproducibility. The optional Microcosm path remains available:
 
 ```bash
-BUS_FARE_CAP_POPULACE=1 python -m bus_fare_cap --year 2027
+BUS_FARE_CAP_MICROCOSM=1 python -m bus_fare_cap --year 2027
 ```
 
 ## Caveats

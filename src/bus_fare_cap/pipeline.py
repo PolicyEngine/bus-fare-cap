@@ -39,6 +39,7 @@ DATASET_REVISION = "32543d455762ce973791f364805621966b083825"
 # policyengine.py wrapper (managed_microsimulation). Kept available but NOT
 # triggered by default — set BUS_FARE_CAP_MICROCOSM=1 to use it.
 MICROCOSM_DATASET = "populace_uk_2023"
+POPULACE_DATASET = MICROCOSM_DATASET  # compat: populace alias, remove after 0.2.0
 
 
 def _use_microcosm() -> bool:
